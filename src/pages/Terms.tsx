@@ -1,0 +1,270 @@
+
+import { Shield, Scale, FileText, AlertTriangle, CheckCircle, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+
+const Terms = () => {
+  const navigate = useNavigate();
+
+  const sections = [
+    {
+      icon: Users,
+      title: "Acceptance of Terms",
+      content: [
+        "By accessing Hunterpedia, you agree to these terms",
+        "Must be 18+ or have parental consent",
+        "Agreement applies to all users and visitors",
+        "Updated terms will be posted with notice"
+      ]
+    },
+    {
+      icon: CheckCircle,
+      title: "Permitted Use",
+      content: [
+        "Professional cybersecurity research and analysis",
+        "Educational and academic purposes",
+        "Internal organizational threat intelligence",
+        "Integration with approved security tools"
+      ]
+    },
+    {
+      icon: AlertTriangle,
+      title: "Prohibited Activities",
+      content: [
+        "Sharing credentials or unauthorized access",
+        "Automated scraping without permission",
+        "Reselling or redistributing content",
+        "Using data for illegal activities"
+      ]
+    },
+    {
+      icon: Scale,
+      title: "Intellectual Property",
+      content: [
+        "Content is licensed, not sold",
+        "Hunterpedia retains all platform rights",
+        "User data remains your property",
+        "Respect third-party intellectual property"
+      ]
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
+      {/* Modern mesh gradient background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/20 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent"></div>
+      
+      {/* Floating geometric shapes */}
+      <div className="absolute top-20 left-20 w-16 h-16 sm:w-32 sm:h-32 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rounded-3xl rotate-45 animate-pulse blur-sm"></div>
+      <div className="absolute top-1/3 right-10 w-12 h-12 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-400/10 to-cyan-600/10 rounded-full animate-bounce blur-sm"></div>
+      <div className="absolute bottom-20 left-1/3 w-8 h-8 sm:w-16 sm:h-16 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rotate-12 animate-pulse blur-sm"></div>
+
+      {/* Header */}
+      <header className="relative z-10">
+        <div className="backdrop-blur-xl bg-white/5 border-b border-white/10 shadow-2xl">
+          <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5">
+            <div className="flex items-center justify-between">
+              <div 
+                className="flex items-center space-x-3 sm:space-x-4 cursor-pointer"
+                onClick={() => navigate('/')}
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl blur opacity-75"></div>
+                  <div className="relative bg-gradient-to-br from-cyan-400 to-purple-600 p-2 sm:p-3 rounded-2xl shadow-2xl">
+                    <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
+                    Hunterpedia
+                  </h1>
+                  <p className="text-xs sm:text-sm text-white/60 hidden sm:block">Intelligence. Curated. Real-Time.</p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => navigate('/auth')}
+                className="bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 shadow-2xl rounded-2xl px-3 sm:px-6 py-2 text-sm sm:text-base transition-all duration-300 hover:scale-105"
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div className="text-center mb-12 sm:mb-20">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent px-2">
+            Terms of Service
+          </h1>
+          <p className="text-lg sm:text-xl text-white/70 max-w-4xl mx-auto leading-relaxed px-4">
+            Clear, fair terms that protect both our users and our platform. 
+            Understanding your rights and responsibilities when using Hunterpedia.
+          </p>
+          <div className="mt-6 sm:mt-8 inline-flex items-center space-x-2 bg-white/5 backdrop-blur-xl rounded-full px-4 sm:px-6 py-2 sm:py-3 border border-white/10">
+            <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+            <span className="text-sm sm:text-base text-white/80">Effective: January 15, 2025</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Overview */}
+      <section className="relative z-10 py-12 sm:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
+          <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden mb-12 sm:mb-20">
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 animate-pulse"></div>
+            <CardContent className="relative p-8 sm:p-16">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
+                Welcome to Hunterpedia
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
+                <div>
+                  <p className="text-lg sm:text-xl text-white/70 leading-relaxed mb-4 sm:mb-6">
+                    These terms govern your use of Hunterpedia's cybersecurity intelligence platform. 
+                    By using our service, you're agreeing to these terms and joining a community 
+                    committed to improving global cybersecurity.
+                  </p>
+                  <p className="text-base sm:text-lg text-cyan-400 font-semibold">
+                    Fair. Transparent. Focused on security.
+                  </p>
+                </div>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-cyan-500/20 p-1.5 sm:p-2 rounded-full">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+                    </div>
+                    <span className="text-sm sm:text-base text-white/80">Responsible use guidelines</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-cyan-500/20 p-1.5 sm:p-2 rounded-full">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+                    </div>
+                    <span className="text-sm sm:text-base text-white/80">Clear intellectual property rights</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-cyan-500/20 p-1.5 sm:p-2 rounded-full">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+                    </div>
+                    <span className="text-sm sm:text-base text-white/80">Privacy-first approach</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-cyan-500/20 p-1.5 sm:p-2 rounded-full">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+                    </div>
+                    <span className="text-sm sm:text-base text-white/80">Professional community standards</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Terms Sections */}
+      <section className="relative z-10 py-12 sm:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-7xl mx-auto">
+            {sections.map((section, index) => (
+              <Card key={index} className="group relative bg-white/5 backdrop-blur-2xl border border-white/10 hover:border-white/20 rounded-3xl shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <CardContent className="relative p-6 sm:p-8">
+                  <div className="flex items-center mb-4 sm:mb-6">
+                    <div className="bg-gradient-to-br from-cyan-500 to-purple-600 p-2 sm:p-3 rounded-2xl mr-3 sm:mr-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                      <section.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-cyan-300 transition-colors duration-300">
+                      {section.title}
+                    </h3>
+                  </div>
+                  <ul className="space-y-3">
+                    {section.content.map((item, itemIndex) => (
+                      <li key={itemIndex} className="flex items-start space-x-3">
+                        <div className="bg-cyan-500/20 p-1 rounded-full mt-1 flex-shrink-0">
+                          <div className="h-2 w-2 bg-cyan-400 rounded-full"></div>
+                        </div>
+                        <span className="text-sm sm:text-base text-white/80 leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Additional Terms */}
+      <section className="relative z-10 py-12 sm:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
+            <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center">
+                <Shield className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-cyan-400" />
+                Service Availability
+              </h3>
+              <div className="space-y-3 sm:space-y-4 text-white/70">
+                <p className="text-sm sm:text-base">We strive for 99.9% uptime but cannot guarantee uninterrupted service.</p>
+                <p className="text-sm sm:text-base">Scheduled maintenance will be announced in advance.</p>
+                <p className="text-sm sm:text-base">Emergency maintenance may occur without notice for security reasons.</p>
+                <p className="text-sm sm:text-base">Free tier users may experience reduced priority during high traffic.</p>
+              </div>
+            </Card>
+
+            <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8">
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center">
+                <Scale className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 text-purple-400" />
+                Limitation of Liability
+              </h3>
+              <div className="space-y-3 sm:space-y-4 text-white/70">
+                <p className="text-sm sm:text-base">Hunterpedia is provided "as is" without warranties.</p>
+                <p className="text-sm sm:text-base">We are not liable for decisions made using our intelligence.</p>
+                <p className="text-sm sm:text-base">Maximum liability is limited to your subscription fees.</p>
+                <p className="text-sm sm:text-base">Users are responsible for verifying threat intelligence independently.</p>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="relative z-10 py-12 sm:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
+          <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-600/10 animate-pulse"></div>
+            <CardContent className="relative p-8 sm:p-16 text-center">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
+                Questions About These Terms?
+              </h2>
+              <p className="text-lg sm:text-xl text-white/70 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-4">
+                Our legal team is available to clarify any aspects of these terms. 
+                We believe in transparency and fair dealing in all our relationships.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
+                <Button 
+                  onClick={() => navigate('/contact')}
+                  size="lg"
+                  className="group relative bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-2xl rounded-2xl px-8 sm:px-12 py-3 sm:py-4 text-lg sm:text-xl font-semibold transition-all duration-300 hover:scale-105"
+                >
+                  Contact Legal Team
+                </Button>
+                <Button 
+                  onClick={() => navigate('/auth')}
+                  variant="outline"
+                  size="lg"
+                  className="bg-white/5 backdrop-blur-xl border border-white/20 text-white hover:bg-white/10 shadow-xl rounded-2xl px-8 sm:px-12 py-3 sm:py-4 text-lg sm:text-xl transition-all duration-300 hover:scale-105"
+                >
+                  Accept & Get Started
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Terms;

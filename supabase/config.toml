@@ -1,0 +1,31 @@
+project_id = "gzpayeckolpfflgvkqvh"
+
+[
+api
+]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[
+auth
+]
+enabled = true
+port = 54324
+site_url = "https://hunterpedia.site"
+additional_redirect_urls = [
+  "https://hunterpedia.site",
+  "https://hunterpedia.site/**",
+  "https://gzpayeckolpfflgvkqvh.supabase.co"
+]
+jwt_expiry = 3600
+enable_signup = true
+email_double_confirm_changes = true
+enable_manual_linking = false
+
+[
+functions.fetch-news
+]
+verify_jwt = false
