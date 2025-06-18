@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UsersManagement } from '@/components/admin/UsersManagement';
 import { AddUser } from '@/components/admin/AddUser';
-import { PaymentMethodsManagement } from '@/components/admin/PaymentMethodsManagement';
+///import { PaymentMethodsManagement } from '@/components/admin/PaymentMethodsManagement';
 import { AddNewsSource } from '@/components/admin/AddNewsSource';
 import { NewsSourcesManagement } from '@/components/admin/NewsSourcesManagement';
 import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
