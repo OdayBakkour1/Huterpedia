@@ -18,7 +18,6 @@ import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
 import { Header } from "./components/Header";
 import Footer from "./components/Footer";
-import { SecurityHeaders } from "./components/SecurityHeaders";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +29,6 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <SecurityHeaders />
             <div className="flex flex-col min-h-screen bg-slate-900 text-white">
               <Header />
               <main className="flex-1 container mx-auto px-4 py-8">
