@@ -1,4 +1,3 @@
-
 import { Shield, Scale, FileText, AlertTriangle, CheckCircle, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -70,12 +69,11 @@ const Terms = () => {
                 className="flex items-center space-x-3 sm:space-x-4 cursor-pointer"
                 onClick={() => navigate('/')}
               >
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl blur opacity-75"></div>
-                  <div className="relative bg-gradient-to-br from-cyan-400 to-purple-600 p-2 sm:p-3 rounded-2xl shadow-2xl">
-                    <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                  </div>
-                </div>
+                <img
+                  src="/HunterPedia Png-01.png"
+                  alt="Hunterpedia Logo"
+                  className="h-28 w-28 object-contain"
+                />
                 <div>
                   <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
                     Hunterpedia
