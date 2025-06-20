@@ -23,11 +23,13 @@ const Bookmarks = () => {
     return null;
   }
 
+  const validArticles = (bookmarks || []).map(b => b.article).filter(Boolean);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-white mb-6">Your Bookmarks</h1>
-      {bookmarks && bookmarks.length > 0 ? (
-        <NewsGrid articles={bookmarks.map(b => b.article)} />
+      {validArticles.length > 0 ? (
+        <NewsGrid articles={validArticles} />
       ) : (
         <div className="text-slate-400 text-center">You have no bookmarked articles yet.</div>
       )}
