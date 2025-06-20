@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useUserBookmarks } from '@/hooks/useNewsArticles';
 import { NewsGrid } from '@/components/NewsGrid';
+import { Header } from '@/components/Header';
 
 const Bookmarks = () => {
   const { user, loading } = useAuth();
@@ -33,6 +34,7 @@ const Bookmarks = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-white mb-6">Your Bookmarks</h1>
         {validArticles.length > 0 ? (
