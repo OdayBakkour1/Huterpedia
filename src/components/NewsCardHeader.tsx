@@ -1,9 +1,9 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Bookmark, BookmarkCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { cleanHtmlContent } from "@/utils/textUtils";
+import { formatDistanceToNow } from 'date-fns';
 
 interface NewsCardHeaderProps {
   category: string;
@@ -25,16 +25,18 @@ export const NewsCardHeader = ({
   isBookmarkPending 
 }: NewsCardHeaderProps) => {
   const getTimeAgo = (dateString: string) => {
-    const now = new Date();
-    const publishedDate = new Date(dateString);
-    const diffInMinutes = Math.floor((now.getTime() - publishedDate.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes} min`;
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)} hr`;
-    } else {
-      return `${Math.floor(diffInMinutes / 1440)} day${Math.floor(diffInMinutes / 1440) > 1 ? 's' : ''}`;
+    try {
+      const date = new Date(dateString);
+      return formatDistanceToNow(date, { addSuffix: true })
+        .replace('about ', '')
+        .replace('less than a minute ago', 'just now')
+        .replace(' minutes', ' min')
+        .replace(' minute', ' min')
+        .replace(' hours', ' hr')
+        .replace(' hour', ' hr');
+    } catch (error) {
+      console.error("Invalid date:", dateString, error);
+      return "a while ago";
     }
   };
 
