@@ -300,3 +300,18 @@ export function useAllUsers() {
 }
 export function useUpdateUserRole() { return {}; }
 export function useUpdateUserSubscription() { return {}; }
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+    },
+  });
+}

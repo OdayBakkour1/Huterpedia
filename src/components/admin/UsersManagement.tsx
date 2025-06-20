@@ -1,19 +1,22 @@
-
 import { useState } from 'react';
-import { useAllUsers, useUpdateUserRole, useUpdateUserSubscription } from '@/hooks/useAdminData';
+import { useAllUsers, useUpdateUserRole, useUpdateUserSubscription, useDeleteUser } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Users, Crown, Shield, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 export const UsersManagement = () => {
   const { data: users, isLoading } = useAllUsers();
   const updateRoleMutation = useUpdateUserRole();
   const updateSubscriptionMutation = useUpdateUserSubscription();
+  const deleteUserMutation = useDeleteUser();
   const { toast } = useToast();
   const [updatingUser, setUpdatingUser] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const handleRoleUpdate = async (userId: string, newRole: 'admin' | 'moderator' | 'user') => {
     setUpdatingUser(userId);
@@ -47,6 +50,26 @@ export const UsersManagement = () => {
         description: "Failed to update user subscription.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    try {
+      await deleteUserMutation.mutateAsync(userToDelete.id);
+      toast({
+        title: 'User Deleted',
+        description: 'User has been successfully deleted.'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete user.',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
     }
   };
 
@@ -144,6 +167,14 @@ export const UsersManagement = () => {
                           <SelectItem value="enterprise" className="text-slate-300">Enterprise</SelectItem>
                         </SelectContent>
                       </Select>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => { setUserToDelete(user); setDeleteDialogOpen(true); }}
+                        disabled={deleteUserMutation.isPending && userToDelete?.id === user.id}
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -152,6 +183,18 @@ export const UsersManagement = () => {
           </Table>
         </div>
       </CardContent>
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+          </DialogHeader>
+          <div>Are you sure you want to delete this user?</div>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setDeleteDialogOpen(false)} disabled={deleteUserMutation.isPending}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteUser} disabled={deleteUserMutation.isPending}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
