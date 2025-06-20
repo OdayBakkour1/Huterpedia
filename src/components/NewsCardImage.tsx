@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkCheck } from "lucide-react";
@@ -42,6 +41,7 @@ export const NewsCardImage = ({
       'Breaches': 'photo-1486312338219-ce68d2c6f44d',
       'Tools': 'photo-1488590528505-98d2b5aba04b',
       'Updates': 'photo-1649972904349-6e44c42644a7',
+      'Threat Actors Landscape': 'photo-1518770660439-4636190af475',
     };
     
     const imageId = placeholders[category as keyof typeof placeholders] || placeholders.Updates;
@@ -55,6 +55,7 @@ export const NewsCardImage = ({
       'Breaches': 'bg-purple-500',
       'Tools': 'bg-cyan-500',
       'Updates': 'bg-green-500',
+      'Threat Actors Landscape': 'bg-yellow-500',
     };
     return colors[category as keyof typeof colors] || 'bg-slate-500';
   };

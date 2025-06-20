@@ -16,6 +16,7 @@ const categories = [
   { name: "Ransomware", icon: Lock },
   { name: "Phishing", icon: Mail },
   { name: "Social Engineering", icon: Users },
+  { name: "Threat Actors Landscape", icon: Users },
   { name: "Zero Day", icon: Zap },
   { name: "APT", icon: Eye },
 ];

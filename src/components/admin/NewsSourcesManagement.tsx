@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNewsSources, useAddNewsSource, useDeleteNewsSource } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
@@ -77,7 +76,7 @@ export const NewsSourcesManagement = () => {
     }
   };
 
-  const categories = ['Threats', 'Vulnerabilities', 'Analysis', 'Breaches', 'Updates'];
+  const categories = ['Threats', 'Vulnerabilities', 'Analysis', 'Breaches', 'Updates', 'Threat Actors Landscape'];
 
   return (
     <div className="space-y-6">

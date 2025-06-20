@@ -60,7 +60,7 @@ export const AddNewsSource = () => {
     }
   };
 
-  const categories = ['Threats', 'Vulnerabilities', 'Analysis', 'Breaches', 'Updates'];
+  const categories = ['Threats', 'Vulnerabilities', 'Analysis', 'Breaches', 'Updates', 'Threat Actors Landscape'];
 
   return (
     <Card className="bg-slate-800/50 border-slate-700">

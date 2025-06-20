@@ -47,6 +47,7 @@ export const NewsCardHeader = ({
       'Breaches': 'bg-purple-500',
       'Tools': 'bg-cyan-500',
       'Updates': 'bg-green-500',
+      'Threat Actors Landscape': 'bg-yellow-500',
     };
     return colors[category as keyof typeof colors] || 'bg-slate-500';
   };

@@ -1,4 +1,3 @@
-
 import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -65,7 +64,7 @@ export const NewsCardDialog = ({
     
     // APT and threat actors
     if (textToCheck.includes('apt') || textToCheck.includes('advanced persistent') || textToCheck.includes('nation-state')) tags.push('APT');
-    if (textToCheck.includes('lazarus') || textToCheck.includes('fancy bear') || textToCheck.includes('cozy bear')) tags.push('threat-actor');
+    if (textToCheck.includes('lazarus') || textToCheck.includes('fancy bear') || textToCheck.includes('cozy bear') || textToCheck.includes('threat actor')) tags.push('threat-actor');
     
     // Remove duplicates and limit to 4 tags
     return [...new Set(tags)].slice(0, 4);
@@ -88,6 +87,7 @@ export const NewsCardDialog = ({
       'Breaches': 'photo-1486312338219-ce68d2c6f44d',
       'Tools': 'photo-1488590528505-98d2b5aba04b',
       'Updates': 'photo-1649972904349-6e44c42644a7',
+      'Threat Actors Landscape': 'photo-1518770660439-4636190af475',
     };
     
     const imageId = placeholders[article.category as keyof typeof placeholders] || placeholders.Updates;

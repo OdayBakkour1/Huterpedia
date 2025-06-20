@@ -1,4 +1,3 @@
-
 import { NewsArticle } from "@/types/news";
 
 export const mockNewsData: NewsArticle[] = [
@@ -73,5 +72,13 @@ export const mockNewsData: NewsArticle[] = [
     source: "Privacy Watch",
     publishedAt: "2024-06-04",
     category: "Breaches",
+  },
+  {
+    id: "10",
+    title: "In-depth Analysis of FIN7 Threat Actor Group's Latest Tactics",
+    description: "A deep dive into the evolving strategies and tools used by the financially motivated threat actor group known as FIN7, famous for targeting point-of-sale systems.",
+    source: "Cyber-Intel Analysts",
+    publishedAt: "2024-06-03",
+    category: "Threat Actors Landscape",
   },
 ];

@@ -21,6 +21,7 @@ const categories = [
   "Ransomware",
   "Phishing",
   "Social Engineering",
+  "Threat Actors Landscape",
   "Zero Day",
   "APT"
 ];
