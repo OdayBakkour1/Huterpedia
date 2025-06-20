@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -8,11 +7,11 @@ export const useFetchNews = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async () => {
-      console.log('Triggering news fetch...');
+    mutationFn: async ({ useStaging = false }: { useStaging?: boolean } = {}) => {
+      console.log(`Triggering news fetch... (Staging: ${useStaging})`);
       
       const { data, error } = await supabase.functions.invoke('fetch-news', {
-        body: {}
+        body: { staging: useStaging }
       });
 
       if (error) {

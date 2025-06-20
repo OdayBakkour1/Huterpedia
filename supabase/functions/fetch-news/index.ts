@@ -1,7 +1,7 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { parseFeed } from "https://deno.land/x/rss/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -147,11 +147,30 @@ Do not include HTML tags or special formatting.`;
           topP: 0.95,
           maxOutputTokens: 300,
         },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
       }),
     });
 
     if (!response.ok) {
-      console.error('Failed to generate AI description:', response.status);
+      const errorText = await response.text();
+      console.error(`Failed to generate AI description: ${response.status}`, errorText);
       return '';
     }
 
@@ -198,28 +217,28 @@ serve(async (req) => {
         console.log(`Processing source: ${source.name} (${source.url})`);
         
         const response = await fetch(source.url);
+        if (!response.ok) {
+          console.error(`Failed to fetch ${source.url}: ${response.statusText}`);
+          continue;
+        }
         const xmlText = await response.text();
+        const feed = await parseFeed(xmlText);
         
-        const items = xmlText.match(/<item[^>]*>[\s\S]*?<\/item>/g) || [];
+        const items = feed.entries || [];
         
         console.log(`Found ${items.length} items in RSS feed`);
 
         for (const item of items) {
           try {
-            const titleMatch = item.match(/<title[^>]*>([\s\S]*?)<\/title>/);
-            const descMatch = item.match(/<description[^>]*>([\s\S]*?)<\/description>/);
-            const linkMatch = item.match(/<link[^>]*>([\s\S]*?)<\/link>/) || item.match(/<guid[^>]*>([\s\S]*?)<\/guid>/);
-            const pubDateMatch = item.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/);
-
-            let title = titleMatch ? titleMatch[1].trim() : '';
-            let description = descMatch ? descMatch[1].trim() : '';
-            const link = linkMatch ? linkMatch[1].trim() : '';
-            const pubDate = pubDateMatch ? pubDateMatch[1].trim() : '';
+            const title = item.title?.value || '';
+            let description = item.description?.value || '';
+            const link = item.links?.[0]?.href || item.id || '';
+            const pubDate = item.published || item.updated || '';
 
             if (!title) continue;
 
-            title = cleanHtmlContent(title);
-            description = cleanHtmlContent(description);
+            // title = cleanHtmlContent(title); // Title is usually plain text
+            description = cleanHtmlContent(description || '');
 
             // Check for existing article in the target table
             const { data: existingArticle } = await supabase

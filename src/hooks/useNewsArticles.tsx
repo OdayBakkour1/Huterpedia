@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { NewsArticle } from '@/types/news';
@@ -42,21 +41,11 @@ export const useNewsArticles = () => {
         cache_updated_at: article.cache_updated_at || undefined,
       })) as NewsArticle[];
 
-      // Simplified sorting - prioritize cached content but reduce complexity
+      // Sort articles to prioritize those with cached content
       const cachedArticles = articles.filter(article => article.cached_content_url);
       const nonCachedArticles = articles.filter(article => !article.cached_content_url);
 
-      // Simple shuffle function
-      const shuffleArray = (array: NewsArticle[]) => {
-        const shuffled = [...array];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
-      };
-
-      // Sort both cached and non-cached by newest first, then mix them with cached priority
+      // Sort both lists by date to ensure newest appear first within their groups
       const sortedCachedArticles = cachedArticles.sort((a, b) => 
         new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
       );
@@ -64,7 +53,7 @@ export const useNewsArticles = () => {
         new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
       );
 
-      // Combine arrays with cached articles first, maintaining newest-first order
+      // Combine arrays, showing cached articles first
       const finalArticles = [
         ...sortedCachedArticles,
         ...sortedNonCachedArticles
