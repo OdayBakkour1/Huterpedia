@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UsersManagement } from '@/components/admin/UsersManagement';
 import { AddUser } from '@/components/admin/AddUser';
 import { PaymentMethodsManagement } from '@/components/admin/PaymentMethodsManage';
-import { AddNewsSource } from '@/components/admin/AddNewsSource';
+import { AddNewsSource as AddNewsArticle } from '@/components/admin/AddNewsSource';
 import { NewsSourcesManagement } from '@/components/admin/NewsSourcesManagement';
 import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
 import { SystemMonitor } from '@/components/admin/SystemMonitor';
@@ -75,11 +75,11 @@ const AdminDashboard = () => {
                   <span className="sm:hidden">%</span>
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="content" 
+                  value="add-article" 
                   className="text-slate-300 data-[state=active]:text-white data-[state=active]:bg-slate-700 whitespace-nowrap px-3 sm:px-4"
                 >
                   <Plus className="h-4 w-4 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Add Content</span>
+                  <span className="hidden sm:inline">Add Article</span>
                   <span className="sm:hidden">Add</span>
                 </TabsTrigger>
                 <TabsTrigger 
@@ -114,8 +114,8 @@ const AdminDashboard = () => {
               <CouponManagement />
             </TabsContent>
 
-            <TabsContent value="content">
-              <AddNewsSource />
+            <TabsContent value="add-article">
+              <AddNewsArticle />
             </TabsContent>
 
             <TabsContent value="sources">

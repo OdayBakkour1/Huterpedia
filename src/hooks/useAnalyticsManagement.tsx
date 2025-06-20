@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -14,12 +13,16 @@ export const useAnalyticsManagement = () => {
         supabase.from('user_bookmarks').select('id', { count: 'exact' })
       ]);
 
-      const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth(); // 0-indexed
+      const startOfMonth = new Date(year, month, 1).toISOString();
+      const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999).toISOString();
       const monthlySignupsResult = await supabase
         .from('profiles')
         .select('id', { count: 'exact' })
-        .gte('created_at', `${currentMonth}-01T00:00:00.000Z`)
-        .lt('created_at', `${currentMonth}-31T23:59:59.999Z`);
+        .gte('created_at', startOfMonth)
+        .lt('created_at', endOfMonth);
 
       // Update analytics table with current counts
       const updates = [
