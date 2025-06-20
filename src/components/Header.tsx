@@ -77,7 +77,7 @@ export const Header = ({
             <img
               src="/HunterPedia Png-01.png"
               alt="Hunterpedia Logo"
-              className="h-12 w-12 object-contain"
+              className="h-20 w-20 object-contain"
             />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-white">Hunterpedia</h1>

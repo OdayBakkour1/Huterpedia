@@ -10,7 +10,7 @@ const Footer = () => {
               <img
                 src="/HunterPedia Png-01.png"
                 alt="Hunterpedia Logo"
-                className="h-12 w-12 object-contain"
+                className="h-20 w-20 object-contain"
               />
               <div>
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent">
