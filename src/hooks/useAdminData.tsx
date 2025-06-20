@@ -1,4 +1,3 @@
-
 import * as React from "react"
 
 import type {
@@ -188,3 +187,15 @@ function useToast() {
 }
 
 export { useToast, toast }
+
+// Stubbed admin hooks for compatibility
+export function useAddNewsArticle() { return {}; }
+export function useAddUser() { return {}; }
+export function useAnalytics() { return {}; }
+export function useAddNewsSource() { return {}; }
+export function useNewsSources() { return {}; }
+export function useDeleteNewsSource() { return {}; }
+export function useAllPaymentMethods() { return { data: [], isLoading: false }; }
+export function useAllUsers() { return {}; }
+export function useUpdateUserRole() { return {}; }
+export function useUpdateUserSubscription() { return {}; }

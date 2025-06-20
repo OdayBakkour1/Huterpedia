@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sparkles, LoaderCircle, ExternalLink } from "lucide-react";
@@ -6,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 
-interface NewsCardContentProps {
+interface NewsCardActionsProps {
   user: any;
   aiUsage: any;
   isAiSummarizing: boolean;
@@ -15,7 +14,7 @@ interface NewsCardContentProps {
   children: React.ReactNode; // For the dialog content
 }
 
-export const NewsCardContent = ({ 
+export const NewsCardActions = ({ 
   user, 
   aiUsage, 
   isAiSummarizing, 
@@ -96,3 +95,5 @@ export const NewsCardContent = ({
     </div>
   );
 };
+
+export { NewsCardActions as NewsCardContent };

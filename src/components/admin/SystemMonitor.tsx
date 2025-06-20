@@ -1,4 +1,3 @@
-
 import { useAllPaymentMethods } from '@/hooks/useAdminData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -65,3 +64,5 @@ export const PaymentMethodsManagement = () => {
     </Card>
   );
 };
+
+export { PaymentMethodsManagement as SystemMonitor };
