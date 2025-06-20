@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useAddNewsArticle } from '@/hooks/useAdminData';
+// import { useAddNewsArticle } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ export const AddNewsSource = () => {
     url: '',
     author: '',
   });
-  const addArticleMutation = useAddNewsArticle();
+  // const addArticleMutation = useAddNewsArticle();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +36,7 @@ export const AddNewsSource = () => {
     }
 
     try {
-      await addArticleMutation.mutateAsync(formData);
+      // await addArticleMutation.mutateAsync(formData);
       toast({
         title: "Success",
         description: "News article has been added successfully.",
@@ -169,9 +169,9 @@ export const AddNewsSource = () => {
           <Button
             type="submit"
             className="bg-cyan-500 hover:bg-cyan-600"
-            disabled={addArticleMutation.isPending}
+            // disabled={addArticleMutation.isPending}
           >
-            {addArticleMutation.isPending ? 'Adding...' : 'Add Article'}
+             'Add Article'
           </Button>
         </form>
       </CardContent>
