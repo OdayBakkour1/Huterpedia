@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAddNewsSource } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
@@ -28,6 +27,8 @@ export const BulkNewsSourceImport = () => {
 
   // Predefined cybersecurity news sources
   const predefinedSources: NewsSourceData[] = [
+    { name: "MITRE ATT&CK", url: "https://attack.mitre.org/groups/", type: "api", category: "Threat Actors Landscape" },
+    { name: "MISP Threat Actor Galaxy", url: "https://www.misp-project.org/galaxy.html#_threat_actors", type: "api", category: "Threat Actors Landscape" },
     { name: "404 Media", url: "https://www.404media.co/rss", type: "rss", category: "Threats" },
     { name: "AboutDFIR – The Definitive Compendium Project", url: "https://aboutdfir.com/feed", type: "rss", category: "Analysis" },
     { name: "A Few Thoughts on Cryptographic Engineering", url: "https://blog.cryptographyengineering.com/feed", type: "rss", category: "Analysis" },
@@ -178,7 +179,7 @@ export const BulkNewsSourceImport = () => {
           url: source.url,
           type: source.type,
           category: source.category,
-          isActive: true,
+          isActive: source.type === 'rss',
         });
         newResults.success++;
       } catch (error) {
