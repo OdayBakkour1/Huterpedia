@@ -1,4 +1,3 @@
-
 import { Shield, Zap, Users, TrendingUp, ChevronRight, Eye, Mail, Globe, Brain, AlertTriangle, BarChart3, Sparkles, ArrowRight, Star, Lock, Activity, Check, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -61,12 +60,11 @@ const Landing = () => {
           <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl blur opacity-75"></div>
-                  <div className="relative bg-gradient-to-br from-cyan-400 to-purple-600 p-2 sm:p-3 rounded-2xl shadow-2xl">
-                    <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                  </div>
-                </div>
+                <img
+                  src="/HunterPedia Png-01.png"
+                  alt="Hunterpedia Logo"
+                  className="h-20 w-20 object-contain"
+                />
                 <div>
                   <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
                     Hunterpedia
