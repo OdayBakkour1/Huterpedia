@@ -207,7 +207,19 @@ export function useAddNewsArticle() {
 }
 
 export function useAddUser() { return {}; }
-export function useAnalytics() { return {}; }
+export function useAnalytics() {
+  return useQuery({
+    queryKey: ['analytics'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('analytics')
+        .select('*')
+        .order('date_recorded', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+}
 export function useAddNewsSource() {
   const queryClient = useQueryClient();
   return useMutation({
