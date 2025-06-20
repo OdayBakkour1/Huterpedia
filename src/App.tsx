@@ -17,7 +17,7 @@ import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "./components/ui/toaster";
 import { Header } from "./components/Header";
-import Footer from "./components/Footer";
+import { Footer } from "./components/Footer";
 
 const queryClient = new QueryClient();
 
