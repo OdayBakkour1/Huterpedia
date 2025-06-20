@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,6 +45,17 @@ export const ProfilePhotoUpload = () => {
       }
 
       const file = event.target.files[0];
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: "Only JPG and PNG images are allowed.",
+          variant: "destructive",
+        });
+        setUploading(false);
+        return;
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${user?.id}/${Math.random()}.${fileExt}`;
 
@@ -168,9 +178,10 @@ export const ProfilePhotoUpload = () => {
         <input
           id="avatar-upload"
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,.jpg,.jpeg,.png"
           onChange={uploadAvatar}
           className="hidden"
+          title="Upload profile photo (JPG or PNG only)"
         />
       </div>
       
