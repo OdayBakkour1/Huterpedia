@@ -40,7 +40,7 @@ const About = () => {
       {/* Header */}
       <header className="relative z-10">
         <div className="backdrop-blur-xl bg-white/5 border-b border-white/10 shadow-2xl">
-          <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5">
+          <div className="container mx-auto px-4 sm:px-6 py-2 sm:py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 sm:space-x-4 cursor-pointer" onClick={() => navigate('/')}>
                 <img

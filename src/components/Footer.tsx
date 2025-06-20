@@ -2,7 +2,7 @@ import { Shield, Facebook, Linkedin, Twitter, Instagram } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 const Footer = () => {
   const navigate = useNavigate();
-  return <footer className="relative z-10 bg-white/5 backdrop-blur-2xl border-t border-white/10 py-16">
+  return <footer className="relative z-10 bg-white/5 backdrop-blur-2xl border-t border-white/10 py-8">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">
@@ -42,7 +42,7 @@ All Rights Reserved To Cyberpedia
           </div>
         </div>
         
-        <div className="border-t border-white/10 pt-8 text-center">
+        <div className="border-t border-white/10 pt-4 text-center">
           <div className="flex justify-center space-x-6">
             <a href="#" className="text-white/60 hover:text-cyan-400 transition-colors duration-300 transform hover:scale-110">
               <Twitter className="h-6 w-6" />
