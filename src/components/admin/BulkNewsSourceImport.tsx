@@ -27,6 +27,8 @@ export const BulkNewsSourceImport = () => {
 
   // Predefined cybersecurity news sources
   const predefinedSources: NewsSourceData[] = [
+    { name: "ThreatFox", url: "https://threatfox.abuse.ch/", type: "api", category: "Threats" },
+    { name: "Group-IB", url: "https://www.group-ib.com/blog/rss/", type: "rss", category: "Threat Actors Landscape" },
     { name: "MITRE ATT&CK", url: "https://attack.mitre.org/groups/", type: "api", category: "Threat Actors Landscape" },
     { name: "MISP Threat Actor Galaxy", url: "https://www.misp-project.org/galaxy.html#_threat_actors", type: "api", category: "Threat Actors Landscape" },
     { name: "404 Media", url: "https://www.404media.co/rss", type: "rss", category: "Threats" },
