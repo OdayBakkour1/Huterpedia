@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
@@ -104,6 +103,7 @@ const Index = () => {
               <CategoryFilter 
                 selectedCategory={selectedCategory} 
                 setSelectedCategory={setSelectedCategory} 
+                articles={articles}
               />
             </div>
           </div>
