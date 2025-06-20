@@ -46,7 +46,7 @@ const About = () => {
                 <img
                   src="/HunterPedia Png-01.png"
                   alt="Hunterpedia Logo"
-                  className="h-28 w-28 object-contain"
+                  className="h-20 w-20 object-contain"
                 />
                 <div>
                   <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
