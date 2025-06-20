@@ -77,8 +77,7 @@ export const Header = ({
             <img
               src="/HunterPedia Png-01.png"
               alt="Hunterpedia Logo"
-              className="h-12 w-12 object-contain rounded-lg bg-white/80 p-1 shadow"
-              style={{ maxWidth: 48, maxHeight: 48 }}
+              className="h-12 w-12 object-contain"
             />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-white">Hunterpedia</h1>
