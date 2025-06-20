@@ -23,7 +23,7 @@ const Bookmarks = () => {
     return null;
   }
 
-  const validArticles = (bookmarks || []).map(b => b.article).filter(Boolean);
+  const validArticles = (bookmarks || []).filter(Boolean);
 
   return (
     <div className="container mx-auto px-4 py-8">
