@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 
-interface NewsCardContentProps {
+interface NewsCardActionsProps {
   user: any;
   aiUsage: any;
   isAiSummarizing: boolean;
@@ -15,7 +15,7 @@ interface NewsCardContentProps {
   children: React.ReactNode; // For the dialog content
 }
 
-export const NewsCardContent = ({ 
+export const NewsCardActions = ({ 
   user, 
   aiUsage, 
   isAiSummarizing, 

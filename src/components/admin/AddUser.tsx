@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-// import { useAddUser } from '@/hooks/useAdminData';
+import { useAddUser } from '@/hooks/useAdminData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ export const AddUser = () => {
     role: 'user',
     subscription: 'free',
   });
-  //const addUserMutation = useAddUser();
+  const addUserMutation = useAddUser();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,7 +33,7 @@ export const AddUser = () => {
     }
 
     try {
-      // await addUserMutation.mutateAsync(formData);
+      await addUserMutation.mutateAsync(formData);
       toast({
         title: "Success",
         description: "User has been created successfully.",
