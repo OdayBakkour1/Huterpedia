@@ -7,12 +7,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-4 mb-6 cursor-pointer" onClick={() => navigate('/')}>
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl blur opacity-75"></div>
-                <div className="relative bg-gradient-to-br from-cyan-400 to-purple-600 p-3 rounded-2xl shadow-2xl">
-                  <Shield className="h-8 w-8 text-white" />
-                </div>
-              </div>
+              <img
+                src="/HunterPedia Png-01.png"
+                alt="Hunterpedia Logo"
+                className="h-12 w-12 object-contain rounded-lg bg-white/80 p-1 shadow"
+                style={{ maxWidth: 48, maxHeight: 48 }}
+              />
               <div>
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent">
                   Hunterpedia

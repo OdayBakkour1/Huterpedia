@@ -1,4 +1,3 @@
-
 import { Shield, User, LogOut, Settings, UserCircle, Bookmark, Users, Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
@@ -75,9 +74,12 @@ export const Header = ({
             className="flex items-center space-x-3 cursor-pointer" 
             onClick={() => navigate(user ? '/dashboard' : '/')}
           >
-            <div className="bg-cyan-500/20 p-2 rounded-lg">
-              <Shield className="h-8 w-8 text-cyan-400" />
-            </div>
+            <img
+              src="/HunterPedia Png-01.png"
+              alt="Hunterpedia Logo"
+              className="h-12 w-12 object-contain rounded-lg bg-white/80 p-1 shadow"
+              style={{ maxWidth: 48, maxHeight: 48 }}
+            />
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-white">Hunterpedia</h1>
               <p className="text-xs sm:text-sm text-slate-400">Security Intelligence Hub</p>
