@@ -11,7 +11,9 @@
       }
     ],
     "rewrites": [
-      { "source": "/(.*)", "destination": "/index.html" }
+      { "source": "/security-check", "destination": "/public/security-check.html" },
+      { "source": "/api/(.*)", "destination": "/api/$1" },
+      { "source": "/(.*)", "destination": "/api/security-check.ts" }
     ]
 }
   

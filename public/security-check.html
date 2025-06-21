@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Security Checkpoint</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #fff; color: #222; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+    .container { max-width: 400px; width: 100%; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); background: #fafbfc; }
+    .progress { width: 100%; height: 8px; background: #eaeaea; border-radius: 4px; margin: 1.5rem 0; overflow: hidden; }
+    .progress-bar { height: 100%; background: #0070f3; width: 0; transition: width 0.3s; }
+    .step { margin: 0.5rem 0; font-size: 1rem; }
+    .active { color: #0070f3; }
+    @media (max-width: 600px) { .container { padding: 1rem; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Security Checkpoint</h2>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="step" id="step1">Checking browser integrity...</div>
+    <div class="step" id="step2">Verifying session...</div>
+    <div class="step" id="step3">Finalizing security...</div>
+    <p id="status"></p>
+  </div>
+  <script>
+    const steps = [
+      { el: document.getElementById('step1'), text: 'Checking browser integrity...' },
+      { el: document.getElementById('step2'), text: 'Verifying session...' },
+      { el: document.getElementById('step3'), text: 'Finalizing security...' }
+    ];
+    const progressBar = document.getElementById('progressBar');
+    const status = document.getElementById('status');
+    let currentStep = 0;
+
+    function nextStep() {
+      if (currentStep > 0) steps[currentStep-1].el.classList.remove('active');
+      if (currentStep < steps.length) {
+        steps[currentStep].el.classList.add('active');
+        progressBar.style.width = `${((currentStep+1)/steps.length)*100}%`;
+        setTimeout(() => {
+          currentStep++;
+          nextStep();
+        }, 900 + Math.random()*400);
+      } else {
+        status.textContent = 'You are being redirected...';
+        // Set cookie for 1 hour
+        document.cookie = "security_verified=true; path=/; max-age=3600; SameSite=Strict";
+        // Redirect to original destination
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect') || '/';
+        setTimeout(() => { window.location.href = redirect; }, 800);
+      }
+    }
+    nextStep();
+  </script>
+</body>
+</html> 
