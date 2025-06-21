@@ -1,4 +1,3 @@
-
 import { NewsCard } from "./NewsCard";
 import { NewsArticle } from "@/types/news";
 
@@ -16,7 +15,7 @@ export const NewsGrid = ({ articles }: NewsGridProps) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8 px-2 md:px-0">
       {articles.map((article) => (
         <NewsCard key={article.id} article={article} />
       ))}
