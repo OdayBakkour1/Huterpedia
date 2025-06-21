@@ -1,4 +1,3 @@
-
 -- Create a temporary staging table for news articles
 CREATE TABLE IF NOT EXISTS public.news_articles_staging (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -124,12 +123,23 @@ SELECT cron.schedule(
   'fetch-news-to-staging-every-10-minutes',
   '*/10 * * * *',
   $$
-  SELECT
-    net.http_post(
+  DECLARE
+    jwt_token TEXT;
+  BEGIN
+    -- This is a placeholder for a secure way to get a token for a specific role
+    -- For now, we get the current user's token, assuming the cron runs as an authenticated user
+    -- A better long-term solution would be to create a specific user for cron jobs
+    jwt_token := auth.jwt();
+    
+    PERFORM net.http_post(
         url:='https://gzpayeckolpfflgvkqvh.supabase.co/functions/v1/fetch-news',
-        headers:='{"Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cGF5ZWNrb2xwZmZsZ3ZrcXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MTE2OTEsImV4cCI6MjA2NTI4NzY5MX0.56YUDNYwuTMYpc2wWdftlXr0nakH8Ru4JTUXj7HOv5M"}'::jsonb,
+        headers:=jsonb_build_object(
+          'Content-Type', 'application/json',
+          'Authorization', 'Bearer ' || jwt_token
+        ),
         body:='{"staging": true}'::jsonb
-    ) as request_id;
+    );
+  END;
   $$
 );
 
