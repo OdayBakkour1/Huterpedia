@@ -34,15 +34,20 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/auth" element={<Auth />} />
+                
+                {/* Routes with MainLayout */}
                 <Route path="/dashboard" element={<MainLayout><Index /></MainLayout>} />
                 <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
-                <Route path="/admin" element={<MainLayout><AdminRoute><AdminDashboard /></AdminRoute></MainLayout>} />
                 <Route path="/bookmarks" element={<MainLayout><Bookmarks /></MainLayout>} />
-                <Route path="/about" element={<MainLayout><About /></MainLayout>} />
-                <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
-                <Route path="/pricing" element={<MainLayout><Pricing /></MainLayout>} />
-                <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
-                <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
+
+                {/* Standalone Routes */}
+                <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
