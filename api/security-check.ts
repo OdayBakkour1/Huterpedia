@@ -37,12 +37,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // If already verified, serve the Vite app
   if (securityCookie === 'true') {
-    const filePath = path.join(process.cwd(), 'index.html');
-    if (fs.existsSync(filePath)) {
-      res.setHeader('Content-Type', 'text/html');
-      res.status(200).send(fs.readFileSync(filePath, 'utf-8'));
-    } else {
-      res.status(404).send('App not found');
+    // In Vercel's environment, the built files are in the parent directory.
+    // We construct a path to `dist/index.html` which is where Vite places the entry file.
+    const indexPath = path.join(process.cwd(), 'dist', 'index.html');
+    
+    try {
+      if (fs.existsSync(indexPath)) {
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).send(fs.readFileSync(indexPath, 'utf-8'));
+      } else {
+        // Fallback for cases where the structure might differ
+        const rootIndexPath = path.join(process.cwd(), 'index.html');
+        if (fs.existsSync(rootIndexPath)) {
+            res.setHeader('Content-Type', 'text/html');
+            res.status(200).send(fs.readFileSync(rootIndexPath, 'utf-8'));
+        } else {
+            res.status(404).send('App entry point not found. Please redeploy.');
+        }
+      }
+    } catch (error) {
+        console.error("Failed to serve index.html:", error);
+        res.status(500).send('Internal Server Error while trying to load the application.');
     }
     return;
   }
