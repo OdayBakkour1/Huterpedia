@@ -7,6 +7,18 @@ const ONE_HOUR = 60 * 60; // seconds
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { cookies, url = '/' } = req;
   const securityCookie = cookies?.['security_verified'];
+  
+  // Let Vercel handle its own routes and static assets by not interfering
+  const isVercelAsset = url.startsWith('/_vercel');
+  const isStaticAsset = /\.(js|css|png|jpg|jpeg|gif|svg|ico|json|txt|webmanifest|map|woff|woff2|ttf|eot)$/i.test(url);
+  if (isVercelAsset || isStaticAsset) {
+    // This function is a rewrite for all routes, so we can't just "pass through".
+    // We can try to serve the file from the "public" or "dist" directory or just return 404
+    // and hope Vercel's default behavior takes over. A 404 is safer.
+    res.status(404).send('Not found');
+    return;
+  }
+
   const isApi = url.startsWith('/api/');
   const isCheckpoint = url.startsWith('/security-check');
 
@@ -18,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // Allow API and checkpoint page through
+  // Allow API and checkpoint page through. The API check is now safe because assets are handled.
   if (isApi) {
     res.status(404).send('Not found');
     return;
