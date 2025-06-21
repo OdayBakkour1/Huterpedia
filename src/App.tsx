@@ -42,11 +42,11 @@ const App = () => {
 
                 {/* Standalone Routes */}
                 <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/terms" element={<Terms />} />
+                <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+                <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
+                <Route path="/pricing" element={<MainLayout><Pricing /></MainLayout>} />
+                <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
+                <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
@@ -57,7 +57,5 @@ const App = () => {
     </QueryClientProvider>
   );
 };
-
-
 
 export default App;
