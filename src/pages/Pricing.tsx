@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/Footer";
 import { CouponInput } from "@/components/CouponInput";
+import { KazawalletButton } from '@/components/KazawalletButton';
+
 const Pricing = () => {
   const navigate = useNavigate();
   const {
@@ -145,19 +147,8 @@ const Pricing = () => {
 
                 <div className="border-t border-white/10 pt-6">
                   <p className="text-center text-white/60 text-sm mb-4">We accept</p>
-                  <div className="flex items-center justify-center space-x-4">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <span className="text-[#00457C] font-bold text-sm">PayPal</span>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <span className="text-[#FF6B35] font-bold text-sm">Payeer</span>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <span className="text-[#635BFF] font-bold text-sm">Stripe</span>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <span className="text-[#4CAF50] font-bold text-sm">Kazawallet</span>
-                    </div>
+                  <div className="flex items-center justify-center">
+                    <KazawalletButton />
                   </div>
                 </div>
               </CardContent>
