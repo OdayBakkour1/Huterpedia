@@ -173,22 +173,23 @@ export const BulkNewsSourceImport = () => {
     setProgress(0);
     const newResults = { success: 0, failed: 0, errors: [] };
 
-    for (let i = 0; i < predefinedSources.length; i++) {
-      const source = predefinedSources[i];
+    for (const source of predefinedSources) {
       try {
-        await addSourceMutation.mutateAsync({
-          name: source.name,
-          url: source.url,
-          type: source.type,
-          category: source.category,
-          isActive: source.type === 'rss',
-        });
+        const { name, url, type, category } = source;
+        const sourceData = {
+          name,
+          url,
+          type,
+          category,
+          isActive: source.type !== 'api',
+        };
+        await addSourceMutation.mutateAsync(sourceData);
         newResults.success++;
       } catch (error) {
         newResults.failed++;
         newResults.errors.push(`${source.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-      setProgress(((i + 1) / predefinedSources.length) * 100);
+      setProgress(((predefinedSources.indexOf(source) + 1) / predefinedSources.length) * 100);
     }
 
     setResults(newResults);

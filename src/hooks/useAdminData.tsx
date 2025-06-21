@@ -220,19 +220,20 @@ export function useAnalytics() {
     },
   });
 }
-export function useAddNewsSource() {
+export const useAddNewsSource = () => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (formData: any) => {
-      const { error } = await supabase
-        .from('news_sources')
-        .insert([formData]);
-      if (error) throw error;
+  return useMutation(
+    async (source: Omit<NewsSource, 'id' | 'created_at'>) => {
+      const { data, error } = await supabase.from('news_sources').insert(source).select('*');
+      if (error) throw new Error(error.message);
+      return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['news-sources'] });
-    },
-  });
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['news-sources'] });
+      },
+    }
+  );
 }
 export function useNewsSources() {
   return useQuery({
