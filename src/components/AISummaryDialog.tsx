@@ -26,7 +26,12 @@ export const AISummaryDialog = ({ open, onOpenChange, summary, article }: AISumm
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+        <SheetContent 
+          side="bottom" 
+          className="max-h-[90vh] overflow-y-auto bg-yellow-300 border-8 border-red-600 z-[9999]!"
+          style={{ background: '#fffbcc', border: '8px solid #e53e3e', zIndex: 9999 }}
+        >
+          <div className="text-center text-2xl font-bold text-red-700 mb-4">DEBUG: SheetContent is rendered</div>
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 text-cyan-400">
               <Sparkles className="w-5 h-5" />
@@ -38,15 +43,15 @@ export const AISummaryDialog = ({ open, onOpenChange, summary, article }: AISumm
           </SheetHeader>
           <div className="space-y-4">
             <div className="p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
-              <p className="text-slate-300 leading-relaxed">{summary}</p>
+              <p className="text-slate-900 leading-relaxed">{summary}</p>
             </div>
             <div className="border-t border-slate-700 pt-4">
-              <h4 className="font-medium text-white mb-2">{article.title}</h4>
-              <div className="flex items-center gap-4 text-sm text-slate-400 mb-2">
+              <h4 className="font-medium text-black mb-2">{article.title}</h4>
+              <div className="flex items-center gap-4 text-sm text-slate-700 mb-2">
                 <span>{article.source}</span>
                 <span>{formatDate(article.publishedAt)}</span>
               </div>
-              <p className="text-sm text-slate-400">{article.description}</p>
+              <p className="text-sm text-slate-700">{article.description}</p>
             </div>
           </div>
         </SheetContent>
