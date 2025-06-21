@@ -27,7 +27,7 @@ export const AISummaryDialog = ({ open, onOpenChange, summary, article }: AISumm
       <DialogContent
         className={
           isMobile
-            ? "fixed inset-0 w-full h-full max-w-full max-h-full rounded-none z-[9999] overflow-y-auto bg-slate-900 border-slate-700"
+            ? "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-sm rounded-lg max-h-[80vh] overflow-y-auto z-[9999] bg-slate-900 border-slate-700"
             : "max-w-2xl bg-slate-900 border-slate-700 max-h-[90vh] overflow-y-auto"
         }
       >
