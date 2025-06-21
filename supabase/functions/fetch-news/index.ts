@@ -233,7 +233,12 @@ serve(async (req) => {
             const title = item.title?.value || '';
             let description = item.description?.value || '';
             const link = item.links?.[0]?.href || item.id || '';
-            const pubDate = item.published || item.updated || '';
+            const pubDate =
+              item.published ||
+              item.updated ||
+              item.pubDate ||
+              (item['dc:date'] && item['dc:date'].value) ||
+              '';
 
             if (!title) continue;
 
@@ -253,12 +258,18 @@ serve(async (req) => {
             }
 
             let publishedAt = new Date().toISOString();
+            let dateIsFallback = false;
             if (pubDate) {
-              try {
-                publishedAt = new Date(pubDate).toISOString();
-              } catch (e) {
-                console.log('Failed to parse date:', pubDate);
+              const parsed = Date.parse(pubDate);
+              if (!isNaN(parsed)) {
+                publishedAt = new Date(parsed).toISOString();
+              } else {
+                dateIsFallback = true;
+                console.log('Failed to parse date:', pubDate, 'for article:', title);
               }
+            } else {
+              dateIsFallback = true;
+              console.log('No publish date found for article:', title);
             }
 
             // For staging, we don't generate AI descriptions immediately
@@ -272,6 +283,7 @@ serve(async (req) => {
                   url: link,
                   category: source.category,
                   published_at: publishedAt,
+                  date_is_fallback: dateIsFallback,
                 })
                 .select('id')
                 .single();
@@ -310,6 +322,7 @@ serve(async (req) => {
                   url: link,
                   category: source.category,
                   published_at: publishedAt,
+                  date_is_fallback: dateIsFallback,
                 })
                 .select('id')
                 .single();
@@ -359,7 +372,6 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in fetch-news function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
     return new Response(JSON.stringify({ 
       error: 'Failed to fetch news',
       details: error.message 

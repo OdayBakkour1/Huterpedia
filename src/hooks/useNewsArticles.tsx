@@ -8,14 +8,10 @@ export const useNewsArticles = () => {
     queryFn: async () => {
       console.log('Fetching news articles from database...');
       
-      // Calculate date for 15 days ago
-      const fifteenDaysAgo = new Date();
-      fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15);
-      
+      // Removed 15-day filter: fetch all articles
       const { data, error } = await supabase
         .from('news_articles')
         .select('*')
-        .gte('published_at', fifteenDaysAgo.toISOString()) // Only articles from last 15 days
         .order('published_at', { ascending: false })
         .limit(100);
       
@@ -24,7 +20,7 @@ export const useNewsArticles = () => {
         throw error;
       }
       
-      console.log(`Found ${data?.length || 0} articles in database (last 15 days)`);
+      console.log(`Found ${data?.length || 0} articles in database`);
       
       // Transform database format to match NewsArticle type
       const articles = data.map(article => ({
@@ -41,27 +37,11 @@ export const useNewsArticles = () => {
         cache_updated_at: article.cache_updated_at || undefined,
       })) as NewsArticle[];
 
-      // Sort articles to prioritize those with cached content
-      const cachedArticles = articles.filter(article => article.cached_content_url);
-      const nonCachedArticles = articles.filter(article => !article.cached_content_url);
+      // Sort all articles by publishedAt descending (newest first)
+      const sortedArticles = articles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 
-      // Sort both lists by date to ensure newest appear first within their groups
-      const sortedCachedArticles = cachedArticles.sort((a, b) => 
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      );
-      const sortedNonCachedArticles = nonCachedArticles.sort((a, b) => 
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      );
-
-      // Combine arrays, showing cached articles first
-      const finalArticles = [
-        ...sortedCachedArticles,
-        ...sortedNonCachedArticles
-      ];
-
-      console.log('Articles processed for display:', finalArticles.length);
-      console.log('Cached articles:', cachedArticles.length);
-      return finalArticles;
+      console.log('Articles processed for display:', sortedArticles.length);
+      return sortedArticles;
     },
     staleTime: 2 * 60 * 1000, // Increased to 2 minutes to reduce refetching
     refetchInterval: 5 * 60 * 1000, // Increased to 5 minutes to reduce background requests
