@@ -57,30 +57,29 @@ export const NewsCardHeader = ({
   const cleanTitle = cleanHtmlContent(title);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="relative flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <div className={cn("w-3 h-3 rounded-full flex-shrink-0", getSeverityColor(category))} />
         <Badge variant="outline" className="text-xs bg-slate-700/50 text-cyan-400 border-slate-600">
           {category}
         </Badge>
       </div>
-      <div className="flex items-center gap-2">
-        {user && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 bg-slate-900/80 hover:bg-slate-900 border border-slate-600"
-            onClick={onBookmarkToggle}
-            disabled={isBookmarkPending}
-          >
-            {isBookmarked ? (
-              <BookmarkCheck className="h-3 w-3 text-cyan-400" />
-            ) : (
-              <Bookmark className="h-3 w-3 text-slate-300" />
-            )}
-          </Button>
-        )}
-      </div>
+      {/* Move bookmark button to top right */}
+      {user && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 bg-slate-900/80 hover:bg-slate-900 border border-slate-600 absolute top-2 right-2"
+          onClick={onBookmarkToggle}
+          disabled={isBookmarkPending}
+        >
+          {isBookmarked ? (
+            <BookmarkCheck className="h-3 w-3 text-cyan-400" />
+          ) : (
+            <Bookmark className="h-3 w-3 text-slate-300" />
+          )}
+        </Button>
+      )}
     </div>
   );
 };
