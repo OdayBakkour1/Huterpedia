@@ -148,7 +148,7 @@ const Pricing = () => {
                 <div className="border-t border-white/10 pt-6">
                   <p className="text-center text-white/60 text-sm mb-4">We accept</p>
                   <div className="flex items-center justify-center">
-                    <KazawalletButton />
+                    <KazawalletButton amount={finalAmount} couponCode={appliedCoupon} />
                   </div>
                 </div>
               </CardContent>
