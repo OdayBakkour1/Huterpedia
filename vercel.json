@@ -13,9 +13,11 @@
       }
     ],
     "rewrites": [
-      { "source": "/security-check", "destination": "/public/security-check.html" },
       { "source": "/api/(.*)", "destination": "/api/$1" },
-      { "source": "/(.*)", "destination": "/api/security-check.cts" }
+      {
+        "source": "/((?!api/|security-check|_next/|static/|favicon.ico|sw.js|robots.txt|manifest.json|HunterPedia Png-01.png).*)",
+        "destination": "/index.html"
+      }
     ]
 }
   
