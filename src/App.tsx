@@ -36,7 +36,7 @@ const App = () => {
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Routes with MainLayout */}
-                <Route path="/dashboard" element={<MainLayout><Index /></MainLayout>} />
+                <Route path="/dashboard" element={<Index />} />
                 <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
                 <Route path="/bookmarks" element={<MainLayout><Bookmarks /></MainLayout>} />
 
