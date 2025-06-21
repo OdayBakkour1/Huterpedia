@@ -15,11 +15,11 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Pricing from "./pages/Pricing";
 import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import NotFound from "./pages/NotFound";
-import { AdminRoute } from "./components/AdminRoute";
-import { Header } from "./components/Header";
-import { Footer } from "./components/Footer";
+import Terms from "@/pages/Terms";
+import NotFound from "@/pages/NotFound";
+import { AdminRoute } from "@/components/AdminRoute";
+import { Header } from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const queryClient = new QueryClient();
 
