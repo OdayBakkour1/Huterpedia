@@ -1,13 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { ReactNode } from 'react';
 import { Header } from './Header';
 import Footer from './Footer';
 
-export const MainLayout = () => {
+interface MainLayoutProps {
+  children: ReactNode;
+}
+
+export const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        <Outlet />
+        {children}
       </main>
       <Footer />
     </div>
