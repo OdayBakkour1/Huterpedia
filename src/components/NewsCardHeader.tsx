@@ -63,15 +63,8 @@ export const NewsCardHeader = ({
         <Badge variant="outline" className="text-xs bg-slate-700/50 text-cyan-400 border-slate-600">
           {category}
         </Badge>
-        <span className="text-xs font-semibold text-slate-400 bg-slate-700/60 rounded px-2 py-0.5">
-          {title}
-        </span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="flex items-center text-xs text-slate-400">
-          <Clock className="w-3 h-3 mr-1" />
-          {getTimeAgo(publishedAt)}
-        </div>
         {user && (
           <Button
             variant="ghost"
