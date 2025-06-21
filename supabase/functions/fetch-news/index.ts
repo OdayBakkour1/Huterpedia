@@ -351,17 +351,15 @@ serve(async (req) => {
     const mode = useStaging ? 'staging' : 'production';
     console.log(`Successfully processed news sources in ${mode} mode. Added ${totalNewArticles} new articles.`);
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      newArticles: totalNewArticles,
-      mode: mode,
-      message: `Added ${totalNewArticles} new articles to ${targetTable}`
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.log(`Finished processing all sources. Total new articles: ${totalNewArticles}`);
 
+    return new Response(JSON.stringify({ message: "News fetched successfully", totalNewArticles }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
   } catch (error) {
     console.error('Error in fetch-news function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
     return new Response(JSON.stringify({ 
       error: 'Failed to fetch news',
       details: error.message 
