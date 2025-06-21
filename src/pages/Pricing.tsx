@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import Footer from "@/components/Footer";
 import { CouponInput } from "@/components/CouponInput";
 import { KazawalletButton } from '@/components/KazawalletButton';
 
@@ -48,33 +47,6 @@ const Pricing = () => {
       <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rounded-3xl rotate-45 animate-pulse blur-sm"></div>
       <div className="absolute top-1/3 right-10 w-20 h-20 bg-gradient-to-br from-purple-400/10 to-cyan-600/10 rounded-full animate-bounce blur-sm"></div>
       <div className="absolute bottom-20 left-1/3 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rotate-12 animate-pulse blur-sm"></div>
-
-      {/* Header */}
-      <header className="relative z-10">
-        <div className="backdrop-blur-xl bg-white/5 border-b border-white/10 shadow-2xl">
-          <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3 sm:space-x-4 cursor-pointer" onClick={() => navigate('/')}>
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-2xl blur opacity-75"></div>
-                  <div className="relative bg-gradient-to-br from-cyan-400 to-purple-600 p-2 sm:p-3 rounded-2xl shadow-2xl">
-                    <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
-                    Hunterpedia
-                  </h1>
-                  <p className="text-xs sm:text-sm text-white/60 hidden sm:block">Intelligence. Curated. Real-Time.</p>
-                </div>
-              </div>
-              <Button onClick={() => navigate('/auth')} className="bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 shadow-2xl rounded-2xl px-3 sm:px-6 py-2 text-sm sm:text-base transition-all duration-300 hover:scale-105">
-                {user ? 'Dashboard' : 'Get Started'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <section className="relative z-10 container mx-auto px-6 py-20">
@@ -186,8 +158,6 @@ const Pricing = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>;
 };
 export default Pricing;
