@@ -4,6 +4,7 @@
       "lib": ["ESNext"],
       "module": "CommonJS",
       "skipLibCheck": true,
+      "esModuleInterop": true,
   
       /* Bundler mode */
       "moduleResolution": "node",
