@@ -1,3 +1,4 @@
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Bookmark, BookmarkCheck } from "lucide-react";
@@ -56,39 +57,37 @@ export const NewsCardHeader = ({
   const cleanTitle = cleanHtmlContent(title);
 
   return (
-    <div className="pb-3">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className={cn("w-3 h-3 rounded-full flex-shrink-0", getSeverityColor(category))} />
-          <Badge variant="outline" className="text-xs bg-slate-700/50 text-cyan-400 border-slate-600">
-            {category}
-          </Badge>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center text-xs text-slate-400">
-            <Clock className="w-3 h-3 mr-1" />
-            {getTimeAgo(publishedAt)}
-          </div>
-          {user && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 bg-slate-900/80 hover:bg-slate-900 border border-slate-600"
-              onClick={onBookmarkToggle}
-              disabled={isBookmarkPending}
-            >
-              {isBookmarked ? (
-                <BookmarkCheck className="h-3 w-3 text-cyan-400" />
-              ) : (
-                <Bookmark className="h-3 w-3 text-slate-300" />
-              )}
-            </Button>
-          )}
-        </div>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <div className={cn("w-3 h-3 rounded-full flex-shrink-0", getSeverityColor(category))} />
+        <Badge variant="outline" className="text-xs bg-slate-700/50 text-cyan-400 border-slate-600">
+          {category}
+        </Badge>
+        <span className="text-xs font-semibold text-slate-400 bg-slate-700/60 rounded px-2 py-0.5">
+          {title}
+        </span>
       </div>
-      <h3 className="font-semibold text-lg line-clamp-2 leading-tight text-white min-h-[3.5rem]">
-        {cleanTitle}
-      </h3>
+      <div className="flex items-center gap-2">
+        <div className="flex items-center text-xs text-slate-400">
+          <Clock className="w-3 h-3 mr-1" />
+          {getTimeAgo(publishedAt)}
+        </div>
+        {user && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 bg-slate-900/80 hover:bg-slate-900 border border-slate-600"
+            onClick={onBookmarkToggle}
+            disabled={isBookmarkPending}
+          >
+            {isBookmarked ? (
+              <BookmarkCheck className="h-3 w-3 text-cyan-400" />
+            ) : (
+              <Bookmark className="h-3 w-3 text-slate-300" />
+            )}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
