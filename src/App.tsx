@@ -17,8 +17,8 @@ import Pricing from "@/pages/Pricing";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/NotFound";
-import { AdminRoute } from "@/components/AdminRoute.tsx";
-import { MainLayout } from "@/components/MainLayout.tsx";
+import { AdminRoute } from "@/components/AdminRoute";
+import { MainLayout } from "@/components/MainLayout";
 
 const queryClient = new QueryClient();
 
