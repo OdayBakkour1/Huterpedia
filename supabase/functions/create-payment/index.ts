@@ -31,6 +31,15 @@ serve(async (req) => {
 
     console.log("Creating payment with:", { amount, currency, email, userId, redirectUrl });
 
+    // Check if KazaWallet API key is configured
+    if (!KAZAWALLET_API_KEY) {
+      console.error('KAZAWALLET_API_KEY environment variable is not set');
+      return new Response(JSON.stringify({ 
+        error: "Payment service not configured. Please contact support.",
+        details: "Missing payment service configuration"
+      }), { status: 500, headers: corsHeaders });
+    }
+
     // Apply coupon if provided
     let finalAmount = amount;
     let discountAmount = 0;
@@ -53,7 +62,15 @@ serve(async (req) => {
 
     // Use test email for KazaWallet in development/testing
     // KazaWallet requires users to be pre-registered in their system
-    const kazawalletEmail = Deno.env.get("KAZAWALLET_TEST_EMAIL") || "test@example.com";
+    const kazawalletEmail = Deno.env.get("KAZAWALLET_TEST_EMAIL");
+    
+    if (!kazawalletEmail) {
+      console.error('KAZAWALLET_TEST_EMAIL environment variable is not set');
+      return new Response(JSON.stringify({ 
+        error: "Payment service not properly configured. Please contact support.",
+        details: "Missing test email configuration for payment service"
+      }), { status: 500, headers: corsHeaders });
+    }
     
     console.log(`Using KazaWallet email: ${kazawalletEmail} (original: ${email})`);
 
@@ -100,7 +117,7 @@ serve(async (req) => {
       try {
         const errorData = JSON.parse(errorText);
         if (errorData.error?.message === "User not found") {
-          errorMessage = "Payment service configuration error. Please contact support.";
+          errorMessage = "Payment service test user not found. Please ensure the KAZAWALLET_TEST_EMAIL environment variable is set to a valid registered test user email in the KazaWallet system.";
         } else if (errorData.error?.message) {
           errorMessage = errorData.error.message;
         }
@@ -111,7 +128,7 @@ serve(async (req) => {
       
       return new Response(JSON.stringify({ 
         error: errorMessage,
-        details: `Payment service error (${response.status})`
+        details: `Payment service error (${response.status}). Please verify that KAZAWALLET_TEST_EMAIL is set to a valid test user email.`
       }), { status: 500, headers: corsHeaders });
     }
     

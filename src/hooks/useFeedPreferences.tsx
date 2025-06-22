@@ -27,13 +27,14 @@ export const useFeedPreferences = (enabled: boolean = false) => {
         .from('user_feed_preferences')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .limit(1);
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         throw error;
       }
       
-      return data;
+      // Return the first item if it exists, otherwise null
+      return data?.[0] || null;
     },
     enabled: !!user,
   });
