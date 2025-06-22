@@ -16,7 +16,7 @@ export const useNewsArticles = () => {
         .from('news_articles')
         .select('*')
         .gte('published_at', thirtyDaysAgo.toISOString())
-        .order('published_at', { ascending: false })
+        .order('published_at', { ascending: false }) // Explicitly order by published_at descending
         .limit(200); // Increased limit for better variety
       
       if (error) {
@@ -41,28 +41,8 @@ export const useNewsArticles = () => {
         cache_updated_at: article.cache_updated_at || undefined,
       })) as NewsArticle[];
 
-      // Enhanced sorting: prioritize recent articles but mix in some variety
-      const now = new Date();
-      const sortedArticles = articles.sort((a, b) => {
-        const dateA = new Date(a.publishedAt);
-        const dateB = new Date(b.publishedAt);
-        
-        // Calculate recency score (more recent = higher score)
-        const recencyScoreA = Math.max(0, 1 - (now.getTime() - dateA.getTime()) / (7 * 24 * 60 * 60 * 1000));
-        const recencyScoreB = Math.max(0, 1 - (now.getTime() - dateB.getTime()) / (7 * 24 * 60 * 60 * 1000));
-        
-        // Add some randomness for variety while maintaining recency preference
-        const randomFactorA = Math.random() * 0.3;
-        const randomFactorB = Math.random() * 0.3;
-        
-        const finalScoreA = recencyScoreA + randomFactorA;
-        const finalScoreB = recencyScoreB + randomFactorB;
-        
-        return finalScoreB - finalScoreA;
-      });
-
-      console.log('Articles processed for display:', sortedArticles.length);
-      return sortedArticles;
+      console.log('Articles processed for display:', articles.length);
+      return articles;
     },
     staleTime: 3 * 60 * 1000, // 3 minutes
     refetchInterval: 10 * 60 * 1000, // 10 minutes

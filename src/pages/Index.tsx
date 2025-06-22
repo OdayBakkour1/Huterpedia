@@ -37,8 +37,7 @@ const Index = () => {
       return;
     }
     
-    // Check subscription status and redirect if expired
-    // Skip this check for admin users
+    // Check subscription status and redirect if expired (skip for admins)
     if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired && userRole !== 'admin') {
       navigate('/checkout');
     }
@@ -65,34 +64,6 @@ const Index = () => {
                          article.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
-  // Shuffle articles by category/tags but keep newest first
-  function shuffleByCategoryAndTags(articles) {
-    // Group by publishedAt (to the minute for stability)
-    const groups = {};
-    articles.forEach(article => {
-      const key = new Date(article.publishedAt).toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(article);
-    });
-    // Shuffle within each group
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-    // Sort groups by publishedAt descending, then shuffle within
-    const sortedKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a));
-    let result = [];
-    for (const key of sortedKeys) {
-      result = result.concat(shuffle(groups[key]));
-    }
-    return result;
-  }
-
-  const shuffledNews = shuffleByCategoryAndTags(filteredNews);
 
   // Count cached articles for performance info
   const cachedCount = articles.filter(article => article.cached_content_url).length;
@@ -175,7 +146,7 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          <NewsGrid articles={shuffledNews} />
+          <NewsGrid articles={filteredNews} />
         )}
       </main>
     </div>
