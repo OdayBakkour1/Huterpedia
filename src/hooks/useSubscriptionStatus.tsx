@@ -35,21 +35,22 @@ export const useSubscriptionStatus = () => {
           plans:subscription_plans(name)
         `)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       
       if (error) {
-        if (error.code === 'PGRST116') {
-          // No subscription found, return default values
-          return {
-            isActive: false,
-            isPremium: false,
-            isTrial: false,
-            isExpired: true,
-            planName: 'none',
-            daysRemaining: 0
-          };
-        }
         throw error;
+      }
+      
+      if (!subscription) {
+        // No subscription found, return default values
+        return {
+          isActive: false,
+          isPremium: false,
+          isTrial: false,
+          isExpired: true,
+          planName: 'none',
+          daysRemaining: 0
+        };
       }
       
       const now = new Date();

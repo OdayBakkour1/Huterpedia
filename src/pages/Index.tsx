@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNewsArticles } from "@/hooks/useNewsArticles";
 import { usePreloadCachedContent } from "@/hooks/useCachedContent";
 import { useFeedPreferences } from "@/hooks/useFeedPreferences";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -21,6 +22,7 @@ const Index = () => {
   
   const { data: newsArticles, isLoading: newsLoading } = useNewsArticles();
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
+  const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   
   // Preload cached content only after articles are loaded
   usePreloadCachedContent(newsArticles || []);
@@ -28,10 +30,16 @@ const Index = () => {
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
+      return;
     }
-  }, [user, loading, navigate]);
+    
+    // Check subscription status and redirect if expired
+    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired) {
+      navigate('/pricing');
+    }
+  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate]);
 
-  if (loading) {
+  if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>

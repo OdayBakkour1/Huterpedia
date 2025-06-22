@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProfilePhotoUpload } from '@/components/profile/ProfilePhotoUpload';
@@ -14,8 +15,22 @@ import { User, Settings, Lock, Share2, Camera } from 'lucide-react';
 
 const Profile = () => {
   const { user, loading } = useAuth();
+  const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
+  const navigate = useNavigate();
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+      return;
+    }
+    
+    // Check subscription status and redirect if expired
+    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired) {
+      navigate('/pricing');
+    }
+  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate]);
+
+  if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>

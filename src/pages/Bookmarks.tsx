@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserBookmarks } from '@/hooks/useNewsArticles';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { NewsGrid } from '@/components/NewsGrid';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -11,15 +12,22 @@ const Bookmarks = () => {
   const [usePersonalizedFeed, setUsePersonalizedFeed] = useState(false);
   const { user, loading } = useAuth();
   const { data: bookmarks, isLoading } = useUserBookmarks();
+  const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
+      return;
     }
-  }, [user, loading, navigate]);
+    
+    // Check subscription status and redirect if expired
+    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired) {
+      navigate('/pricing');
+    }
+  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate]);
 
-  if (loading || isLoading) {
+  if (loading || isLoading || subscriptionLoading) {
     return <div className="text-center text-white py-12">Loading...</div>;
   }
 
