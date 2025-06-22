@@ -11,7 +11,8 @@ import { NewsSourcesManagement } from '@/components/admin/NewsSourcesManagement'
 import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
 import { SystemMonitor } from '@/components/admin/SystemMonitor';
 import { CouponManagement } from '@/components/admin/CouponManagement';
-import { Settings, Users, CreditCard, Plus, BarChart3, Shield, Rss, Monitor, Percent } from 'lucide-react';
+import { SubscriptionManagement } from '@/components/admin/SubscriptionManagement';
+import { Settings, Users, CreditCard, Plus, BarChart3, Shield, Rss, Monitor, Percent, Crown } from 'lucide-react';
 
 const AdminDashboard = () => {
   return (
@@ -35,7 +36,7 @@ const AdminDashboard = () => {
 
           <Tabs defaultValue="analytics" className="space-y-4 sm:space-y-6">
             <div className="overflow-x-auto pb-2">
-              <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-7 bg-slate-800/50 border border-slate-700">
+              <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-8 bg-slate-800/50 border border-slate-700">
                 <TabsTrigger 
                   value="analytics" 
                   className="text-slate-300 data-[state=active]:text-white data-[state=active]:bg-slate-700 whitespace-nowrap px-3 sm:px-4"
@@ -57,6 +58,14 @@ const AdminDashboard = () => {
                 >
                   <Users className="h-4 w-4 mr-1 sm:mr-2" />
                   Users
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="subscriptions" 
+                  className="text-slate-300 data-[state=active]:text-white data-[state=active]:bg-slate-700 whitespace-nowrap px-3 sm:px-4"
+                >
+                  <Crown className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Subscriptions</span>
+                  <span className="sm:hidden">Subs</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="payments" 
@@ -104,6 +113,10 @@ const AdminDashboard = () => {
             <TabsContent value="users" className="space-y-4 sm:space-y-6">
               <AddUser />
               <UsersManagement />
+            </TabsContent>
+
+            <TabsContent value="subscriptions">
+              <SubscriptionManagement />
             </TabsContent>
 
             <TabsContent value="payments">

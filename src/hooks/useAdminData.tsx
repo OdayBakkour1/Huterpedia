@@ -18,7 +18,68 @@ export function useAddNewsArticle() {
   });
 }
 
-export function useAddUser() { return {}; }
+export function useAddUser() { 
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (userData: any) => {
+      // Create user in auth
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        email: userData.email,
+        password: userData.password,
+        email_confirm: true
+      });
+      
+      if (authError) throw authError;
+      
+      // Create profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: authUser.user.id,
+          email: userData.email,
+          full_name: userData.fullName,
+          subscription: userData.subscription,
+          role: userData.role
+        });
+        
+      if (profileError) throw profileError;
+      
+      // Create role if not user
+      if (userData.role !== 'user') {
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: authUser.user.id,
+            role: userData.role
+          });
+          
+        if (roleError) throw roleError;
+      }
+      
+      // Create trial subscription
+      const now = new Date();
+      const trialEnd = new Date(now);
+      trialEnd.setDate(trialEnd.getDate() + 7);
+      
+      const { error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .insert({
+          user_id: authUser.user.id,
+          plan_id: userData.subscription === 'premium' ? 'premium-plan-id' : 'free-plan-id',
+          status: 'trial',
+          trial_start_date: now.toISOString(),
+          trial_end_date: trialEnd.toISOString()
+        });
+        
+      if (subscriptionError) throw subscriptionError;
+      
+      return authUser.user;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+    },
+  });
+}
 
 export function useAnalytics() {
   return useQuery({
@@ -116,8 +177,107 @@ export function useAllUsers() {
   });
 }
 
-export function useUpdateUserRole() { return {}; }
-export function useUpdateUserSubscription() { return {}; }
+export function useUpdateUserRole() { 
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+      // First check if user already has a role
+      const { data: existingRole } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+      
+      if (existingRole) {
+        // Update existing role
+        const { error } = await supabase
+          .from('user_roles')
+          .update({ role })
+          .eq('user_id', userId);
+        
+        if (error) throw error;
+      } else {
+        // Insert new role
+        const { error } = await supabase
+          .from('user_roles')
+          .insert({ user_id: userId, role });
+        
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+    },
+  });
+}
+
+export function useUpdateUserSubscription() { 
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, subscription }: { userId: string; subscription: string }) => {
+      // Update profile subscription
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ subscription })
+        .eq('id', userId);
+      
+      if (profileError) throw profileError;
+      
+      // Check if subscription record exists
+      const { data: existingSub } = await supabase
+        .from('subscriptions')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+      
+      const now = new Date();
+      let endDate = new Date(now);
+      
+      if (subscription === 'premium') {
+        // Premium is 1 month
+        endDate.setMonth(endDate.getMonth() + 1);
+      } else {
+        // Free trial is 7 days
+        endDate.setDate(endDate.getDate() + 7);
+      }
+      
+      if (existingSub) {
+        // Update existing subscription
+        const { error } = await supabase
+          .from('subscriptions')
+          .update({
+            status: subscription === 'premium' ? 'active' : 'trial',
+            plan_id: subscription === 'premium' ? 'premium-plan-id' : 'free-plan-id',
+            subscription_start_date: subscription === 'premium' ? now.toISOString() : null,
+            subscription_end_date: subscription === 'premium' ? endDate.toISOString() : null,
+            trial_start_date: subscription === 'free' ? now.toISOString() : null,
+            trial_end_date: subscription === 'free' ? endDate.toISOString() : null
+          })
+          .eq('user_id', userId);
+        
+        if (error) throw error;
+      } else {
+        // Create new subscription
+        const { error } = await supabase
+          .from('subscriptions')
+          .insert({
+            user_id: userId,
+            plan_id: subscription === 'premium' ? 'premium-plan-id' : 'free-plan-id',
+            status: subscription === 'premium' ? 'active' : 'trial',
+            subscription_start_date: subscription === 'premium' ? now.toISOString() : null,
+            subscription_end_date: subscription === 'premium' ? endDate.toISOString() : null,
+            trial_start_date: subscription === 'free' ? now.toISOString() : null,
+            trial_end_date: subscription === 'free' ? endDate.toISOString() : null
+          });
+        
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+    },
+  });
+}
 
 export function useDeleteUser() {
   const queryClient = useQueryClient();
@@ -132,5 +292,38 @@ export function useDeleteUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-users'] });
     },
+  });
+}
+
+export function useSubscriptionPlans() {
+  return useQuery({
+    queryKey: ['subscription-plans'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .order('price_monthly', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
+    }
+  });
+}
+
+export function useUserSubscriptions() {
+  return useQuery({
+    queryKey: ['user-subscriptions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select(`
+          *,
+          profiles:profiles(id, email, full_name),
+          plans:subscription_plans(id, name, price_monthly)
+        `);
+      
+      if (error) throw error;
+      return data || [];
+    }
   });
 }
