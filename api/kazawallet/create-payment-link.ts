@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 
 const KAZAWALLET_API_KEY = process.env.KAZAWALLET_API_KEY;
+const KAZAWALLET_API_SECRET = process.env.KAZAWALLET_API_SECRET;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
