@@ -28,6 +28,8 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
     setError(null);
     
     try {
+      console.log("Creating payment with:", { amount, couponCode, email: user.email, userId: user.id });
+      
       const res = await fetch("https://gzpayeckolpfflgvkqvh.supabase.co/functions/v1/create-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,15 +42,23 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
         }),
       });
       
-      const data = await res.json();
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`Payment API error (${res.status}):`, errorText);
+        throw new Error(`Payment service error (${res.status}): ${errorText}`);
+      }
       
-      if (res.ok && data.paymentUrl) {
+      const data = await res.json();
+      console.log("Payment API response:", data);
+      
+      if (data.paymentUrl) {
         window.location.href = data.paymentUrl;
       } else {
-        setError(data.error || "Failed to create payment.");
+        throw new Error(data.error || "Failed to create payment link.");
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      console.error("Payment error:", err);
+      setError(err instanceof Error ? err.message : "Network error. Please try again.");
       setLoading(false);
     }
   };

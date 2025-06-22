@@ -3,41 +3,57 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as crypto from "https://deno.land/std@0.168.0/node/crypto.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://www.hunterpedia.site",
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: corsHeaders });
   }
 
-  const { amount, order_id, ref, status, signature } = await req.json();
-  if (!amount || !order_id || !ref || !status || !signature) {
-    return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: corsHeaders });
-  }
-
-  const KAZAWALLET_API_KEY = Deno.env.get("KAZAWALLET_API_KEY")!;
-  const KAZAWALLET_API_SECRET = Deno.env.get("KAZAWALLET_API_SECRET")!;
-  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-  // Verify signature
-  const secretString = `${amount}:::${order_id}:::${KAZAWALLET_API_KEY}`;
-  const hashDigest = crypto.createHash("sha256").update(secretString).digest();
-  const hmacDigest = crypto.createHmac("sha512", KAZAWALLET_API_SECRET).update(hashDigest).digest("base64");
-  if (signature !== hmacDigest) {
-    return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 401, headers: corsHeaders });
-  }
-
   try {
+    console.log("Received webhook request");
+    const payload = await req.json();
+    console.log("Webhook payload:", payload);
+    
+    const { amount, order_id, ref, status, signature } = payload;
+    
+    if (!amount || !order_id || !ref || !status || !signature) {
+      console.error("Missing required fields in webhook payload");
+      return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: corsHeaders });
+    }
+
+    const KAZAWALLET_API_KEY = Deno.env.get("KAZAWALLET_API_KEY")!;
+    const KAZAWALLET_API_SECRET = Deno.env.get("KAZAWALLET_API_SECRET")!;
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Verify signature
+    console.log("Verifying signature");
+    const secretString = `${amount}:::${order_id}:::${KAZAWALLET_API_KEY}`;
+    console.log("Secret string:", secretString);
+    
+    const hashDigest = crypto.createHash("sha256").update(secretString).digest();
+    const hmacDigest = crypto.createHmac("sha512", KAZAWALLET_API_SECRET).update(hashDigest).digest("base64");
+    
+    console.log("Calculated signature:", hmacDigest);
+    console.log("Received signature:", signature);
+    
+    if (signature !== hmacDigest) {
+      console.error("Invalid signature");
+      return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 401, headers: corsHeaders });
+    }
+
     // Update payment status in Supabase
     let newStatus = status === "fulfilled" ? "fulfilled" : (status === "timed_out" ? "timed_out" : "unknown");
+    console.log(`Updating payment status to ${newStatus} for ref ${ref}`);
+    
     const { data: payment, error: paymentError } = await supabase
       .from("payments")
       .update({ status: newStatus, order_id })
@@ -52,6 +68,8 @@ serve(async (req) => {
 
     // If payment was successful, update user's subscription
     if (newStatus === "fulfilled" && payment?.user_id) {
+      console.log(`Payment fulfilled for user ${payment.user_id}, updating subscription`);
+      
       // Get premium plan ID
       const { data: premiumPlan, error: planError } = await supabase
         .from("subscription_plans")
@@ -82,6 +100,7 @@ serve(async (req) => {
       oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
 
       if (subscription) {
+        console.log("Updating existing subscription");
         // Update existing subscription
         const { error: updateError } = await supabase
           .from("subscriptions")
@@ -99,6 +118,7 @@ serve(async (req) => {
           return new Response(JSON.stringify({ error: "Error updating subscription", details: updateError.message }), { status: 500, headers: corsHeaders });
         }
       } else {
+        console.log("Creating new subscription");
         // Create new subscription
         const { error: insertError } = await supabase
           .from("subscriptions")
@@ -122,6 +142,6 @@ serve(async (req) => {
     return new Response(JSON.stringify({ success: true }), { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error("Unexpected error:", error);
-    return new Response(JSON.stringify({ error: "Unexpected error", details: error.message }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Unexpected error", details: error.message, stack: error.stack }), { status: 500, headers: corsHeaders });
   }
 });

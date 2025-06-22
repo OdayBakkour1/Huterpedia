@@ -1,14 +1,37 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 import NewPublicHeader from '@/components/NewPublicHeader';
 import NewPublicFooter from '@/components/NewPublicFooter';
-import PaymentButton from '@/components/PaymentButton';
+import { KazawalletButton } from '@/components/KazawalletButton';
+import { CouponInput } from '@/components/CouponInput';
+import { Button } from '@/components/ui/button';
+import { Check } from 'lucide-react';
 
 const Checkout = () => {
   const { user } = useAuth();
+  const { data: subscription } = useSubscription();
   const navigate = useNavigate();
   const [email, setEmail] = useState(user?.email || '');
+  const [appliedCoupon, setAppliedCoupon] = useState<string>('');
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [finalAmount, setFinalAmount] = useState(5);
+  const originalPrice = 5;
+
+  const handleCouponApplied = (discount: number, final: number, couponCode: string) => {
+    setDiscountAmount(discount);
+    setFinalAmount(final);
+    setAppliedCoupon(couponCode);
+  };
+  
+  const handleCouponRemoved = () => {
+    setDiscountAmount(0);
+    setFinalAmount(originalPrice);
+    setAppliedCoupon('');
+  };
+
+  const isSubscribed = subscription?.status === 'active';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
@@ -23,9 +46,26 @@ const Checkout = () => {
           <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent mb-4">Checkout</h1>
           <div className="text-center mb-6">
             <div className="text-lg text-white font-semibold mb-2">Premium Subscription</div>
-            <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">$5</div>
+            <div className="flex items-center justify-center">
+              {discountAmount > 0 && (
+                <div className="text-xl text-white/60 line-through mr-2">${originalPrice}</div>
+              )}
+              <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">${finalAmount.toFixed(2)}</div>
+            </div>
             <div className="text-white/60 text-base">per month</div>
           </div>
+          
+          {!isSubscribed && (
+            <div className="mb-6">
+              <CouponInput 
+                originalAmount={originalPrice} 
+                onCouponApplied={handleCouponApplied} 
+                onCouponRemoved={handleCouponRemoved} 
+                appliedCoupon={appliedCoupon} 
+              />
+            </div>
+          )}
+          
           <div className="mb-4">
             <label className="block text-white/80 text-sm font-medium mb-2">Email</label>
             <input
@@ -38,12 +78,34 @@ const Checkout = () => {
               placeholder="Enter your email"
             />
           </div>
-          <PaymentButton
-            amount={5}
-            productName="Premium Subscription"
-            onSuccess={ref => console.log('Payment started, ref:', ref)}
-            onError={err => console.error('Payment error:', err)}
-          />
+          
+          {isSubscribed ? (
+            <Button 
+              onClick={() => navigate('/dashboard')} 
+              className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-green-600 hover:bg-green-700 text-white mb-6"
+            >
+              <Check className="h-5 w-5 mr-2" />
+              Already Subscribed - Go to Dashboard
+            </Button>
+          ) : user ? (
+            <KazawalletButton 
+              amount={finalAmount} 
+              couponCode={appliedCoupon}
+            />
+          ) : (
+            <Button 
+              onClick={() => navigate('/auth')} 
+              className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white mb-6"
+            >
+              Sign In to Continue
+            </Button>
+          )}
+          
+          <div className="mt-4 text-center">
+            <p className="text-white/60 text-sm">
+              By subscribing, you agree to our <a href="/terms" className="text-cyan-400 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-cyan-400 hover:underline">Privacy Policy</a>.
+            </p>
+          </div>
         </div>
       </div>
       <NewPublicFooter />
@@ -51,4 +113,4 @@ const Checkout = () => {
   );
 };
 
-export default Checkout; 
+export default Checkout;

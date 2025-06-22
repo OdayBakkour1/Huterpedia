@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://www.hunterpedia.site",
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
@@ -15,20 +15,22 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: corsHeaders });
   }
 
-  const { amount, currency = "USD", email, userId, couponCode } = await req.json();
-  if (!amount || !email || !userId) {
-    return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: corsHeaders });
-  }
-
-  const ref = crypto.randomUUID();
-  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const KAZAWALLET_API_KEY = Deno.env.get("KAZAWALLET_API_KEY")!;
-  const SITE_URL = Deno.env.get("SITE_URL")!;
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-  const redirectUrl = `${SITE_URL}/payment-success?ref=${ref}`;
-
   try {
+    const { amount, currency = "USD", email, userId, couponCode } = await req.json();
+    if (!amount || !email || !userId) {
+      return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: corsHeaders });
+    }
+
+    const ref = crypto.randomUUID();
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const KAZAWALLET_API_KEY = Deno.env.get("KAZAWALLET_API_KEY")!;
+    const SITE_URL = Deno.env.get("SITE_URL") || "http://localhost:8080";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const redirectUrl = `${SITE_URL}/payment-success?ref=${ref}`;
+
+    console.log("Creating payment with:", { amount, currency, email, userId, redirectUrl });
+
     // Apply coupon if provided
     let finalAmount = amount;
     let discountAmount = 0;
@@ -66,9 +68,14 @@ serve(async (req) => {
     }
 
     // Call KazaWallet API
+    console.log("Calling KazaWallet API with:", { amount: String(finalAmount), currency, email, ref, redirectUrl });
+    
     const response = await fetch("https://outdoor.kasroad.com/wallet/createPaymentLink", {
       method: "POST",
-      headers: { "x-api-key": KAZAWALLET_API_KEY, "Content-Type": "application/json" },
+      headers: { 
+        "x-api-key": KAZAWALLET_API_KEY, 
+        "Content-Type": "application/json" 
+      },
       body: JSON.stringify({ 
         amount: String(finalAmount), 
         currency, 
@@ -78,10 +85,23 @@ serve(async (req) => {
       }),
     });
     
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`KazaWallet API error (${response.status}):`, errorText);
+      return new Response(JSON.stringify({ 
+        error: "Failed to create payment link", 
+        details: `API responded with status ${response.status}: ${errorText}` 
+      }), { status: 500, headers: corsHeaders });
+    }
+    
     const data = await response.json();
-    if (!response.ok || !data?.paymentLink) {
-      console.error('KazaWallet API error:', data);
-      return new Response(JSON.stringify({ error: "Failed to create payment link", details: data }), { status: 500, headers: corsHeaders });
+    console.log("KazaWallet API response:", data);
+    
+    if (!data?.paymentLink) {
+      return new Response(JSON.stringify({ 
+        error: "Invalid response from payment provider", 
+        details: "No payment link returned" 
+      }), { status: 500, headers: corsHeaders });
     }
 
     // Update payment_url in Supabase
@@ -101,6 +121,10 @@ serve(async (req) => {
     return new Response(JSON.stringify({ paymentUrl: data.paymentLink, ref }), { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error('Unexpected error:', error);
-    return new Response(JSON.stringify({ error: "Unexpected error", details: error.message }), { status: 500, headers: corsHeaders });
+    return new Response(JSON.stringify({ 
+      error: "Unexpected error", 
+      details: error.message,
+      stack: error.stack
+    }), { status: 500, headers: corsHeaders });
   }
 });
