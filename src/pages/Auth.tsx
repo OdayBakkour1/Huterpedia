@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, AlertCircle, Eye, EyeOff, Clock, Mail, RefreshCw } from 'lucide-react';
+import { Shield, AlertCircle, Eye, EyeOff, Clock, Mail, RefreshCw, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { validateEmail, validatePassword, sanitizeInput } from '@/utils/security';
@@ -160,7 +160,7 @@ const Auth = () => {
     } else {
       toast({
         title: "Account Created!",
-        description: "Please check your email to verify your account."
+        description: "Please check your email to verify your account. You'll get a 7-day free trial when you confirm your email."
       });
     }
     setLoading(false);
@@ -280,10 +280,10 @@ const Auth = () => {
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-1">
-                <TabsTrigger value="signin" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-600/20 data-[state=active]:border data-[state=active]:border-white/20 rounded-xl font-medium transition-all duration-300 text-slate-800">
+                <TabsTrigger value="signin" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-600/20 data-[state=active]:border data-[state=active]:border-white/20 rounded-xl font-medium transition-all duration-300 text-white">
                   Sign In
                 </TabsTrigger>
-                <TabsTrigger value="signup" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-600/20 data-[state=active]:border data-[state=active]:border-white/20 rounded-xl font-medium transition-all duration-300 text-slate-800">
+                <TabsTrigger value="signup" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-600/20 data-[state=active]:border data-[state=active]:border-white/20 rounded-xl font-medium transition-all duration-300 text-white">
                   Sign Up
                 </TabsTrigger>
               </TabsList>
@@ -372,6 +372,16 @@ const Auth = () => {
                     {password && !passwordValidation.isValid && <div className="text-sm text-red-300 space-y-1 bg-red-900/20 backdrop-blur-xl border border-red-500/30 rounded-2xl p-4">
                         {passwordValidation.errors.map((error, index) => <div key={index}>• {error}</div>)}
                       </div>}
+                    
+                    <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded-2xl">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Crown className="h-4 w-4 text-blue-400" />
+                        <span className="text-blue-300 font-medium">7-Day Free Trial</span>
+                      </div>
+                      <p className="text-sm text-blue-200">
+                        Sign up today and get a 7-day free trial with full access to all premium features!
+                      </p>
+                    </div>
                     
                     <Button type="submit" className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-2xl rounded-2xl py-6 text-base font-semibold transition-all duration-300 hover:scale-105" disabled={loading || !!emailError || !passwordValidation.isValid}>
                       {loading ? 'Creating Account...' : 'Sign Up'}

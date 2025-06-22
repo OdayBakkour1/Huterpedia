@@ -9,6 +9,7 @@ import { EmailChangeForm } from '@/components/profile/EmailChangeForm';
 import { PasswordChangeForm } from '@/components/profile/PasswordChangeForm';
 import { SocialMediaForm } from '@/components/profile/SocialMediaForm';
 import { ProfileInfo } from '@/components/profile/ProfileInfo';
+import { SubscriptionBanner } from '@/components/SubscriptionBanner';
 import { User, Settings, Lock, Share2, Camera } from 'lucide-react';
 
 const Profile = () => {
@@ -29,6 +30,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       <Header />
+      <SubscriptionBanner />
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="text-center mb-6 sm:mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">

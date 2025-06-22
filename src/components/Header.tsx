@@ -1,6 +1,7 @@
-import { Shield, User, LogOut, Settings, UserCircle, Bookmark, Users, Menu, X } from "lucide-react";
+import { Shield, User, LogOut, Settings, UserCircle, Bookmark, Users, Menu, X, Crown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -9,6 +10,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AIUsageIndicator } from "./AIUsageIndicator";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
 
 interface HeaderProps {
   usePersonalizedFeed?: boolean;
@@ -25,6 +27,7 @@ export const Header = ({
 }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const { data: userRole } = useCurrentUserRole();
+  const { data: subscription } = useSubscriptionStatus();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -100,6 +103,11 @@ export const Header = ({
                           <User className="h-4 w-4" />
                         </AvatarFallback>
                       </Avatar>
+                      {subscription?.isPremium && (
+                        <Badge className="absolute -top-1 -right-1 bg-gradient-to-r from-cyan-400 to-purple-500 text-white px-1 py-0.5 rounded-full text-[10px]">
+                          <Crown className="h-2 w-2" />
+                        </Badge>
+                      )}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-slate-800 border-slate-700 w-64">
@@ -215,7 +223,7 @@ export const Header = ({
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="text-slate-300 flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 hover:bg-transparent hover:text-slate-300"
+                      className="text-slate-300 flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 hover:bg-transparent hover:text-slate-300 relative"
                     >
                       <Avatar className="h-7 w-7 md:h-8 md:w-8">
                         <AvatarImage src={profileData.avatar_url || undefined} alt="Profile" />
@@ -223,6 +231,11 @@ export const Header = ({
                           <User className="h-3 w-3 md:h-4 md:w-4" />
                         </AvatarFallback>
                       </Avatar>
+                      {subscription?.isPremium && (
+                        <Badge className="absolute -top-1 -right-1 bg-gradient-to-r from-cyan-400 to-purple-500 text-white px-1 py-0.5 rounded-full text-[10px]">
+                          <Crown className="h-2 w-2" />
+                        </Badge>
+                      )}
                       <span className="hidden lg:inline text-sm">{displayName}</span>
                     </Button>
                   </DropdownMenuTrigger>

@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users, Crown, Shield, User } from 'lucide-react';
+import { Users, Crown, Shield, User, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { format } from 'date-fns';
 
 export const UsersManagement = () => {
   const { data: users, isLoading } = useAllUsers();
@@ -90,6 +91,30 @@ export const UsersManagement = () => {
     return colors[subscription as keyof typeof colors] || colors.free;
   };
 
+  const getSubscriptionDates = (user: any) => {
+    if (!user) return null;
+    
+    if (user.subscription === 'premium' && user.subscription_end_date) {
+      return (
+        <div className="text-xs flex items-center gap-1 text-blue-400">
+          <Calendar className="h-3 w-3" />
+          <span>Until {format(new Date(user.subscription_end_date), 'MMM dd, yyyy')}</span>
+        </div>
+      );
+    }
+    
+    if (user.subscription === 'free' && user.trial_end_date) {
+      return (
+        <div className="text-xs flex items-center gap-1 text-gray-400">
+          <Calendar className="h-3 w-3" />
+          <span>Trial ends {format(new Date(user.trial_end_date), 'MMM dd, yyyy')}</span>
+        </div>
+      );
+    }
+    
+    return null;
+  };
+
   if (isLoading) {
     return <div className="text-slate-400">Loading users...</div>;
   }
@@ -129,9 +154,12 @@ export const UsersManagement = () => {
                     {user.role || 'user'}
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded text-xs ${getSubscriptionBadge(user.subscription || 'free')}`}>
-                      {(user.subscription || 'free').charAt(0).toUpperCase() + (user.subscription || 'free').slice(1)}
-                    </span>
+                    <div>
+                      <span className={`px-2 py-1 rounded text-xs ${getSubscriptionBadge(user.subscription || 'free')}`}>
+                        {(user.subscription || 'free').charAt(0).toUpperCase() + (user.subscription || 'free').slice(1)}
+                      </span>
+                      {getSubscriptionDates(user)}
+                    </div>
                   </TableCell>
                   <TableCell className="text-slate-300">
                     {new Date(user.created_at).toLocaleDateString()}
@@ -164,7 +192,6 @@ export const UsersManagement = () => {
                         <SelectContent className="bg-slate-800 border-slate-700">
                           <SelectItem value="free" className="text-slate-300">Free</SelectItem>
                           <SelectItem value="premium" className="text-slate-300">Premium</SelectItem>
-                          <SelectItem value="enterprise" className="text-slate-300">Enterprise</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button

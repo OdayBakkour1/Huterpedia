@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAICredits } from '@/hooks/useAICredits';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { User, Zap } from 'lucide-react';
+import { User, Zap, Crown, Calendar } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface Profile {
   id: string;
@@ -22,6 +23,7 @@ interface Profile {
 export const ProfileInfo = () => {
   const { user } = useAuth();
   const { data: aiCredits } = useAICredits(user?.id || '');
+  const { data: subscription } = useSubscriptionStatus();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -169,10 +171,48 @@ export const ProfileInfo = () => {
 
           <div>
             <Label className="text-slate-300">Subscription</Label>
-            <div className="mt-1">
-              <span className={`px-3 py-1 rounded-full text-sm ${getSubscriptionBadge(profile?.subscription || 'free')}`}>
-                {(profile?.subscription || 'free').charAt(0).toUpperCase() + (profile?.subscription || 'free').slice(1)}
-              </span>
+            <div className="mt-1 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-sm ${getSubscriptionBadge(profile?.subscription || 'free')}`}>
+                  {(profile?.subscription || 'free').charAt(0).toUpperCase() + (profile?.subscription || 'free').slice(1)}
+                </span>
+                {subscription?.isPremium && (
+                  <Crown className="h-4 w-4 text-blue-400" />
+                )}
+              </div>
+              
+              {subscription && (
+                <div className="text-sm text-slate-400">
+                  {subscription.isTrial && subscription.isActive && (
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>
+                        Trial ends on {format(new Date(subscription.trialEnd!), 'MMMM d, yyyy')} 
+                        ({subscription.daysRemaining} days remaining)
+                      </span>
+                    </div>
+                  )}
+                  
+                  {subscription.isPremium && subscription.isActive && (
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>
+                        Premium subscription until {format(new Date(subscription.subscriptionEnd!), 'MMMM d, yyyy')}
+                        ({subscription.daysRemaining} days remaining)
+                      </span>
+                    </div>
+                  )}
+                  
+                  {subscription.isExpired && (
+                    <div className="flex items-center gap-1 text-red-400">
+                      <Calendar className="h-3 w-3" />
+                      <span>
+                        Your {subscription.isTrial ? 'trial' : 'subscription'} has expired
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

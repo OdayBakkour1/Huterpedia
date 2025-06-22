@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const checkAccountLockout = (email: string): boolean => {
     const lockoutKey = `lockout-${email}`;
     const maxAttempts = 5;
-    const lockoutDuration = 30 * 60 * 1000; // 30 minutes
+    const lockoutDuration = 5 * 60 * 1000; // 5 minutes
     
     if (!rateLimiter.isAllowed(lockoutKey, maxAttempts, lockoutDuration)) {
       const remaining = rateLimiter.getRemainingTime(lockoutKey);
@@ -142,7 +142,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       // Input validation and sanitization
       const cleanEmail = sanitizeInput(email).toLowerCase().trim();
-      const cleanFullName = fullName ? sanitizeInput(fullName).replace(/\s+/g, '_') : undefined;
+      const cleanFullName = fullName ? sanitizeInput(fullName) : undefined;
       
       if (!validateEmail(cleanEmail)) {
         throw new Error('Please enter a valid email address');
@@ -160,7 +160,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: cleanEmail,
         password,
         options: {
@@ -169,7 +169,49 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       });
 
-      return { error };
+      if (error) throw error;
+
+      // If signup was successful and we have a user, set up their trial subscription
+      if (data.user) {
+        try {
+          // Get the free plan ID
+          const { data: plans } = await supabase
+            .from('subscription_plans')
+            .select('id')
+            .eq('name', 'free')
+            .single();
+
+          if (plans) {
+            const now = new Date();
+            const trialEnd = new Date(now);
+            trialEnd.setDate(trialEnd.getDate() + 7); // 7-day trial
+
+            // Create subscription record
+            await supabase
+              .from('subscriptions')
+              .insert({
+                user_id: data.user.id,
+                plan_id: plans.id,
+                status: 'trial',
+                trial_start_date: now.toISOString(),
+                trial_end_date: trialEnd.toISOString()
+              });
+
+            // Update profile with subscription status
+            await supabase
+              .from('profiles')
+              .update({
+                subscription: 'free'
+              })
+              .eq('id', data.user.id);
+          }
+        } catch (subscriptionError) {
+          console.error('Error setting up trial subscription:', subscriptionError);
+          // Don't throw here, as the user was created successfully
+        }
+      }
+
+      return { error: null };
     } catch (error: any) {
       console.error('Sign up error:', error);
       return { error };

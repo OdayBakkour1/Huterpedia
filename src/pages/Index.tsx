@@ -5,6 +5,7 @@ import { NewsGrid } from "@/components/NewsGrid";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { SearchBar } from "@/components/SearchBar";
 import { FeedPreferences } from "@/components/FeedPreferences";
+import { SubscriptionBanner } from "@/components/SubscriptionBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNewsArticles } from "@/hooks/useNewsArticles";
 import { usePreloadCachedContent } from "@/hooks/useCachedContent";
@@ -91,6 +92,7 @@ const Index = () => {
         showPreferences={showPreferences}
         setShowPreferences={setShowPreferences}
       />
+      <SubscriptionBanner />
       <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8">
         <div className="text-center mb-6 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">
@@ -110,7 +112,7 @@ const Index = () => {
           {articles.length > 0 && (
             <div className="flex justify-center flex-col items-center gap-2">
               <span className="text-slate-400 text-sm text-center px-2">
-                {articles.length} articles available • {usePersonalizedFeed ? "Personalized feed" : "General feed"} • Updated automatically every 15 minutes • Last 15 days
+                {articles.length} articles available • {usePersonalizedFeed ? "Personalized feed" : "General feed"} • Updated automatically every 15 minutes • Last 30 days
               </span>
               {cachedCount > 0 && (
                 <span className="text-cyan-400 text-xs flex items-center gap-1">
@@ -152,7 +154,7 @@ const Index = () => {
               <p className="text-slate-400 text-sm sm:text-base">
                 {usePersonalizedFeed 
                   ? "No articles match your current preferences. Try adjusting your feed settings or switch to the general feed."
-                  : "News articles are automatically fetched every 15 minutes. Please check back shortly for the latest cybersecurity updates from the last 15 days."
+                  : "News articles are automatically fetched every 15 minutes. Please check back shortly for the latest cybersecurity updates from the last 30 days."
                 }
               </p>
             </div>
