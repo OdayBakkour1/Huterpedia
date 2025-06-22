@@ -15,7 +15,7 @@ export default function PaymentButton({ amount, productName, onSuccess, onError 
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/create-payment', {
+      const res = await fetch('https://gzpayeckolpfflgvkqvh.supabase.co/functions/v1/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -31,7 +31,7 @@ export default function PaymentButton({ amount, productName, onSuccess, onError 
         if (onSuccess) onSuccess(data.ref);
         window.location.href = data.paymentUrl;
       } else {
-        setError(data.error || 'Failed to create payment link.');
+        setError(data.error || 'Failed to create payment.');
         if (onError) onError(data.error);
       }
     } catch (err) {

@@ -19,23 +19,22 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/kazawallet/kazawallet-payment", {
+      const res = await fetch("https://gzpayeckolpfflgvkqvh.supabase.co/functions/v1/create-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount,
           currency: "USD",
           email: user.email,
-          user_id: user.id,
+          userId: user.id,
           couponCode,
         }),
       });
       const data = await res.json();
-      if (res.ok && data.paymentLink) {
-        window.location.href = data.paymentLink;
+      if (res.ok && data.paymentUrl) {
+        window.location.href = data.paymentUrl;
       } else {
-        setError(data.error || "Failed to create payment link.");
-        setLoading(false);
+        setError(data.error || "Failed to create payment.");
       }
     } catch (err) {
       setError("Network error. Please try again.");
@@ -50,7 +49,7 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
         disabled={loading}
         className="bg-cyan-700 hover:bg-cyan-800 text-white font-semibold py-2 px-4 rounded shadow"
       >
-        Pay with Kazawallet
+        {loading ? 'Redirecting...' : 'Pay with KazaWallet'}
       </button>
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
