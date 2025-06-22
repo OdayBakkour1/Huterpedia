@@ -1,18 +1,20 @@
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Crown, Clock, AlertTriangle } from 'lucide-react';
 
 export const SubscriptionBanner = () => {
   const { data: subscription, isLoading } = useSubscriptionStatus();
+  const { data: userRole } = useCurrentUserRole();
   const navigate = useNavigate();
   
   if (isLoading || !subscription) {
     return null;
   }
   
-  // Don't show banner for premium users
-  if (subscription.isPremium && subscription.isActive) {
+  // Don't show banner for premium users or admins
+  if ((subscription.isPremium && subscription.isActive) || userRole === 'admin') {
     return null;
   }
   
@@ -41,7 +43,7 @@ export const SubscriptionBanner = () => {
     );
   }
   
-  if (subscription.isExpired) {
+  if (subscription.isExpired && userRole !== 'admin') {
     return (
       <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-b border-red-500/30 py-2 px-4">
         <div className="container mx-auto flex flex-wrap items-center justify-between gap-2">

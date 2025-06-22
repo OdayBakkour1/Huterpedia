@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, Trash2, User, AlertTriangle } from 'lucide-react';
+import { Upload, Trash2, User } from 'lucide-react';
 
 export const ProfilePhotoUpload = () => {
   const { user } = useAuth();
@@ -12,7 +12,6 @@ export const ProfilePhotoUpload = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -37,29 +36,9 @@ export const ProfilePhotoUpload = () => {
     }
   };
 
-  const validateFile = (file: File): boolean => {
-    // Check file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    if (!allowedTypes.includes(file.type)) {
-      setError('Only JPG and PNG images are allowed.');
-      return false;
-    }
-
-    // Check file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    if (file.size > maxSize) {
-      setError('Image size must be less than 5MB.');
-      return false;
-    }
-
-    setError(null);
-    return true;
-  };
-
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true);
-      setError(null);
 
       if (!event.target.files || event.target.files.length === 0) {
         return;
@@ -67,37 +46,52 @@ export const ProfilePhotoUpload = () => {
 
       const file = event.target.files[0];
       
-      // Frontend validation
-      if (!validateFile(file)) {
+      // Validate file type - only allow JPG, JPEG, and PNG
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: "Only JPG and PNG images are allowed.",
+          variant: "destructive",
+        });
         setUploading(false);
         return;
       }
 
+      // Validate file extension
       const fileExt = file.name.split('.').pop()?.toLowerCase();
-      
-      // Additional extension check
-      if (!['jpg', 'jpeg', 'png'].includes(fileExt || '')) {
-        setError('Only JPG and PNG images are allowed.');
+      if (!fileExt || !['jpg', 'jpeg', 'png'].includes(fileExt)) {
+        toast({
+          title: "Invalid file extension",
+          description: "Only .jpg, .jpeg, and .png files are allowed.",
+          variant: "destructive",
+        });
+        setUploading(false);
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: "Maximum file size is 5MB.",
+          variant: "destructive",
+        });
         setUploading(false);
         return;
       }
 
       const fileName = `${user?.id}/${Math.random()}.${fileExt}`;
 
-      // Upload to Supabase Storage
-      const { error: uploadError, data: uploadData } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, {
-          contentType: file.type, // Set the correct content type
-          upsert: true
+          contentType: file.type,
+          cacheControl: '3600'
         });
 
       if (uploadError) {
-        // Check for file type validation errors from Supabase
-        if (uploadError.message.includes('type') || uploadError.message.includes('format')) {
-          setError('Only JPG and PNG images are allowed.');
-          throw new Error('Invalid file type');
-        }
         throw uploadError;
       }
 
@@ -163,11 +157,11 @@ export const ProfilePhotoUpload = () => {
         title: "Success",
         description: "Profile photo removed successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting avatar:', error);
       toast({
         title: "Error",
-        description: "Failed to remove profile photo",
+        description: error.message || "Failed to remove profile photo",
         variant: "destructive",
       });
     } finally {
@@ -184,13 +178,6 @@ export const ProfilePhotoUpload = () => {
             <User className="h-16 w-16" />
           </AvatarFallback>
         </Avatar>
-        
-        {error && (
-          <div className="flex items-center gap-2 text-red-400 bg-red-400/10 px-3 py-2 rounded-md border border-red-400/20">
-            <AlertTriangle className="h-4 w-4" />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
         
         <div className="flex gap-3">
           <Button

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +19,7 @@ import { User, Settings, Lock, Share2, Camera } from 'lucide-react';
 const Profile = () => {
   const { user, loading } = useAuth();
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
+  const { data: userRole } = useCurrentUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,11 +28,11 @@ const Profile = () => {
       return;
     }
     
-    // Check subscription status and redirect if expired
-    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired) {
+    // Check subscription status and redirect if expired (skip for admins)
+    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired && userRole !== 'admin') {
       navigate('/checkout');
     }
-  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate]);
+  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
   if (loading || subscriptionLoading) {
     return (

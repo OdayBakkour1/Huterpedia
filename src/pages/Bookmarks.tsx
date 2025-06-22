@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserBookmarks } from '@/hooks/useNewsArticles';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { NewsGrid } from '@/components/NewsGrid';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ const Bookmarks = () => {
   const { user, loading } = useAuth();
   const { data: bookmarks, isLoading } = useUserBookmarks();
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
+  const { data: userRole } = useCurrentUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,11 +26,11 @@ const Bookmarks = () => {
       return;
     }
     
-    // Check subscription status and redirect if expired
-    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired) {
+    // Check subscription status and redirect if expired (skip for admins)
+    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired && userRole !== 'admin') {
       navigate('/checkout');
     }
-  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate]);
+  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
   if (loading || isLoading || subscriptionLoading) {
     return <div className="text-center text-white py-12">Loading...</div>;

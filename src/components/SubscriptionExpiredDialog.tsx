@@ -4,16 +4,18 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Crown, Clock, AlertTriangle } from "lucide-react";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 
 export const SubscriptionExpiredDialog = () => {
   const [open, setOpen] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const { data: subscription } = useSubscriptionStatus();
+  const { data: userRole } = useCurrentUserRole();
   const navigate = useNavigate();
   
   useEffect(() => {
-    // Only show dialog if subscription is expired
-    if (subscription?.isExpired) {
+    // Only show dialog if subscription is expired and user is not an admin
+    if (subscription?.isExpired && userRole !== 'admin') {
       // Small delay to ensure it doesn't show immediately on page load
       const timer = setTimeout(() => {
         setOpen(true);
@@ -21,11 +23,11 @@ export const SubscriptionExpiredDialog = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [subscription]);
+  }, [subscription, userRole]);
   
   // Set up countdown timer when dialog is opened
   useEffect(() => {
-    if (open && subscription?.isExpired) {
+    if (open && subscription?.isExpired && userRole !== 'admin') {
       const countdownInterval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -39,9 +41,9 @@ export const SubscriptionExpiredDialog = () => {
       
       return () => clearInterval(countdownInterval);
     }
-  }, [open, subscription, navigate]);
+  }, [open, subscription, userRole, navigate]);
   
-  if (!subscription?.isExpired) {
+  if (!subscription?.isExpired || userRole === 'admin') {
     return null;
   }
   

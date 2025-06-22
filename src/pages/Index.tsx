@@ -13,6 +13,7 @@ import { useNewsArticles } from "@/hooks/useNewsArticles";
 import { usePreloadCachedContent } from "@/hooks/useCachedContent";
 import { useFeedPreferences } from "@/hooks/useFeedPreferences";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -25,6 +26,7 @@ const Index = () => {
   const { data: newsArticles, isLoading: newsLoading } = useNewsArticles();
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
+  const { data: userRole } = useCurrentUserRole();
   
   // Preload cached content only after articles are loaded
   usePreloadCachedContent(newsArticles || []);
@@ -36,10 +38,11 @@ const Index = () => {
     }
     
     // Check subscription status and redirect if expired
-    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired) {
+    // Skip this check for admin users
+    if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired && userRole !== 'admin') {
       navigate('/checkout');
     }
-  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate]);
+  }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
   if (loading || subscriptionLoading) {
     return (
