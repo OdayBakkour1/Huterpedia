@@ -27,9 +27,12 @@ export const WelcomeBackDialog = () => {
     return null;
   }
   
-  const endDate = subscription.isTrial 
-    ? new Date(subscription.trialEnd || "") 
-    : new Date(subscription.subscriptionEnd || "");
+  const endDateString = subscription.isTrial 
+    ? subscription.trialEnd 
+    : subscription.subscriptionEnd;
+  
+  const endDate = endDateString ? new Date(endDateString) : null;
+  const isValidDate = endDate && !isNaN(endDate.getTime());
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -69,9 +72,9 @@ export const WelcomeBackDialog = () => {
             
             <div className="mt-2 text-sm text-slate-400">
               {subscription.isTrial ? (
-                <>Your trial ends on {format(endDate, "MMMM d, yyyy")}</>
+                <>Your trial ends on {isValidDate ? format(endDate, "MMMM d, yyyy") : 'N/A'}</>
               ) : (
-                <>Your subscription is active until {format(endDate, "MMMM d, yyyy")}</>
+                <>Your subscription is active until {isValidDate ? format(endDate, "MMMM d, yyyy") : 'N/A'}</>
               )}
             </div>
           </div>
