@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { v4 } from "https://deno.land/std@0.168.0/uuid/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://www.hunterpedia.site",
@@ -21,7 +20,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: corsHeaders });
   }
 
-  const ref = v4.generate();
+  const ref = crypto.randomUUID();
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
   const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const KAZAWALLET_API_KEY = Deno.env.get("KAZAWALLET_API_KEY")!;
