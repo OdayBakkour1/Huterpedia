@@ -51,12 +51,18 @@ serve(async (req) => {
       }
     }
 
-    // Store payment intent in Supabase
+    // Use test email for KazaWallet in development/testing
+    // KazaWallet requires users to be pre-registered in their system
+    const kazawalletEmail = Deno.env.get("KAZAWALLET_TEST_EMAIL") || "test@example.com";
+    
+    console.log(`Using KazaWallet email: ${kazawalletEmail} (original: ${email})`);
+
+    // Store payment intent in Supabase with original user email
     const { error: dbError } = await supabase.from("payments").insert([{
       ref, 
       amount: finalAmount, 
       currency, 
-      user_email: email, 
+      user_email: email, // Store original user email
       user_id: userId, 
       status: "pending", 
       payment_url: null,
@@ -67,8 +73,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Database error", details: dbError.message }), { status: 500, headers: corsHeaders });
     }
 
-    // Call KazaWallet API
-    console.log("Calling KazaWallet API with:", { amount: String(finalAmount), currency, email, ref, redirectUrl });
+    // Call KazaWallet API with test email
+    console.log("Calling KazaWallet API with:", { amount: String(finalAmount), currency, email: kazawalletEmail, ref, redirectUrl });
     
     const response = await fetch("https://outdoor.kasroad.com/wallet/createPaymentLink", {
       method: "POST",
@@ -79,7 +85,7 @@ serve(async (req) => {
       body: JSON.stringify({ 
         amount: String(finalAmount), 
         currency, 
-        email, 
+        email: kazawalletEmail, // Use test email for KazaWallet
         ref, 
         redirectUrl 
       }),
@@ -88,9 +94,24 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`KazaWallet API error (${response.status}):`, errorText);
+      
+      // Parse the error response to provide more helpful error messages
+      let errorMessage = "Failed to create payment link";
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.error?.message === "User not found") {
+          errorMessage = "Payment service configuration error. Please contact support.";
+        } else if (errorData.error?.message) {
+          errorMessage = errorData.error.message;
+        }
+      } catch (parseError) {
+        // If we can't parse the error, use the original text
+        errorMessage = errorText;
+      }
+      
       return new Response(JSON.stringify({ 
-        error: "Failed to create payment link", 
-        details: `API responded with status ${response.status}: ${errorText}` 
+        error: errorMessage,
+        details: `Payment service error (${response.status})`
       }), { status: 500, headers: corsHeaders });
     }
     

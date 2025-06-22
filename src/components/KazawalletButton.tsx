@@ -51,9 +51,22 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
       });
       
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error(`Payment API error (${res.status}):`, errorText);
-        throw new Error(`Payment service error (${res.status}): ${errorText}`);
+        const errorData = await res.json();
+        console.error(`Payment API error (${res.status}):`, errorData);
+        
+        // Provide user-friendly error messages
+        let userMessage = "Payment processing failed. Please try again.";
+        if (errorData.error) {
+          if (errorData.error.includes("configuration error") || errorData.error.includes("contact support")) {
+            userMessage = errorData.error;
+          } else if (errorData.error.includes("User not found")) {
+            userMessage = "Payment service is temporarily unavailable. Please try again later or contact support.";
+          } else {
+            userMessage = errorData.error;
+          }
+        }
+        
+        throw new Error(userMessage);
       }
       
       const data = await res.json();
