@@ -2,14 +2,23 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { v4 } from "https://deno.land/std@0.168.0/uuid/mod.ts";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://www.hunterpedia.site",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
+    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: corsHeaders });
   }
 
   const { amount, currency = "USD", email, userId, productInfo } = await req.json();
   if (!amount || !email || !userId) {
-    return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 });
+    return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: corsHeaders });
   }
 
   const ref = v4.generate();
@@ -25,7 +34,7 @@ serve(async (req) => {
     ref, amount, currency, user_email: email, user_id: userId, status: "pending", payment_url: null,
   }]);
   if (dbError) {
-    return new Response(JSON.stringify({ error: "Database error", details: dbError.message }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Database error", details: dbError.message }), { status: 500, headers: corsHeaders });
   }
 
   // Call KazaWallet API
@@ -36,10 +45,10 @@ serve(async (req) => {
   });
   const data = await response.json();
   if (!response.ok || !data?.paymentLink) {
-    return new Response(JSON.stringify({ error: "Failed to create payment link", details: data }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Failed to create payment link", details: data }), { status: 500, headers: corsHeaders });
   }
 
   // Update payment_url in Supabase
   await supabase.from("payments").update({ payment_url: data.paymentLink }).eq("ref", ref);
-  return new Response(JSON.stringify({ paymentUrl: data.paymentLink, ref }), { status: 200 });
-}); 
+  return new Response(JSON.stringify({ paymentUrl: data.paymentLink, ref }), { status: 200, headers: corsHeaders });
+});
