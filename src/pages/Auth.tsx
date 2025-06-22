@@ -9,6 +9,8 @@ import { Shield, AlertCircle, Eye, EyeOff, Clock, Mail, RefreshCw } from 'lucide
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { validateEmail, validatePassword, sanitizeInput } from '@/utils/security';
+import NewPublicHeader from "@/components/NewPublicHeader";
+import NewPublicFooter from "@/components/NewPublicFooter";
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -238,7 +240,7 @@ const Auth = () => {
       <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rounded-3xl rotate-45 animate-pulse blur-sm"></div>
       <div className="absolute top-1/3 right-10 w-20 h-20 bg-gradient-to-br from-purple-400/10 to-cyan-600/10 rounded-full animate-bounce blur-sm"></div>
       <div className="absolute bottom-20 left-1/3 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rotate-12 animate-pulse blur-sm"></div>
-
+      <NewPublicHeader />
       <div className="flex items-center justify-center min-h-screen p-6">
         <Card className="w-full max-w-md bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden">
           {/* Animated gradient border effect */}
@@ -388,6 +390,7 @@ const Auth = () => {
           </CardContent>
         </Card>
       </div>
+      <NewPublicFooter />
     </div>;
 };
 
