@@ -14,11 +14,16 @@ export const WelcomeBackDialog = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    // Show welcome back dialog only for active subscriptions
-    if (subscription?.isActive) {
+    // Check if dialog has been shown in this session
+    const hasShownWelcome = sessionStorage.getItem('welcomeShown');
+    
+    // Only show welcome back dialog if it hasn't been shown yet and subscription is active
+    if (!hasShownWelcome && subscription?.isActive) {
       // Small delay to ensure it doesn't show immediately on page load
       const timer = setTimeout(() => {
         setOpen(true);
+        // Mark as shown for this session
+        sessionStorage.setItem('welcomeShown', 'true');
       }, 1000);
       
       return () => clearTimeout(timer);
