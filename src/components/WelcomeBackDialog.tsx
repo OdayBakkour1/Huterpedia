@@ -5,10 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { CheckCircle, Crown } from "lucide-react";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { format } from "date-fns";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 
 export const WelcomeBackDialog = () => {
   const [open, setOpen] = useState(false);
   const { data: subscription } = useSubscriptionStatus();
+  const { data: userRole } = useCurrentUserRole();
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -27,12 +29,26 @@ export const WelcomeBackDialog = () => {
     return null;
   }
   
-  const endDateString = subscription.isTrial 
-    ? subscription.trialEnd 
-    : subscription.subscriptionEnd;
-  
-  const endDate = endDateString ? new Date(endDateString) : null;
-  const isValidDate = endDate && !isNaN(endDate.getTime());
+  // Safely handle date formatting
+  const getFormattedDate = () => {
+    try {
+      if (subscription.isTrial && subscription.trialEnd) {
+        const date = new Date(subscription.trialEnd);
+        if (!isNaN(date.getTime())) {
+          return format(date, "MMMM d, yyyy");
+        }
+      } else if (subscription.subscriptionEnd) {
+        const date = new Date(subscription.subscriptionEnd);
+        if (!isNaN(date.getTime())) {
+          return format(date, "MMMM d, yyyy");
+        }
+      }
+      return "N/A";
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return "N/A";
+    }
+  };
   
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -56,25 +72,29 @@ export const WelcomeBackDialog = () => {
           <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {subscription.isPremium ? (
+                {subscription.isPremium || userRole === 'admin' ? (
                   <Crown className="h-5 w-5 text-purple-400" />
                 ) : (
                   <Crown className="h-5 w-5 text-blue-400" />
                 )}
                 <span className="font-medium text-white">
-                  {subscription.isPremium ? 'Premium Plan' : 'Free Trial'}
+                  {userRole === 'admin' ? 'Admin Account' : (subscription.isPremium ? 'Premium Plan' : 'Free Trial')}
                 </span>
               </div>
-              <span className={`text-sm ${subscription.isPremium ? 'text-purple-400' : 'text-blue-400'}`}>
-                {subscription.daysRemaining} days remaining
-              </span>
+              {userRole !== 'admin' && (
+                <span className={`text-sm ${subscription.isPremium ? 'text-purple-400' : 'text-blue-400'}`}>
+                  {subscription.daysRemaining} days remaining
+                </span>
+              )}
             </div>
             
             <div className="mt-2 text-sm text-slate-400">
-              {subscription.isTrial ? (
-                <>Your trial ends on {isValidDate ? format(endDate, "MMMM d, yyyy") : 'N/A'}</>
+              {userRole === 'admin' ? (
+                <>Admin account with full access to all features</>
+              ) : subscription.isTrial ? (
+                <>Your trial ends on {getFormattedDate()}</>
               ) : (
-                <>Your subscription is active until {isValidDate ? format(endDate, "MMMM d, yyyy") : 'N/A'}</>
+                <>Your subscription is active until {getFormattedDate()}</>
               )}
             </div>
           </div>
