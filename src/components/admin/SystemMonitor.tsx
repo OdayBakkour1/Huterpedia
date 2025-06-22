@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Monitor } from 'lucide-react';
 
 export const SystemMonitor = () => {
-  // You can replace these with real env vars if available
-  const region = process.env.VERCEL_REGION || 'iad1 (Washington, D.C., USA)';
+  // Using static values since process.env is not available in browser
+  const region = 'iad1 (Washington, D.C., USA)';
   const memory = '8 GB';
   const cpu = '2 vCPU';
   const provider = 'Vercel';
