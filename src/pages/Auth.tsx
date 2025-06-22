@@ -382,7 +382,7 @@ const Auth = () => {
             <div className="mt-8 p-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10">
               <div className="flex items-center space-x-3 text-sm text-white/70">
                 <AlertCircle className="h-4 w-4 text-cyan-400" />
-                <span>Secured By Cyberpedia</span>
+                <span>Secured By <a href="https://cyberpedia.site/" target="_blank" rel="noopener noreferrer" className="underline hover:text-cyan-300 transition-colors">Cyberpedia</a></span>
               </div>
             </div>
           </CardContent>
