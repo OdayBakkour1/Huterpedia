@@ -245,8 +245,8 @@ const Auth = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-cyan-500/20 rounded-3xl opacity-50 animate-pulse"></div>
           
           <CardHeader className="relative text-center py-8 px-8">
-            <div className="flex justify-center mb-6">
-              <img src="/HunterPedia Png-01.png" alt="Hunterpedia Logo" className="h-20 w-20 object-contain" />
+            <div className="flex justify-center mb-2">
+              <img src="/HunterPedia Png-01.png" alt="Hunterpedia Logo" className="h-28 w-28 object-contain" />
             </div>
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent mb-2">
               Hunterpedia
