@@ -1,13 +1,10 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -26,6 +23,7 @@ serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const KAZAWALLET_API_KEY = Deno.env.get("KAZAWALLET_API_KEY")!;
     const SITE_URL = Deno.env.get("SITE_URL") || "http://localhost:8080";
+    
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const redirectUrl = `${SITE_URL}/payment-success?ref=${ref}`;
 
@@ -60,26 +58,12 @@ serve(async (req) => {
       }
     }
 
-    // Use test email for KazaWallet in development/testing
-    // KazaWallet requires users to be pre-registered in their system
-    const kazawalletEmail = Deno.env.get("KAZAWALLET_TEST_EMAIL");
-    
-    if (!kazawalletEmail) {
-      console.error('KAZAWALLET_TEST_EMAIL environment variable is not set');
-      return new Response(JSON.stringify({ 
-        error: "Payment service not properly configured. Please contact support.",
-        details: "Missing test email configuration for payment service"
-      }), { status: 500, headers: corsHeaders });
-    }
-    
-    console.log(`Using KazaWallet email: ${kazawalletEmail} (original: ${email})`);
-
-    // Store payment intent in Supabase with original user email
+    // Store payment intent in Supabase
     const { error: dbError } = await supabase.from("payments").insert([{
       ref, 
       amount: finalAmount, 
       currency, 
-      user_email: email, // Store original user email
+      user_email: email,
       user_id: userId, 
       status: "pending", 
       payment_url: null,
@@ -90,8 +74,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Database error", details: dbError.message }), { status: 500, headers: corsHeaders });
     }
 
-    // Call KazaWallet API with test email
-    console.log("Calling KazaWallet API with:", { amount: String(finalAmount), currency, email: kazawalletEmail, ref, redirectUrl });
+    // Call KazaWallet API with user's actual email
+    console.log("Calling KazaWallet API with:", { amount: String(finalAmount), currency, email, ref, redirectUrl });
     
     const response = await fetch("https://outdoor.kasroad.com/wallet/createPaymentLink", {
       method: "POST",
@@ -102,7 +86,7 @@ serve(async (req) => {
       body: JSON.stringify({ 
         amount: String(finalAmount), 
         currency, 
-        email: kazawalletEmail, // Use test email for KazaWallet
+        email, 
         ref, 
         redirectUrl 
       }),
@@ -114,21 +98,24 @@ serve(async (req) => {
       
       // Parse the error response to provide more helpful error messages
       let errorMessage = "Failed to create payment link";
+      let errorDetails = `Payment service error (${response.status})`;
+      
       try {
         const errorData = JSON.parse(errorText);
-        if (errorData.error?.message === "User not found") {
-          errorMessage = "Payment service test user not found. Please ensure the KAZAWALLET_TEST_EMAIL environment variable is set to a valid registered test user email in the KazaWallet system.";
-        } else if (errorData.error?.message) {
+        if (errorData.error?.message) {
           errorMessage = errorData.error.message;
+        }
+        if (errorData.error?.details) {
+          errorDetails = errorData.error.details;
         }
       } catch (parseError) {
         // If we can't parse the error, use the original text
-        errorMessage = errorText;
+        errorDetails = errorText;
       }
       
       return new Response(JSON.stringify({ 
         error: errorMessage,
-        details: `Payment service error (${response.status}). Please verify that KAZAWALLET_TEST_EMAIL is set to a valid test user email.`
+        details: errorDetails
       }), { status: 500, headers: corsHeaders });
     }
     
@@ -161,8 +148,10 @@ serve(async (req) => {
     console.error('Unexpected error:', error);
     return new Response(JSON.stringify({ 
       error: "Unexpected error", 
-      details: error.message,
-      stack: error.stack
+      details: error.message
     }), { status: 500, headers: corsHeaders });
   }
 });
+
+// Import createClient at the top
+import { createClient } from "npm:@supabase/supabase-js@2";
