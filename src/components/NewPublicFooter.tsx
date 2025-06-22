@@ -1,3 +1,0 @@
-import Footer from "./Footer";
-const NewPublicFooter = Footer;
-export default NewPublicFooter;
