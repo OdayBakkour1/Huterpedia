@@ -8,12 +8,16 @@ export const useNewsArticles = () => {
     queryFn: async () => {
       console.log('Fetching news articles from database...');
       
-      // Removed 15-day filter: fetch all articles
+      // Fetch articles from the last 30 days for better content variety
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
       const { data, error } = await supabase
         .from('news_articles')
         .select('*')
+        .gte('published_at', thirtyDaysAgo.toISOString())
         .order('published_at', { ascending: false })
-        .limit(100);
+        .limit(200); // Increased limit for better variety
       
       if (error) {
         console.error('Error fetching news articles:', error);
@@ -37,15 +41,32 @@ export const useNewsArticles = () => {
         cache_updated_at: article.cache_updated_at || undefined,
       })) as NewsArticle[];
 
-      // Sort all articles by publishedAt descending (newest first)
-      const sortedArticles = articles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+      // Enhanced sorting: prioritize recent articles but mix in some variety
+      const now = new Date();
+      const sortedArticles = articles.sort((a, b) => {
+        const dateA = new Date(a.publishedAt);
+        const dateB = new Date(b.publishedAt);
+        
+        // Calculate recency score (more recent = higher score)
+        const recencyScoreA = Math.max(0, 1 - (now.getTime() - dateA.getTime()) / (7 * 24 * 60 * 60 * 1000));
+        const recencyScoreB = Math.max(0, 1 - (now.getTime() - dateB.getTime()) / (7 * 24 * 60 * 60 * 1000));
+        
+        // Add some randomness for variety while maintaining recency preference
+        const randomFactorA = Math.random() * 0.3;
+        const randomFactorB = Math.random() * 0.3;
+        
+        const finalScoreA = recencyScoreA + randomFactorA;
+        const finalScoreB = recencyScoreB + randomFactorB;
+        
+        return finalScoreB - finalScoreA;
+      });
 
       console.log('Articles processed for display:', sortedArticles.length);
       return sortedArticles;
     },
-    staleTime: 2 * 60 * 1000, // Increased to 2 minutes to reduce refetching
-    refetchInterval: 5 * 60 * 1000, // Increased to 5 minutes to reduce background requests
-    refetchOnWindowFocus: false, // Disable to prevent unnecessary refetches
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    refetchInterval: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 };
 

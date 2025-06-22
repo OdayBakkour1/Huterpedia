@@ -1,17 +1,13 @@
 project_id = "gzpayeckolpfflgvkqvh"
 
-[
-api
-]
+[api]
 enabled = true
 port = 54321
 schemas = ["public", "graphql_public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
-[
-auth
-]
+[auth]
 enabled = true
 port = 54324
 site_url = "https://hunterpedia.site"
@@ -25,7 +21,14 @@ enable_signup = true
 email_double_confirm_changes = true
 enable_manual_linking = false
 
-[
-functions.fetch-news
-]
+[functions.fetch-news]
+verify_jwt = false
+
+[functions.process-staging-articles]
+verify_jwt = false
+
+[functions.summarize-article]
+verify_jwt = true
+
+[functions.generate-description]
 verify_jwt = false

@@ -1,4 +1,4 @@
-import { Shield, Bug, Database, Code, Skull, Lock, Mail, Users, Zap, Eye } from "lucide-react";
+import { Shield, Bug, Database, Code, Skull, Lock, Mail, Users, Zap, Eye, TrendingUp, AlertTriangle } from "lucide-react";
 
 interface CategoryFilterProps {
   selectedCategory: string;
@@ -7,18 +7,13 @@ interface CategoryFilterProps {
 }
 
 const categories = [
-  { name: "All", icon: Shield },
-  { name: "Threats", icon: Shield },
-  { name: "Vulnerabilities", icon: Bug },
-  { name: "Breaches", icon: Database },
-  { name: "Tools", icon: Code },
-  { name: "Malware", icon: Skull },
-  { name: "Ransomware", icon: Lock },
-  { name: "Phishing", icon: Mail },
-  { name: "Social Engineering", icon: Users },
-  { name: "Threat Actors Landscape", icon: Users },
-  { name: "Zero Day", icon: Zap },
-  { name: "APT", icon: Eye },
+  { name: "All", icon: Shield, color: "text-slate-400" },
+  { name: "Threats", icon: Shield, color: "text-red-400" },
+  { name: "Vulnerabilities", icon: Bug, color: "text-orange-400" },
+  { name: "Breaches", icon: Database, color: "text-purple-400" },
+  { name: "Analysis", icon: TrendingUp, color: "text-blue-400" },
+  { name: "Updates", icon: AlertTriangle, color: "text-green-400" },
+  { name: "Threat Actors Landscape", icon: Users, color: "text-yellow-400" },
 ];
 
 export const CategoryFilter = ({ selectedCategory, setSelectedCategory, articles }: CategoryFilterProps) => {
@@ -39,19 +34,27 @@ export const CategoryFilter = ({ selectedCategory, setSelectedCategory, articles
         .map((category) => {
           const Icon = category.icon;
           const isSelected = selectedCategory === category.name;
+          const count = categoryCounts[category.name];
+          
           return (
             <button
               key={category.name}
               onClick={() => setSelectedCategory(category.name)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm group ${
                 isSelected
-                  ? "bg-cyan-500 text-white shadow-lg"
-                  : "bg-slate-800/50 text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-400/50 border border-transparent backdrop-blur-sm"
+                  ? "bg-cyan-500 text-white shadow-lg transform scale-105"
+                  : "bg-slate-800/50 text-slate-300 hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-400/50 border border-transparent backdrop-blur-sm hover:transform hover:scale-105"
               }`}
             >
-              <Icon className="h-3 w-3" />
-              <span>{category.name}</span>
-              <span className="ml-1 text-xs text-slate-400">{categoryCounts[category.name]}</span>
+              <Icon className={`h-3 w-3 ${isSelected ? 'text-white' : category.color} group-hover:text-cyan-300 transition-colors duration-200`} />
+              <span className="font-medium">{category.name}</span>
+              <span className={`ml-1 text-xs px-1.5 py-0.5 rounded-full ${
+                isSelected 
+                  ? 'bg-white/20 text-white' 
+                  : 'bg-slate-700/50 text-slate-400 group-hover:bg-cyan-500/20 group-hover:text-cyan-300'
+              } transition-all duration-200`}>
+                {count}
+              </span>
             </button>
           );
         })}

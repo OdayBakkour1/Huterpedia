@@ -145,9 +145,22 @@ export const NewsCard = ({ article }: NewsCardProps) => {
     }
   };
 
+  // Get category color for visual enhancement
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      'Threats': 'border-red-500/30 bg-red-500/5',
+      'Vulnerabilities': 'border-orange-500/30 bg-orange-500/5',
+      'Breaches': 'border-purple-500/30 bg-purple-500/5',
+      'Analysis': 'border-blue-500/30 bg-blue-500/5',
+      'Updates': 'border-green-500/30 bg-green-500/5',
+      'Threat Actors Landscape': 'border-yellow-500/30 bg-yellow-500/5',
+    };
+    return colors[category as keyof typeof colors] || 'border-slate-600/30 bg-slate-800/5';
+  };
+
   return (
     <>
-      <Card className="overflow-hidden hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 bg-slate-800/50 border-slate-700 hover:border-slate-600 backdrop-blur-sm h-full flex flex-col group">
+      <Card className={`overflow-hidden hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 bg-slate-800/50 border-slate-700 hover:border-slate-600 backdrop-blur-sm h-full flex flex-col group ${getCategoryColor(cleanedArticle.category)}`}>
         <CardHeader className="pb-3 flex-shrink-0">
           <NewsCardHeader
             category={cleanedArticle.category}

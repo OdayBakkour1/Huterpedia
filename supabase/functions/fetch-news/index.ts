@@ -8,7 +8,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Clean HTML content utility
+// Enhanced HTML content cleaning utility
 const cleanHtmlContent = (text: string): string => {
   if (!text) return '';
   
@@ -26,7 +26,11 @@ const cleanHtmlContent = (text: string): string => {
       '&rsquo;': "'",
       '&mdash;': '—',
       '&ndash;': '–',
-      '&hellip;': '…'
+      '&hellip;': '…',
+      '&apos;': "'",
+      '&copy;': '©',
+      '&reg;': '®',
+      '&trade;': '™'
     };
     
     return str.replace(/&[#\w]+;/g, (entity) => {
@@ -35,22 +39,88 @@ const cleanHtmlContent = (text: string): string => {
   };
   
   let cleaned = text
+    // Remove script and style tags completely
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+    // Remove img tags completely (including incomplete ones)
     .replace(/<img[^>]*>/gi, '')
+    .replace(/<img[^>]*$/gi, '')
+    // Remove all other HTML tags including incomplete ones
     .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .replace(/\n/g, ' ')
-    .trim();
-  
-  cleaned = decodeHtmlEntities(cleaned);
-  
-  cleaned = cleaned
-    .replace(/src="[^"]*$/gi, '')
-    .replace(/href="[^"]*$/gi, '')
     .replace(/<[^>]*$/g, '')
     .replace(/^[^<]*>/g, '')
+    // Remove incomplete HTML attributes
+    .replace(/\s+src="[^"]*"?/gi, '')
+    .replace(/\s+href="[^"]*"?/gi, '')
+    .replace(/\s+class="[^"]*"?/gi, '')
+    .replace(/\s+style="[^"]*"?/gi, '')
+    // Remove broken image URLs and incomplete attributes
+    .replace(/https?:\/\/[^\s<>"]*-\s*$/gi, '')
+    .replace(/src="[^"]*$/gi, '')
+    .replace(/href="[^"]*$/gi, '')
+    // Remove multiple spaces with single space
+    .replace(/\s+/g, ' ')
+    // Remove line breaks and tabs
+    .replace(/[\n\r\t]/g, ' ')
+    .trim();
+  
+  // Decode HTML entities
+  cleaned = decodeHtmlEntities(cleaned);
+  
+  // Final cleanup for any remaining artifacts
+  cleaned = cleaned
+    // Remove any remaining incomplete tags or attributes
+    .replace(/[<>]/g, '')
+    // Remove standalone attribute patterns
+    .replace(/\b(src|href|class|style|id)=["'][^"']*["']?/gi, '')
+    .replace(/\b(src|href|class|style|id)=[^\s]*/gi, '')
+    // Clean up multiple spaces again
+    .replace(/\s+/g, ' ')
     .trim();
   
   return cleaned;
+};
+
+// Enhanced category detection
+const detectCategory = (title: string, description: string, source: string, defaultCategory: string): string => {
+  const text = `${title} ${description}`.toLowerCase();
+  
+  // Threat-related keywords
+  if (text.match(/\b(apt|advanced persistent threat|nation.?state|state.?sponsored|cyber.?attack|hack|breach|compromise|infiltrat|exploit|zero.?day|0.?day)\b/)) {
+    return 'Threats';
+  }
+  
+  // Vulnerability keywords
+  if (text.match(/\b(cve|vulnerability|vuln|patch|security.?update|security.?fix|buffer.?overflow|sql.?injection|xss|rce|remote.?code.?execution)\b/)) {
+    return 'Vulnerabilities';
+  }
+  
+  // Breach keywords
+  if (text.match(/\b(data.?breach|data.?leak|exposed|stolen|theft|ransomware|extortion|leak)\b/)) {
+    return 'Breaches';
+  }
+  
+  // Malware keywords
+  if (text.match(/\b(malware|trojan|virus|worm|backdoor|rootkit|spyware|adware|botnet)\b/)) {
+    return 'Threats';
+  }
+  
+  // Phishing keywords
+  if (text.match(/\b(phishing|spear.?phishing|social.?engineering|scam|fraud|impersonat)\b/)) {
+    return 'Threats';
+  }
+  
+  // Analysis keywords
+  if (text.match(/\b(analysis|research|report|study|investigation|forensic|incident.?response)\b/)) {
+    return 'Analysis';
+  }
+  
+  // Updates keywords
+  if (text.match(/\b(update|release|announcement|advisory|alert|warning|guidance)\b/)) {
+    return 'Updates';
+  }
+  
+  return defaultCategory;
 };
 
 // Cache article content in storage
@@ -90,23 +160,36 @@ const cacheArticleContent = async (supabase: any, articleId: string, title: stri
   }
 };
 
-// Check if description is valid
+// Enhanced description validation
 const isValidDescription = (description: string): boolean => {
   if (!description) return false;
   
   const cleaned = cleanHtmlContent(description);
   
-  if (cleaned.length < 20) return false;
+  // Must be at least 30 characters for meaningful content
+  if (cleaned.length < 30) return false;
   
-  const htmlArtifacts = /src=|href=|<[^>]*|img\s|style=|class=/gi;
+  // Check if description contains mostly HTML artifacts
+  const htmlArtifacts = /src=|href=|<[^>]*|img\s|style=|class=|https?:\/\/[^\s]*-\s*$/gi;
   const artifactMatches = cleaned.match(htmlArtifacts);
   
-  if (artifactMatches && artifactMatches.length > cleaned.length * 0.2) return false;
+  // If more than 15% of the content is HTML artifacts, consider it invalid
+  if (artifactMatches && artifactMatches.length > cleaned.length * 0.15) return false;
+  
+  // Check for common invalid patterns
+  const invalidPatterns = [
+    /^(read more|continue reading|click here)/i,
+    /^(the post|this article|this story)/i,
+    /^\s*\.{3,}\s*$/,
+    /^\s*-+\s*$/
+  ];
+  
+  if (invalidPatterns.some(pattern => pattern.test(cleaned))) return false;
   
   return true;
 };
 
-// Generate AI description with rate limiting
+// Enhanced AI description generation with better error handling
 const generateDescription = async (title: string, url: string, source: string): Promise<string> => {
   try {
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
@@ -127,8 +210,9 @@ The description should:
 - Be factual and informative
 - Focus on the main threat, vulnerability, or security development
 - Be suitable for a cybersecurity news aggregator
+- Include relevant technical details if mentioned in the title
 
-Do not include HTML tags or special formatting.`;
+Do not include HTML tags, special formatting, or promotional language.`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -175,11 +259,99 @@ Do not include HTML tags or special formatting.`;
     }
 
     const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Clean the generated text
+    return cleanHtmlContent(generatedText);
   } catch (error) {
     console.error('Error generating AI description:', error);
     return '';
   }
+};
+
+// Enhanced duplicate detection
+const isDuplicate = async (supabase: any, title: string, source: string, url: string, targetTable: string): Promise<boolean> => {
+  try {
+    // Check for exact title and source match
+    const { data: exactMatch } = await supabase
+      .from(targetTable)
+      .select('id')
+      .eq('title', title)
+      .eq('source', source)
+      .single();
+
+    if (exactMatch) return true;
+
+    // Check for URL match if URL exists
+    if (url) {
+      const { data: urlMatch } = await supabase
+        .from(targetTable)
+        .select('id')
+        .eq('url', url)
+        .single();
+
+      if (urlMatch) return true;
+    }
+
+    // Check for similar titles (fuzzy matching)
+    const { data: similarTitles } = await supabase
+      .from(targetTable)
+      .select('title')
+      .eq('source', source)
+      .limit(50);
+
+    if (similarTitles) {
+      const normalizedTitle = title.toLowerCase().replace(/[^\w\s]/g, '').trim();
+      for (const article of similarTitles) {
+        const normalizedExisting = article.title.toLowerCase().replace(/[^\w\s]/g, '').trim();
+        
+        // Calculate similarity (simple word overlap)
+        const titleWords = normalizedTitle.split(/\s+/);
+        const existingWords = normalizedExisting.split(/\s+/);
+        const commonWords = titleWords.filter(word => 
+          word.length > 3 && existingWords.includes(word)
+        );
+        
+        // If more than 70% of words match, consider it a duplicate
+        if (commonWords.length / Math.max(titleWords.length, existingWords.length) > 0.7) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Error checking for duplicates:', error);
+    return false;
+  }
+};
+
+// Enhanced date parsing
+const parsePublishDate = (pubDate: string): { date: string; isFallback: boolean } => {
+  if (!pubDate) {
+    return { date: new Date().toISOString(), isFallback: true };
+  }
+
+  try {
+    // Try parsing the date
+    const parsed = Date.parse(pubDate);
+    if (!isNaN(parsed)) {
+      const date = new Date(parsed);
+      
+      // Check if date is reasonable (not too far in future or past)
+      const now = new Date();
+      const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      
+      if (date >= oneYearAgo && date <= oneWeekFromNow) {
+        return { date: date.toISOString(), isFallback: false };
+      }
+    }
+  } catch (error) {
+    console.error('Error parsing date:', pubDate, error);
+  }
+
+  return { date: new Date().toISOString(), isFallback: true };
 };
 
 serve(async (req) => {
@@ -194,13 +366,16 @@ serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const useStaging = body.staging || false;
+    const maxArticlesPerSource = body.maxArticles || 20;
 
-    console.log(`Fetching active news sources... (Staging mode: ${useStaging})`);
+    console.log(`Starting news fetch process... (Staging mode: ${useStaging}, Max articles per source: ${maxArticlesPerSource})`);
 
+    // Fetch active news sources with better error handling
     const { data: sources, error: sourcesError } = await supabase
       .from('news_sources')
       .select('*')
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .order('created_at', { ascending: true });
 
     if (sourcesError) {
       console.error('Error fetching sources:', sourcesError);
@@ -210,67 +385,87 @@ serve(async (req) => {
     console.log(`Found ${sources?.length || 0} active sources`);
 
     let totalNewArticles = 0;
+    let totalProcessedSources = 0;
+    let totalErrors = 0;
     const targetTable = useStaging ? 'news_articles_staging' : 'news_articles';
+    const sourceResults: any[] = [];
 
     for (const source of sources || []) {
+      const sourceResult = {
+        name: source.name,
+        url: source.url,
+        category: source.category,
+        articlesFound: 0,
+        articlesAdded: 0,
+        errors: [] as string[]
+      };
+
       try {
         console.log(`Processing source: ${source.name} (${source.url})`);
         
-        const response = await fetch(source.url);
+        // Enhanced fetch with timeout and retry logic
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
+        const response = await fetch(source.url, {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'Hunterpedia News Aggregator 1.0',
+            'Accept': 'application/rss+xml, application/xml, text/xml'
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        
         if (!response.ok) {
-          console.error(`Failed to fetch ${source.url}: ${response.statusText}`);
+          const errorMsg = `Failed to fetch ${source.url}: ${response.status} ${response.statusText}`;
+          console.error(errorMsg);
+          sourceResult.errors.push(errorMsg);
           continue;
         }
-        const xmlText = await response.text();
-        const feed = await parseFeed(xmlText);
         
+        const xmlText = await response.text();
+        
+        if (!xmlText || xmlText.trim().length === 0) {
+          const errorMsg = `Empty response from ${source.url}`;
+          console.error(errorMsg);
+          sourceResult.errors.push(errorMsg);
+          continue;
+        }
+        
+        const feed = await parseFeed(xmlText);
         const items = feed.entries || [];
         
-        console.log(`Found ${items.length} items in RSS feed`);
+        sourceResult.articlesFound = items.length;
+        console.log(`Found ${items.length} items in RSS feed for ${source.name}`);
 
-        for (const item of items) {
+        // Process items with limit
+        const itemsToProcess = items.slice(0, maxArticlesPerSource);
+        
+        for (const item of itemsToProcess) {
           try {
-            const title = item.title?.value || '';
-            let description = item.description?.value || '';
+            const title = cleanHtmlContent(item.title?.value || '');
+            let description = cleanHtmlContent(item.description?.value || '');
             const link = item.links?.[0]?.href || item.id || '';
-            const pubDate =
-              item.published ||
-              item.updated ||
-              item.pubDate ||
-              (item['dc:date'] && item['dc:date'].value) ||
-              '';
+            const pubDate = item.published || item.updated || item.pubDate || '';
 
-            if (!title) continue;
-
-            // title = cleanHtmlContent(title); // Title is usually plain text
-            description = cleanHtmlContent(description || '');
-
-            // Check for existing article in the target table
-            const { data: existingArticle } = await supabase
-              .from(targetTable)
-              .select('id')
-              .eq('title', title)
-              .eq('source', source.name)
-              .single();
-
-            if (existingArticle) {
+            if (!title || title.length < 10) {
+              console.log(`Skipping item with insufficient title: "${title}"`);
               continue;
             }
 
-            let publishedAt = new Date().toISOString();
-            let dateIsFallback = false;
-            if (pubDate) {
-              const parsed = Date.parse(pubDate);
-              if (!isNaN(parsed)) {
-                publishedAt = new Date(parsed).toISOString();
-              } else {
-                dateIsFallback = true;
-                console.log('Failed to parse date:', pubDate, 'for article:', title);
-              }
-            } else {
-              dateIsFallback = true;
-              console.log('No publish date found for article:', title);
+            // Enhanced duplicate checking
+            const isDuplicateArticle = await isDuplicate(supabase, title, source.name, link, targetTable);
+            if (isDuplicateArticle) {
+              console.log(`Duplicate article found, skipping: ${title}`);
+              continue;
             }
+
+            // Enhanced date parsing
+            const { date: publishedAt, isFallback: dateIsFallback } = parsePublishDate(pubDate);
+
+            // Enhanced category detection
+            const detectedCategory = detectCategory(title, description, source.name, source.category);
 
             // For staging, we don't generate AI descriptions immediately
             if (useStaging) {
@@ -280,31 +475,34 @@ serve(async (req) => {
                   title,
                   description: description || '',
                   source: source.name,
-                  url: link,
-                  category: source.category,
+                  url: link || null,
+                  category: detectedCategory,
                   published_at: publishedAt,
-                  date_is_fallback: dateIsFallback,
+                  has_valid_description: isValidDescription(description),
+                  is_processed: false
                 })
                 .select('id')
                 .single();
 
               if (insertError) {
                 console.error('Error inserting article to staging:', insertError);
+                sourceResult.errors.push(`Insert error: ${insertError.message}`);
                 continue;
               }
 
+              sourceResult.articlesAdded++;
               totalNewArticles++;
               console.log(`Inserted article to staging: ${title}`);
             } else {
-              // Original logic for direct insertion
+              // Enhanced description handling for production
               if (!isValidDescription(description)) {
                 console.log(`Generating AI description for: ${title}`);
                 const aiDescription = await generateDescription(title, link, source.name);
-                if (aiDescription) {
+                if (aiDescription && aiDescription.length > 30) {
                   description = aiDescription;
                   console.log('AI description generated successfully');
                 } else {
-                  description = `This cybersecurity article from ${source.name} discusses important security developments. Click to read the full article for detailed information.`;
+                  description = `This cybersecurity article from ${source.name} discusses important security developments. The article covers ${detectedCategory.toLowerCase()} related to current threat landscape. Click to read the full article for detailed information.`;
                 }
               }
 
@@ -319,16 +517,16 @@ serve(async (req) => {
                   title,
                   description,
                   source: source.name,
-                  url: link,
-                  category: source.category,
+                  url: link || null,
+                  category: detectedCategory,
                   published_at: publishedAt,
-                  date_is_fallback: dateIsFallback,
                 })
                 .select('id')
                 .single();
 
               if (insertError) {
                 console.error('Error inserting article:', insertError);
+                sourceResult.errors.push(`Insert error: ${insertError.message}`);
                 continue;
               }
 
@@ -347,26 +545,63 @@ serve(async (req) => {
                 console.log(`Article cached successfully: ${title}`);
               }
 
+              sourceResult.articlesAdded++;
               totalNewArticles++;
               console.log(`Inserted new article: ${title}`);
             }
 
           } catch (itemError) {
             console.error('Error processing item:', itemError);
+            sourceResult.errors.push(`Item processing error: ${itemError.message}`);
           }
         }
 
+        totalProcessedSources++;
+
       } catch (sourceError) {
         console.error(`Error processing source ${source.name}:`, sourceError);
+        sourceResult.errors.push(`Source error: ${sourceError.message}`);
+        totalErrors++;
       }
+
+      sourceResults.push(sourceResult);
+    }
+
+    // Update analytics
+    try {
+      const { error: analyticsError } = await supabase
+        .from('analytics')
+        .upsert({
+          metric_name: 'news_fetch_run',
+          metric_value: totalNewArticles,
+          date_recorded: new Date().toISOString().split('T')[0]
+        }, {
+          onConflict: 'metric_name,date_recorded'
+        });
+
+      if (analyticsError) {
+        console.error('Error updating analytics:', analyticsError);
+      }
+    } catch (analyticsError) {
+      console.error('Error in analytics update:', analyticsError);
     }
 
     const mode = useStaging ? 'staging' : 'production';
-    console.log(`Successfully processed news sources in ${mode} mode. Added ${totalNewArticles} new articles.`);
+    const summary = {
+      mode,
+      totalSources: sources?.length || 0,
+      processedSources: totalProcessedSources,
+      totalNewArticles,
+      totalErrors,
+      sourceResults: sourceResults.filter(r => r.errors.length > 0 || r.articlesAdded > 0)
+    };
 
-    console.log(`Finished processing all sources. Total new articles: ${totalNewArticles}`);
+    console.log(`Finished processing all sources. Summary:`, summary);
 
-    return new Response(JSON.stringify({ message: "News fetched successfully", totalNewArticles }), {
+    return new Response(JSON.stringify({
+      message: `News fetched successfully in ${mode} mode`,
+      summary
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
