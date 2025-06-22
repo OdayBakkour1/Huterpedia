@@ -9,7 +9,7 @@ interface KazawalletButtonProps {
 }
 
 export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, couponCode }) => {
-  const { user, session } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,16 +30,16 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
     try {
       console.log("Creating payment with:", { amount, couponCode, email: user.email, userId: user.id });
       
-      const res = await fetch("https://gzpayeckolpfflgvkqvh.supabase.co/functions/v1/create-payment", {
+      const res = await fetch("/api/create-payment-link", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          amount,
+          amount: String(amount),
           currency: "USD",
           email: user.email,
-          userId: user.id,
+          ref: user.id,
           couponCode,
         }),
       });
@@ -53,8 +53,8 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
       const data = await res.json();
       console.log("Payment API response:", data);
       
-      if (data.paymentUrl) {
-        window.location.href = data.paymentUrl;
+      if (data.paymentLink) {
+        window.location.href = data.paymentLink;
       } else {
         throw new Error(data.error || "Failed to create payment link.");
       }
