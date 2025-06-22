@@ -3,40 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import NewPublicHeader from '@/components/NewPublicHeader';
 import NewPublicFooter from '@/components/NewPublicFooter';
-import { Button } from '@/components/ui/button';
+import PaymentButton from '@/components/PaymentButton';
 
 const Checkout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState(user?.email || '');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handlePay = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch('/api/kazawallet/kazawallet-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: 5,
-          currency: 'USD',
-          email,
-          user_id: user?.id || 'guest',
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data.paymentLink) {
-        window.location.href = data.paymentLink;
-      } else {
-        setError(data.error || 'Failed to create payment link.');
-      }
-    } catch (err) {
-      setError('An error occurred. Please try again.');
-    }
-    setLoading(false);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
@@ -66,10 +38,12 @@ const Checkout = () => {
               placeholder="Enter your email"
             />
           </div>
-          {error && <div className="text-red-400 text-sm mb-4 text-center">{error}</div>}
-          <Button onClick={handlePay} className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-2xl rounded-2xl py-4 text-lg font-semibold transition-all duration-300 hover:scale-105" disabled={loading}>
-            {loading ? 'Redirecting...' : 'Pay with Kazawallet'}
-          </Button>
+          <PaymentButton
+            amount={5}
+            productName="Premium Subscription"
+            onSuccess={ref => console.log('Payment started, ref:', ref)}
+            onError={err => console.error('Payment error:', err)}
+          />
         </div>
       </div>
       <NewPublicFooter />
