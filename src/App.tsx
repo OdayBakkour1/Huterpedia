@@ -17,6 +17,7 @@ import Pricing from "@/pages/Pricing";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/NotFound";
+import PaymentSuccess from "@/pages/PaymentSuccess";
 import { AdminRoute } from "@/components/AdminRoute";
 import { MainLayout } from "@/components/MainLayout";
 import Checkout from "@/pages/Checkout";
@@ -49,6 +50,7 @@ const App = () => {
                 <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
                 <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -35,12 +35,93 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 401, headers: corsHeaders });
   }
 
-  // Update payment status in Supabase
-  let newStatus = status === "fulfilled" ? "fulfilled" : (status === "timed_out" ? "timed_out" : "unknown");
-  const { error: dbError } = await supabase.from("payments").update({ status: newStatus, order_id }).eq("ref", ref);
-  if (dbError) {
-    return new Response(JSON.stringify({ error: "Database error", details: dbError.message }), { status: 500, headers: corsHeaders });
-  }
+  try {
+    // Update payment status in Supabase
+    let newStatus = status === "fulfilled" ? "fulfilled" : (status === "timed_out" ? "timed_out" : "unknown");
+    const { data: payment, error: paymentError } = await supabase
+      .from("payments")
+      .update({ status: newStatus, order_id })
+      .eq("ref", ref)
+      .select("user_id")
+      .single();
 
-  return new Response(JSON.stringify({ success: true }), { status: 200, headers: corsHeaders });
+    if (paymentError) {
+      console.error("Error updating payment:", paymentError);
+      return new Response(JSON.stringify({ error: "Database error", details: paymentError.message }), { status: 500, headers: corsHeaders });
+    }
+
+    // If payment was successful, update user's subscription
+    if (newStatus === "fulfilled" && payment?.user_id) {
+      // Get premium plan ID
+      const { data: premiumPlan, error: planError } = await supabase
+        .from("subscription_plans")
+        .select("id")
+        .eq("name", "Premium")
+        .single();
+
+      if (planError) {
+        console.error("Error fetching premium plan:", planError);
+        return new Response(JSON.stringify({ error: "Error fetching premium plan", details: planError.message }), { status: 500, headers: corsHeaders });
+      }
+
+      // Get user's current subscription
+      const { data: subscription, error: subError } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", payment.user_id)
+        .single();
+
+      if (subError && subError.code !== "PGRST116") { // PGRST116 = not found
+        console.error("Error fetching subscription:", subError);
+        return new Response(JSON.stringify({ error: "Error fetching subscription", details: subError.message }), { status: 500, headers: corsHeaders });
+      }
+
+      // Calculate subscription dates
+      const now = new Date();
+      const oneMonthLater = new Date(now);
+      oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+
+      if (subscription) {
+        // Update existing subscription
+        const { error: updateError } = await supabase
+          .from("subscriptions")
+          .update({
+            status: "active",
+            plan_id: premiumPlan.id,
+            subscription_start_date: now.toISOString(),
+            subscription_end_date: oneMonthLater.toISOString(),
+            updated_at: now.toISOString()
+          })
+          .eq("user_id", payment.user_id);
+
+        if (updateError) {
+          console.error("Error updating subscription:", updateError);
+          return new Response(JSON.stringify({ error: "Error updating subscription", details: updateError.message }), { status: 500, headers: corsHeaders });
+        }
+      } else {
+        // Create new subscription
+        const { error: insertError } = await supabase
+          .from("subscriptions")
+          .insert({
+            user_id: payment.user_id,
+            plan_id: premiumPlan.id,
+            status: "active",
+            subscription_start_date: now.toISOString(),
+            subscription_end_date: oneMonthLater.toISOString()
+          });
+
+        if (insertError) {
+          console.error("Error creating subscription:", insertError);
+          return new Response(JSON.stringify({ error: "Error creating subscription", details: insertError.message }), { status: 500, headers: corsHeaders });
+        }
+      }
+
+      console.log(`Successfully updated subscription for user ${payment.user_id}`);
+    }
+
+    return new Response(JSON.stringify({ success: true }), { status: 200, headers: corsHeaders });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return new Response(JSON.stringify({ error: "Unexpected error", details: error.message }), { status: 500, headers: corsHeaders });
+  }
 });

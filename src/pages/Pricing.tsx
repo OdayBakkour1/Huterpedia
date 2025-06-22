@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import { CouponInput } from "@/components/CouponInput";
 import { KazawalletButton } from '@/components/KazawalletButton';
 import NewPublicHeader from "@/components/NewPublicHeader";
@@ -13,6 +14,7 @@ import NewPublicFooter from "@/components/NewPublicFooter";
 const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { data: subscription } = useSubscription();
   const [appliedCoupon, setAppliedCoupon] = useState<string>('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [finalAmount, setFinalAmount] = useState(5);
@@ -28,16 +30,42 @@ const Pricing = () => {
     aiFeature: "15 AI summaries per month",
     limitations: []
   };
+  
   const handleCouponApplied = (discount: number, final: number, couponCode: string) => {
     setDiscountAmount(discount);
     setFinalAmount(final);
     setAppliedCoupon(couponCode);
   };
+  
   const handleCouponRemoved = () => {
     setDiscountAmount(0);
     setFinalAmount(originalPrice);
     setAppliedCoupon('');
   };
+
+  // Determine button text based on subscription status
+  const getButtonText = () => {
+    if (!user) {
+      return "Start 7-Day Free Trial";
+    }
+    
+    if (!subscription) {
+      return "Start 7-Day Free Trial";
+    }
+    
+    if (subscription.status === 'trial') {
+      return `Upgrade Now (${subscription.trial_days_remaining} days left in trial)`;
+    }
+    
+    if (subscription.status === 'active') {
+      return "Already Subscribed";
+    }
+    
+    return "Reactivate Subscription";
+  };
+
+  const isSubscribed = subscription?.status === 'active';
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
       {/* Modern mesh gradient background */}
@@ -67,7 +95,10 @@ const Pricing = () => {
           <div className="max-w-md mx-auto">
             <Card className="group relative backdrop-blur-2xl border rounded-3xl shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 overflow-hidden bg-white/10 border-cyan-400/50 ring-2 ring-cyan-400/30">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
-                
+                <Badge className="bg-gradient-to-r from-cyan-400 to-purple-500 text-white px-4 sm:px-6 py-2 rounded-full font-bold text-xs sm:text-sm shadow-2xl border-2 border-white/20 backdrop-blur-sm">
+                  <Crown className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                  7-day free trial
+                </Badge>
               </div>
               
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-purple-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
@@ -110,12 +141,30 @@ const Pricing = () => {
                   </div>
                 </div>
 
-                <Button onClick={() => navigate('/auth')} className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white mb-6">
-                  Start 7-Day Free Trial
-                  {finalAmount < originalPrice && <span className="ml-2 text-sm">
+                {isSubscribed ? (
+                  <Button 
+                    onClick={() => navigate('/dashboard')} 
+                    className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-green-600 hover:bg-green-700 text-white mb-6"
+                  >
+                    <Check className="h-5 w-5 mr-2" />
+                    Already Subscribed - Go to Dashboard
+                  </Button>
+                ) : user ? (
+                  <KazawalletButton 
+                    amount={finalAmount} 
+                    couponCode={appliedCoupon}
+                  />
+                ) : (
+                  <Button 
+                    onClick={() => navigate('/auth')} 
+                    className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white mb-6"
+                  >
+                    Start 7-Day Free Trial
+                    {finalAmount < originalPrice && <span className="ml-2 text-sm">
                       (${finalAmount.toFixed(2)}/month after trial)
                     </span>}
-                </Button>
+                  </Button>
+                )}
 
                 <div className="border-t border-white/10 pt-6">
                   <p className="text-center text-white/60 text-sm mb-4">We accept</p>
