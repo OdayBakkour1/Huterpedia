@@ -19,7 +19,7 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/kazawallet/create-payment-link", {
+      const res = await fetch("/api/kazawallet/create-payment-link-v2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
