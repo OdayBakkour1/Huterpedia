@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Crown, Calendar, Edit, Users, Search, Filter, Plus, Trash2, Eye } from 'lucide-react';
 import { format, addDays, addMonths } from 'date-fns';
+import { useSubscriptionPlans } from '@/hooks/useAdminData';
 
 interface UserSubscription {
   id: string;
@@ -34,6 +35,7 @@ export const SubscriptionManagement = () => {
   const [editingUser, setEditingUser] = useState<UserSubscription | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { toast } = useToast();
+  const { data: subscriptionPlans } = useSubscriptionPlans();
 
   const [editForm, setEditForm] = useState({
     subscription: 'free',
@@ -129,9 +131,14 @@ export const SubscriptionManagement = () => {
   };
 
   const handleSaveUser = async () => {
-    if (!editingUser) return;
+    if (!editingUser || !subscriptionPlans) return;
 
     try {
+      // Create plan map from subscription plans
+      const planMap = Object.fromEntries(
+        subscriptionPlans.map((plan: any) => [plan.name.toLowerCase(), plan.id])
+      );
+
       // Update profile
       const { error: profileError } = await supabase
         .from('profiles')
@@ -143,10 +150,13 @@ export const SubscriptionManagement = () => {
 
       if (profileError) throw profileError;
 
+      // Get the correct plan ID
+      const planId = planMap[editForm.subscription] || planMap['free'] || null;
+
       // Update or create subscription record
       const subscriptionData = {
         user_id: editingUser.id,
-        plan_id: editForm.subscription === 'premium' ? 'premium-plan-id' : 'free-plan-id',
+        plan_id: planId,
         status: editForm.subscription === 'free' ? 'trial' : 'active',
         subscription_start_date: editForm.subscription_start_date || null,
         subscription_end_date: editForm.subscription_end_date || null,

@@ -22,6 +22,17 @@ export function useAddUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (userData: any) => {
+      // Get subscription plans first
+      const { data: plans, error: plansError } = await supabase
+        .from('subscription_plans')
+        .select('id, name');
+      
+      if (plansError) throw plansError;
+      
+      const planMap = Object.fromEntries(
+        (plans || []).map((plan: any) => [plan.name.toLowerCase(), plan.id])
+      );
+      
       // Create user in auth
       const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
         email: userData.email,
@@ -61,11 +72,13 @@ export function useAddUser() {
       const trialEnd = new Date(now);
       trialEnd.setDate(trialEnd.getDate() + 7);
       
+      const planId = planMap[userData.subscription] || planMap['free'] || null;
+      
       const { error: subscriptionError } = await supabase
         .from('subscriptions')
         .insert({
           user_id: authUser.user.id,
-          plan_id: userData.subscription === 'premium' ? 'premium-plan-id' : 'free-plan-id',
+          plan_id: planId,
           status: 'trial',
           trial_start_date: now.toISOString(),
           trial_end_date: trialEnd.toISOString()
@@ -186,7 +199,7 @@ export function useUpdateUserRole() {
         .from('user_roles')
         .select('id')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
       
       if (existingRole) {
         // Update existing role
@@ -215,6 +228,17 @@ export function useUpdateUserSubscription() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ userId, subscription }: { userId: string; subscription: string }) => {
+      // Get subscription plans first
+      const { data: plans, error: plansError } = await supabase
+        .from('subscription_plans')
+        .select('id, name');
+      
+      if (plansError) throw plansError;
+      
+      const planMap = Object.fromEntries(
+        (plans || []).map((plan: any) => [plan.name.toLowerCase(), plan.id])
+      );
+      
       // Update profile subscription
       const { error: profileError } = await supabase
         .from('profiles')
@@ -228,7 +252,7 @@ export function useUpdateUserSubscription() {
         .from('subscriptions')
         .select('id')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
       
       const now = new Date();
       let endDate = new Date(now);
@@ -241,13 +265,15 @@ export function useUpdateUserSubscription() {
         endDate.setDate(endDate.getDate() + 7);
       }
       
+      const planId = planMap[subscription] || planMap['free'] || null;
+      
       if (existingSub) {
         // Update existing subscription
         const { error } = await supabase
           .from('subscriptions')
           .update({
             status: subscription === 'premium' ? 'active' : 'trial',
-            plan_id: subscription === 'premium' ? 'premium-plan-id' : 'free-plan-id',
+            plan_id: planId,
             subscription_start_date: subscription === 'premium' ? now.toISOString() : null,
             subscription_end_date: subscription === 'premium' ? endDate.toISOString() : null,
             trial_start_date: subscription === 'free' ? now.toISOString() : null,
@@ -262,7 +288,7 @@ export function useUpdateUserSubscription() {
           .from('subscriptions')
           .insert({
             user_id: userId,
-            plan_id: subscription === 'premium' ? 'premium-plan-id' : 'free-plan-id',
+            plan_id: planId,
             status: subscription === 'premium' ? 'active' : 'trial',
             subscription_start_date: subscription === 'premium' ? now.toISOString() : null,
             subscription_end_date: subscription === 'premium' ? endDate.toISOString() : null,
