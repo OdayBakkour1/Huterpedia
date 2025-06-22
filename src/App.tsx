@@ -14,6 +14,7 @@ import Bookmarks from "@/pages/Bookmarks";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Pricing from "@/pages/Pricing";
+import Checkout from "@/pages/Checkout";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/NotFound";
@@ -45,6 +46,7 @@ const App = () => {
                 <Route path="/about" element={<MainLayout><About /></MainLayout>} />
                 <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
                 <Route path="/pricing" element={<MainLayout><Pricing /></MainLayout>} />
+                <Route path="/checkout" element={<MainLayout><Checkout /></MainLayout>} />
                 <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
                 <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
                 

@@ -6,6 +6,8 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 import { SearchBar } from "@/components/SearchBar";
 import { FeedPreferences } from "@/components/FeedPreferences";
 import { SubscriptionBanner } from "@/components/SubscriptionBanner";
+import { SubscriptionExpiredDialog } from "@/components/SubscriptionExpiredDialog";
+import { WelcomeBackDialog } from "@/components/WelcomeBackDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNewsArticles } from "@/hooks/useNewsArticles";
 import { usePreloadCachedContent } from "@/hooks/useCachedContent";
@@ -101,6 +103,8 @@ const Index = () => {
         setShowPreferences={setShowPreferences}
       />
       <SubscriptionBanner />
+      <WelcomeBackDialog />
+      <SubscriptionExpiredDialog />
       <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8">
         <div className="text-center mb-6 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">

@@ -5,12 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import NewPublicHeader from "@/components/NewPublicHeader";
 import NewPublicFooter from "@/components/NewPublicFooter";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { data: subscription } = useSubscriptionStatus();
+  
   const plan = {
     name: "Premium",
     price: "$5",
@@ -19,8 +22,16 @@ const Pricing = () => {
     popular: true,
     trial: "7-day free trial",
     features: ["Full real-time threat feed", "Advanced filtering & search", "Email & chat support", "Personalized feed preferences", "Bookmarks & saved articles", "Multi-source intelligence feeds"],
-    aiFeature: "15 AI summaries per month",
+    aiFeature: "30 AI summaries per month",
     limitations: []
+  };
+
+  const handleSubscribe = () => {
+    if (user) {
+      navigate('/checkout');
+    } else {
+      navigate('/auth');
+    }
   };
 
   return (
@@ -86,8 +97,15 @@ const Pricing = () => {
                   </div>
                 </div>
 
-                <Button onClick={() => navigate('/auth')} className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white mb-6">
-                  Start 7-Day Free Trial
+                <Button 
+                  onClick={handleSubscribe} 
+                  className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white mb-6"
+                >
+                  {subscription?.isExpired 
+                    ? "Upgrade Now" 
+                    : subscription?.isTrial 
+                      ? "Upgrade to Premium" 
+                      : "Start 7-Day Free Trial"}
                 </Button>
 
                 <div className="border-t border-white/10 pt-6">
@@ -117,7 +135,7 @@ const Pricing = () => {
             q: "How does the 7-day trial work?",
             a: "Start using all features immediately. No payment required until your trial ends."
           }, {
-            q: "What happens after 15 AI summaries?",
+            q: "What happens after 30 AI summaries?",
             a: "You can still access all other features. AI summaries reset monthly with your subscription."
           }, {
             q: "Can I cancel anytime?",

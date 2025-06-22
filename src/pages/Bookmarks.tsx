@@ -6,6 +6,9 @@ import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { NewsGrid } from '@/components/NewsGrid';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { SubscriptionBanner } from '@/components/SubscriptionBanner';
+import { SubscriptionExpiredDialog } from '@/components/SubscriptionExpiredDialog';
+import { WelcomeBackDialog } from '@/components/WelcomeBackDialog';
 
 const Bookmarks = () => {
   const [showPreferences, setShowPreferences] = useState(false);
@@ -51,6 +54,9 @@ const Bookmarks = () => {
         showPreferences={showPreferences}
         setShowPreferences={setShowPreferences}
       />
+      <SubscriptionBanner />
+      <WelcomeBackDialog />
+      <SubscriptionExpiredDialog />
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-white">Your Bookmarks</h1>
