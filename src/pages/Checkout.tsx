@@ -62,7 +62,7 @@ const Checkout = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              disabled={!!user?.email}
+              readOnly={!!user?.email}
               placeholder="Enter your email"
             />
           </div>
