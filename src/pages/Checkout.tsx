@@ -103,7 +103,7 @@ const Checkout = () => {
           
           <div className="mt-4 text-center">
             <p className="text-white/60 text-sm">
-              By subscribing, you agree to our <a href="/terms" className="text-cyan-400 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-cyan-400 hover:underline">Privacy Policy</a>.
+              By subscribing, you agree to our <a href="/terms" className="text-cyan-400 hover:underline">Terms of Service</a> and <a href="/privacy" className=\"text-cyan-400 hover:underline">Privacy Policy</a>.
             </p>
           </div>
         </div>
