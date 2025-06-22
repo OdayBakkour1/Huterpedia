@@ -16,7 +16,7 @@ const Checkout = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/kazawallet/create-payment-link-v2', {
+      const res = await fetch('/api/kazawallet/kazawallet-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
