@@ -249,7 +249,7 @@ const Auth = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-3xl blur opacity-75"></div>
                 <div className="relative bg-gradient-to-br from-cyan-400 to-purple-600 p-4 rounded-3xl shadow-2xl">
-                  <Shield className="h-10 w-10 text-white" />
+                  <img src="/HunterPedia Png-01.png" alt="Hunterpedia Logo" className="h-10 w-10 object-contain" />
                 </div>
               </div>
             </div>
