@@ -29,7 +29,7 @@ export const SubscriptionBanner = () => {
             </span>
           </div>
           <Button 
-            onClick={() => navigate('/pricing')} 
+            onClick={() => navigate('/checkout')} 
             size="sm" 
             className="bg-blue-500 hover:bg-blue-600 text-white"
           >
@@ -53,7 +53,7 @@ export const SubscriptionBanner = () => {
             </span>
           </div>
           <Button 
-            onClick={() => navigate('/pricing')} 
+            onClick={() => navigate('/checkout')} 
             size="sm" 
             className="bg-red-500 hover:bg-red-600 text-white"
           >

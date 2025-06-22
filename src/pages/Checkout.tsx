@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
@@ -12,12 +12,19 @@ import { Crown, Check, ArrowLeft, CreditCard, Shield, Zap } from 'lucide-react';
 import PaymentButton from '@/components/PaymentButton';
 
 const Checkout = () => {
-  const { user } = useAuth();
-  const { data: subscription } = useSubscriptionStatus();
+  const { user, loading } = useAuth();
+  const { data: subscription, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const navigate = useNavigate();
   const [appliedCoupon, setAppliedCoupon] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [finalAmount, setFinalAmount] = useState(5.00);
+  
+  useEffect(() => {
+    // Redirect to auth if not logged in
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
   
   const handleCouponApplied = (discount: number, final: number, couponCode: string) => {
     setDiscountAmount(discount);
@@ -39,6 +46,14 @@ const Checkout = () => {
   const handlePaymentError = (error: string) => {
     console.error('Payment error:', error);
   };
+
+  if (loading || subscriptionLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">

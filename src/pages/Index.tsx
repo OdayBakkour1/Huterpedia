@@ -37,7 +37,7 @@ const Index = () => {
     
     // Check subscription status and redirect if expired
     if (!loading && !subscriptionLoading && user && subscriptionStatus?.isExpired) {
-      navigate('/pricing');
+      navigate('/checkout');
     }
   }, [user, loading, subscriptionStatus, subscriptionLoading, navigate]);
 

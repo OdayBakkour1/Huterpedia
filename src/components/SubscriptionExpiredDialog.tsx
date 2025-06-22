@@ -7,6 +7,7 @@ import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 
 export const SubscriptionExpiredDialog = () => {
   const [open, setOpen] = useState(false);
+  const [countdown, setCountdown] = useState(10);
   const { data: subscription } = useSubscriptionStatus();
   const navigate = useNavigate();
   
@@ -22,14 +23,21 @@ export const SubscriptionExpiredDialog = () => {
     }
   }, [subscription]);
   
-  // Set up redirect timer when dialog is opened
+  // Set up countdown timer when dialog is opened
   useEffect(() => {
     if (open && subscription?.isExpired) {
-      const redirectTimer = setTimeout(() => {
-        navigate('/pricing');
-      }, 10000); // 10 seconds
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            navigate('/checkout');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
       
-      return () => clearTimeout(redirectTimer);
+      return () => clearInterval(countdownInterval);
     }
   }, [open, subscription, navigate]);
   
@@ -60,7 +68,7 @@ export const SubscriptionExpiredDialog = () => {
           <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 space-y-2">
             <div className="flex items-center gap-2 text-cyan-400">
               <Clock className="h-4 w-4" />
-              <span className="font-medium">You will be redirected to the pricing page in a few seconds</span>
+              <span className="font-medium">Redirecting to checkout in {countdown} seconds</span>
             </div>
             <p className="text-sm text-slate-400">
               Upgrade now to continue enjoying all premium features without interruption.
@@ -69,7 +77,7 @@ export const SubscriptionExpiredDialog = () => {
           
           <div className="flex flex-col gap-3">
             <Button 
-              onClick={() => navigate('/pricing')} 
+              onClick={() => navigate('/checkout')} 
               className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white shadow-xl"
             >
               <Crown className="h-4 w-4 mr-2" />
@@ -77,11 +85,14 @@ export const SubscriptionExpiredDialog = () => {
             </Button>
             
             <Button 
-              onClick={() => setOpen(false)} 
+              onClick={() => {
+                setOpen(false);
+                navigate('/pricing');
+              }} 
               variant="outline" 
               className="border-slate-600 text-slate-300 hover:bg-slate-800"
             >
-              Continue with Limited Access
+              View Pricing Options
             </Button>
           </div>
         </div>

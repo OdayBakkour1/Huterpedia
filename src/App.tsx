@@ -15,6 +15,8 @@ import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Pricing from "@/pages/Pricing";
 import Checkout from "@/pages/Checkout";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentCancel from "@/pages/PaymentCancel";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import NotFound from "@/pages/NotFound";
@@ -41,12 +43,16 @@ const App = () => {
                 <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
                 <Route path="/bookmarks" element={<MainLayout><Bookmarks /></MainLayout>} />
 
+                {/* Payment Routes */}
+                <Route path="/checkout" element={<MainLayout><Checkout /></MainLayout>} />
+                <Route path="/payment-success" element={<MainLayout><PaymentSuccess /></MainLayout>} />
+                <Route path="/payment-cancel" element={<MainLayout><PaymentCancel /></MainLayout>} />
+
                 {/* Standalone Routes */}
                 <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/about" element={<MainLayout><About /></MainLayout>} />
                 <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
                 <Route path="/pricing" element={<MainLayout><Pricing /></MainLayout>} />
-                <Route path="/checkout" element={<MainLayout><Checkout /></MainLayout>} />
                 <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
                 <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
                 

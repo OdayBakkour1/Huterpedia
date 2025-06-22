@@ -37,7 +37,7 @@ export const useSubscriptionStatus = () => {
         .eq('user_id', user.id)
         .maybeSingle();
       
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         throw error;
       }
       
