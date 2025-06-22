@@ -5,20 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
-import { CouponInput } from "@/components/CouponInput";
-import { KazawalletButton } from '@/components/KazawalletButton';
 import NewPublicHeader from "@/components/NewPublicHeader";
 import NewPublicFooter from "@/components/NewPublicFooter";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data: subscription } = useSubscription();
-  const [appliedCoupon, setAppliedCoupon] = useState<string>('');
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [finalAmount, setFinalAmount] = useState(5);
-  const originalPrice = 5;
   const plan = {
     name: "Premium",
     price: "$5",
@@ -30,42 +22,7 @@ const Pricing = () => {
     aiFeature: "15 AI summaries per month",
     limitations: []
   };
-  
-  const handleCouponApplied = (discount: number, final: number, couponCode: string) => {
-    setDiscountAmount(discount);
-    setFinalAmount(final);
-    setAppliedCoupon(couponCode);
-  };
-  
-  const handleCouponRemoved = () => {
-    setDiscountAmount(0);
-    setFinalAmount(originalPrice);
-    setAppliedCoupon('');
-  };
 
-  // Determine button text based on subscription status
-  const getButtonText = () => {
-    if (!user) {
-      return "Start 7-Day Free Trial";
-    }
-    
-    if (!subscription) {
-      return "Start 7-Day Free Trial";
-    }
-    
-    if (subscription.status === 'trial') {
-      return `Upgrade Now (${subscription.trial_days_remaining} days left in trial)`;
-    }
-    
-    if (subscription.status === 'active') {
-      return "Already Subscribed";
-    }
-    
-    return "Reactivate Subscription";
-  };
-
-  const isSubscribed = subscription?.status === 'active';
-  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
       {/* Modern mesh gradient background */}
@@ -107,23 +64,11 @@ const Pricing = () => {
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-white mb-4">{plan.name}</h3>
                   <div className="mb-6">
-                    {discountAmount > 0 && <div className="mb-2">
-                        <span className="text-2xl font-bold text-white/60 line-through">
-                          ${originalPrice}
-                        </span>
-                        <span className="text-sm text-green-400 ml-2">
-                          Save ${discountAmount.toFixed(2)}
-                        </span>
-                      </div>}
                     <span className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                      ${finalAmount.toFixed(2)}
+                      $5
                     </span>
-                    <span className="text-white/60 text-lg">{plan.period}</span>
+                    <span className="text-white/60 text-lg">/month</span>
                   </div>
-                </div>
-
-                <div className="mb-8">
-                  <CouponInput originalAmount={originalPrice} onCouponApplied={handleCouponApplied} onCouponRemoved={handleCouponRemoved} appliedCoupon={appliedCoupon} />
                 </div>
 
                 <div className="space-y-4 mb-8">
@@ -141,37 +86,15 @@ const Pricing = () => {
                   </div>
                 </div>
 
-                {isSubscribed ? (
-                  <Button 
-                    onClick={() => navigate('/dashboard')} 
-                    className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-green-600 hover:bg-green-700 text-white mb-6"
-                  >
-                    <Check className="h-5 w-5 mr-2" />
-                    Already Subscribed - Go to Dashboard
-                  </Button>
-                ) : user ? (
-                  <KazawalletButton 
-                    amount={finalAmount} 
-                    couponCode={appliedCoupon}
-                  />
-                ) : (
-                  <Button 
-                    onClick={() => navigate('/auth')} 
-                    className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white mb-6"
-                  >
-                    Start 7-Day Free Trial
-                    {finalAmount < originalPrice && <span className="ml-2 text-sm">
-                      (${finalAmount.toFixed(2)}/month after trial)
-                    </span>}
-                  </Button>
-                )}
+                <Button onClick={() => navigate('/auth')} className="w-full shadow-2xl rounded-2xl py-6 text-lg font-semibold transition-all duration-300 hover:scale-105 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white mb-6">
+                  Start 7-Day Free Trial
+                </Button>
 
                 <div className="border-t border-white/10 pt-6">
                   <p className="text-center text-white/60 text-sm mb-4">We accept</p>
                   <div className="flex items-center justify-center space-x-6">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" className="h-8 w-auto" />
                     <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="Mastercard" className="h-8 w-auto" />
-                    <img src="/kazawallet logo.png" alt="Kazawallet" className="h-8 w-auto" />
                   </div>
                 </div>
               </CardContent>
@@ -200,8 +123,8 @@ const Pricing = () => {
             q: "Can I cancel anytime?",
             a: "Yes, cancel anytime during or after your trial. No long-term commitments required."
           }, {
-            q: "How do coupon codes work?",
-            a: "Enter a valid coupon code during checkout to receive your discount. Each user can use a coupon once."
+            q: "How do I get started?",
+            a: "Simply create an account and you'll automatically get a 7-day free trial with full access."
           }].map((faq, index) => <Card key={index} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all duration-300">
                   <h3 className="text-lg font-semibold text-white mb-3">{faq.q}</h3>
                   <p className="text-white/70">{faq.a}</p>

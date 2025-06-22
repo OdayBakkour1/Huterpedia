@@ -5,7 +5,6 @@ import { useUserBookmarks } from '@/hooks/useNewsArticles';
 import { NewsGrid } from '@/components/NewsGrid';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { SubscriptionGuard } from '@/components/SubscriptionGuard';
 
 const Bookmarks = () => {
   const [showPreferences, setShowPreferences] = useState(false);
@@ -37,29 +36,27 @@ const Bookmarks = () => {
   }));
 
   return (
-    <SubscriptionGuard>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-        <Header 
-          usePersonalizedFeed={usePersonalizedFeed}
-          setUsePersonalizedFeed={setUsePersonalizedFeed}
-          showPreferences={showPreferences}
-          setShowPreferences={setShowPreferences}
-        />
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-white">Your Bookmarks</h1>
-            <Button onClick={() => navigate('/dashboard')} variant="outline" className="bg-slate-800 text-slate-200 border-slate-600 hover:bg-slate-700">
-              Back to Dashboard
-            </Button>
-          </div>
-          {validArticles.length > 0 ? (
-            <NewsGrid articles={validArticles} />
-          ) : (
-            <div className="text-slate-400 text-center">You have no bookmarked articles yet.</div>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <Header 
+        usePersonalizedFeed={usePersonalizedFeed}
+        setUsePersonalizedFeed={setUsePersonalizedFeed}
+        showPreferences={showPreferences}
+        setShowPreferences={setShowPreferences}
+      />
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-white">Your Bookmarks</h1>
+          <Button onClick={() => navigate('/dashboard')} variant="outline" className="bg-slate-800 text-slate-200 border-slate-600 hover:bg-slate-700">
+            Back to Dashboard
+          </Button>
         </div>
+        {validArticles.length > 0 ? (
+          <NewsGrid articles={validArticles} />
+        ) : (
+          <div className="text-slate-400 text-center">You have no bookmarked articles yet.</div>
+        )}
       </div>
-    </SubscriptionGuard>
+    </div>
   );
 };
 

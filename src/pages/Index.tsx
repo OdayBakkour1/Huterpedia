@@ -5,7 +5,6 @@ import { NewsGrid } from "@/components/NewsGrid";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { SearchBar } from "@/components/SearchBar";
 import { FeedPreferences } from "@/components/FeedPreferences";
-import { SubscriptionGuard } from "@/components/SubscriptionGuard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNewsArticles } from "@/hooks/useNewsArticles";
 import { usePreloadCachedContent } from "@/hooks/useCachedContent";
@@ -85,86 +84,84 @@ const Index = () => {
   const cachedCount = articles.filter(article => article.cached_content_url).length;
 
   return (
-    <SubscriptionGuard>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-        <Header 
-          usePersonalizedFeed={usePersonalizedFeed}
-          setUsePersonalizedFeed={setUsePersonalizedFeed}
-          showPreferences={showPreferences}
-          setShowPreferences={setShowPreferences}
-        />
-        <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8">
-          <div className="text-center mb-6 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">
-              Cyber<span className="text-cyan-400">Security</span> News
-            </h1>
-            <p className="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto mb-4 sm:mb-6 px-2">
-              Stay informed with the latest cybersecurity threats, vulnerabilities, and industry developments
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <Header 
+        usePersonalizedFeed={usePersonalizedFeed}
+        setUsePersonalizedFeed={setUsePersonalizedFeed}
+        showPreferences={showPreferences}
+        setShowPreferences={setShowPreferences}
+      />
+      <main className="container mx-auto px-3 sm:px-6 py-4 sm:py-8">
+        <div className="text-center mb-6 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4">
+            Cyber<span className="text-cyan-400">Security</span> News
+          </h1>
+          <p className="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto mb-4 sm:mb-6 px-2">
+            Stay informed with the latest cybersecurity threats, vulnerabilities, and industry developments
+          </p>
 
-            {/* Feed Preferences Component */}
-            {showPreferences && (
-              <div className="mb-4 sm:mb-8">
-                <FeedPreferences />
-              </div>
-            )}
-            
-            {articles.length > 0 && (
-              <div className="flex justify-center flex-col items-center gap-2">
-                <span className="text-slate-400 text-sm text-center px-2">
-                  {articles.length} articles available • {usePersonalizedFeed ? "Personalized feed" : "General feed"} • Updated automatically every 15 minutes • Last 15 days
-                </span>
-                {cachedCount > 0 && (
-                  <span className="text-cyan-400 text-xs flex items-center gap-1">
-                    <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>
-                    {cachedCount} articles cached for fast loading
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="mb-4 sm:mb-8 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <div className="w-full sm:w-auto order-2 sm:order-1">
-                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-              </div>
-              <div className="w-full sm:flex-1 order-1 sm:order-2">
-                <CategoryFilter 
-                  selectedCategory={selectedCategory} 
-                  setSelectedCategory={setSelectedCategory} 
-                  articles={articles}
-                />
-              </div>
+          {/* Feed Preferences Component */}
+          {showPreferences && (
+            <div className="mb-4 sm:mb-8">
+              <FeedPreferences />
             </div>
-          </div>
-
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-pulse space-y-4">
-                <div className="h-4 bg-slate-700 rounded w-1/3 mx-auto"></div>
-                <div className="h-4 bg-slate-700 rounded w-1/4 mx-auto"></div>
-              </div>
-              <p className="text-xl text-slate-400 mt-4">Loading latest news articles...</p>
-            </div>
-          ) : articles.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 sm:p-8 max-w-md mx-auto">
-                <h3 className="text-xl font-semibold text-white mb-4">No Articles Available</h3>
-                <p className="text-slate-400 text-sm sm:text-base">
-                  {usePersonalizedFeed 
-                    ? "No articles match your current preferences. Try adjusting your feed settings or switch to the general feed."
-                    : "News articles are automatically fetched every 15 minutes. Please check back shortly for the latest cybersecurity updates from the last 15 days."
-                  }
-                </p>
-              </div>
-            </div>
-          ) : (
-            <NewsGrid articles={shuffledNews} />
           )}
-        </main>
-      </div>
-    </SubscriptionGuard>
+          
+          {articles.length > 0 && (
+            <div className="flex justify-center flex-col items-center gap-2">
+              <span className="text-slate-400 text-sm text-center px-2">
+                {articles.length} articles available • {usePersonalizedFeed ? "Personalized feed" : "General feed"} • Updated automatically every 15 minutes • Last 15 days
+              </span>
+              {cachedCount > 0 && (
+                <span className="text-cyan-400 text-xs flex items-center gap-1">
+                  <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>
+                  {cachedCount} articles cached for fast loading
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="mb-4 sm:mb-8 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="w-full sm:w-auto order-2 sm:order-1">
+              <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            </div>
+            <div className="w-full sm:flex-1 order-1 sm:order-2">
+              <CategoryFilter 
+                selectedCategory={selectedCategory} 
+                setSelectedCategory={setSelectedCategory} 
+                articles={articles}
+              />
+            </div>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-pulse space-y-4">
+              <div className="h-4 bg-slate-700 rounded w-1/3 mx-auto"></div>
+              <div className="h-4 bg-slate-700 rounded w-1/4 mx-auto"></div>
+            </div>
+            <p className="text-xl text-slate-400 mt-4">Loading latest news articles...</p>
+          </div>
+        ) : articles.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-lg p-6 sm:p-8 max-w-md mx-auto">
+              <h3 className="text-xl font-semibold text-white mb-4">No Articles Available</h3>
+              <p className="text-slate-400 text-sm sm:text-base">
+                {usePersonalizedFeed 
+                  ? "No articles match your current preferences. Try adjusting your feed settings or switch to the general feed."
+                  : "News articles are automatically fetched every 15 minutes. Please check back shortly for the latest cybersecurity updates from the last 15 days."
+                }
+              </p>
+            </div>
+          </div>
+        ) : (
+          <NewsGrid articles={shuffledNews} />
+        )}
+      </main>
+    </div>
   );
 };
 
