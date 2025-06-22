@@ -119,8 +119,10 @@ const Pricing = () => {
 
                 <div className="border-t border-white/10 pt-6">
                   <p className="text-center text-white/60 text-sm mb-4">We accept</p>
-                  <div className="flex items-center justify-center">
-                    <KazawalletButton amount={finalAmount} couponCode={appliedCoupon} />
+                  <div className="flex items-center justify-center space-x-6">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" className="h-8 w-auto" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="Mastercard" className="h-8 w-auto" />
+                    <img src="/kazawallet logo.png" alt="Kazawallet" className="h-8 w-auto" />
                   </div>
                 </div>
               </CardContent>
