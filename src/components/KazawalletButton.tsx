@@ -9,13 +9,18 @@ interface KazawalletButtonProps {
 }
 
 export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, couponCode }) => {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handlePay = async () => {
     if (!user) {
       setError("Please sign in to continue with payment.");
+      return;
+    }
+    
+    if (!session?.access_token) {
+      setError("Authentication session expired. Please sign in again.");
       return;
     }
     
@@ -32,7 +37,10 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
       
       const res = await fetch("https://gzpayeckolpfflgvkqvh.supabase.co/functions/v1/create-payment", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({
           amount,
           currency: "USD",
