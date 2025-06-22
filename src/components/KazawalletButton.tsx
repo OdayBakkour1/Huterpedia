@@ -19,11 +19,6 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
       return;
     }
     
-    if (!session?.access_token) {
-      setError("Authentication session expired. Please sign in again.");
-      return;
-    }
-    
     if (!amount || amount <= 0) {
       setError("Invalid amount. Please check your coupon code or try again.");
       return;
@@ -38,8 +33,7 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
       const res = await fetch("https://gzpayeckolpfflgvkqvh.supabase.co/functions/v1/create-payment", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           amount,
@@ -53,20 +47,7 @@ export const KazawalletButton: React.FC<KazawalletButtonProps> = ({ amount, coup
       if (!res.ok) {
         const errorData = await res.json();
         console.error(`Payment API error (${res.status}):`, errorData);
-        
-        // Provide user-friendly error messages
-        let userMessage = "Payment processing failed. Please try again.";
-        if (errorData.error) {
-          if (errorData.error.includes("configuration error") || errorData.error.includes("contact support")) {
-            userMessage = errorData.error;
-          } else if (errorData.error.includes("User not found")) {
-            userMessage = "Payment service is temporarily unavailable. Please try again later or contact support.";
-          } else {
-            userMessage = errorData.error;
-          }
-        }
-        
-        throw new Error(userMessage);
+        throw new Error(errorData.error || "Payment processing failed. Please try again.");
       }
       
       const data = await res.json();
