@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+const SUPABASE_FUNCTIONS_URL = 'https://gzpayeckolpfflgvkqvh.functions.supabase.co';
+
 // Stubbed admin hooks for compatibility
 export function useAddNewsArticle() {
   const queryClient = useQueryClient();
@@ -9,7 +11,7 @@ export function useAddNewsArticle() {
     mutationFn: async (formData: any) => {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
-      const response = await fetch('/api/admin-add-article', {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/admin-add-article`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
