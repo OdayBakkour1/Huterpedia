@@ -1,4 +1,5 @@
 {
+    "$schema": "https://openapi.vercel.sh/vercel.json",
     "headers": [
       {
         "source": "/(.*)",
@@ -19,7 +20,7 @@
         "destination": "/index.html"
       }
     ],
-    "cron": [
+    "crons": [
       {
         "path": "/api/trigger-fetch-news",
         "schedule": "*/10 * * * *"
