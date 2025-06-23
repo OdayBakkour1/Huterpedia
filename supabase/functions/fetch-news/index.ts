@@ -496,88 +496,29 @@ serve(async (req) => {
             // Enhanced category detection
             const detectedCategory = detectCategory(title, description, source.name, source.category);
 
-            // For staging, we don't generate AI descriptions immediately
-            if (useStaging) {
-              const { data: newArticle, error: insertError } = await supabase
-                .from('news_articles_staging')
-                .insert({
-                  title,
-                  description: description || '',
-                  source: source.name,
-                  url: link || null,
-                  category: detectedCategory,
-                  published_at: publishedAt,
-                  has_valid_description: isValidDescription(description),
-                  is_processed: false
-                })
-                .select('id')
-                .single();
-
-              if (insertError) {
-                console.error('Error inserting article to staging:', insertError);
-                sourceResult.errors.push(`Insert error: ${insertError.message}`);
-                continue;
-              }
-
-              sourceResult.articlesAdded++;
-              totalNewArticles++;
-              console.log(`Inserted article to staging: ${title}`);
-            } else {
-              // Enhanced description handling for production
-              if (!isValidDescription(description)) {
-                console.log(`Generating AI description for: ${title}`);
-                const aiDescription = await generateDescription(title, link, source.name);
-                if (aiDescription && aiDescription.length > 30) {
-                  description = aiDescription;
-                  console.log('AI description generated successfully');
-                } else {
-                  description = `This cybersecurity article from ${source.name} discusses important security developments. The article covers ${detectedCategory.toLowerCase()} related to current threat landscape. Click to read the full article for detailed information.`;
-                }
-              }
-
-              if (!description || description.length < 20) {
-                console.log(`Skipping article with insufficient description: ${title}`);
-                continue;
-              }
-
-              const { data: newArticle, error: insertError } = await supabase
-                .from('news_articles')
-                .insert({
-                  title,
-                  description,
-                  source: source.name,
-                  url: link || null,
-                  category: detectedCategory,
-                  published_at: publishedAt,
-                })
-                .select('id')
-                .single();
-
-              if (insertError) {
-                console.error('Error inserting article:', insertError);
-                sourceResult.errors.push(`Insert error: ${insertError.message}`);
-                continue;
-              }
-
-              // Cache the article content
-              const cachedContentUrl = await cacheArticleContent(supabase, newArticle.id, title, description);
-              
-              if (cachedContentUrl) {
-                await supabase
-                  .from('news_articles')
-                  .update({
-                    cached_content_url: cachedContentUrl,
-                    cache_updated_at: new Date().toISOString()
-                  })
-                  .eq('id', newArticle.id);
-                
-                console.log(`Article cached successfully: ${title}`);
-              }
-
-              sourceResult.articlesAdded++;
-              totalNewArticles++;
-              console.log(`Inserted new article: ${title}`);
+            // For both staging and production modes, always insert into news_articles_staging only
+            const { data: newArticle, error: insertError } = await supabase
+              .from('news_articles_staging')
+              .insert({
+                title,
+                description: description || '',
+                source: source.name,
+                url: link || null,
+                category: detectedCategory,
+                published_at: publishedAt,
+                has_valid_description: isValidDescription(description),
+                is_processed: false
+              })
+              .select('id')
+              .single();
+            if (insertError) {
+              console.error('Error inserting article to staging:', insertError);
+              sourceResult.errors.push(`Insert error: ${insertError.message}`);
+              continue;
             }
+            sourceResult.articlesAdded++;
+            totalNewArticles++;
+            console.log(`Inserted article to staging: ${title}`);
 
           } catch (itemError) {
             console.error('Error processing item:', itemError);
