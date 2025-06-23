@@ -56,30 +56,38 @@ export const NewsCardHeader = ({
   // Clean the title to remove any HTML content
   const cleanTitle = cleanHtmlContent(title);
 
+  // Format the published date
+  let formattedDate = 'Unknown date';
+  if (publishedAt) {
+    const date = new Date(publishedAt);
+    if (!isNaN(date.getTime())) {
+      formattedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+  }
+
   return (
-    <div className="relative flex flex-col gap-2">
+    <div className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-2">
-        <div className={cn("w-3 h-3 rounded-full flex-shrink-0", getSeverityColor(category))} />
-        <Badge variant="outline" className="text-xs bg-slate-700/50 text-cyan-400 border-slate-600">
-          {category}
-        </Badge>
+        <Badge className={getSeverityColor(category)}>{category}</Badge>
+        <span className="text-xs text-slate-400">{formattedDate}</span>
       </div>
-      {/* Move bookmark button to top right */}
-      {user && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 bg-slate-900/80 hover:bg-slate-900 border border-slate-600 absolute top-2 right-2"
-          onClick={onBookmarkToggle}
-          disabled={isBookmarkPending}
-        >
-          {isBookmarked ? (
-            <BookmarkCheck className="h-3 w-3 text-cyan-400" />
-          ) : (
-            <Bookmark className="h-3 w-3 text-slate-300" />
-          )}
-        </Button>
-      )}
+      <div className="flex-1 min-w-0">
+        <h3 className="text-base font-semibold text-white truncate" title={cleanTitle}>{cleanTitle}</h3>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="ml-2"
+        onClick={onBookmarkToggle}
+        disabled={isBookmarkPending}
+        aria-label={isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}
+      >
+        {isBookmarked ? <BookmarkCheck className="w-5 h-5 text-cyan-400" /> : <Bookmark className="w-5 h-5 text-slate-400" />}
+      </Button>
     </div>
   );
 };

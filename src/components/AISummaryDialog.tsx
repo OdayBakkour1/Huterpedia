@@ -22,6 +22,21 @@ export const AISummaryDialog = ({ open, onOpenChange, summary, article }: AISumm
     });
   };
 
+  // Clean the title
+  const cleanTitle = article.title || 'Untitled Article';
+  // Format the published date
+  let formattedDate = 'Unknown date';
+  if (article.publishedAt) {
+    const date = new Date(article.publishedAt);
+    if (!isNaN(date.getTime())) {
+      formattedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -45,10 +60,10 @@ export const AISummaryDialog = ({ open, onOpenChange, summary, article }: AISumm
             <p className="text-slate-300 leading-relaxed">{summary}</p>
           </div>
           <div className="border-t border-slate-700 pt-4">
-            <h4 className="font-medium text-white mb-2">{article.title}</h4>
+            <h4 className="font-medium text-white mb-2">{cleanTitle}</h4>
             <div className="flex items-center gap-4 text-sm text-slate-400 mb-2">
               <span>{article.source}</span>
-              <span>{formatDate(article.publishedAt)}</span>
+              <span>{formattedDate}</span>
             </div>
             <p className="text-sm text-slate-400">{article.description}</p>
           </div>

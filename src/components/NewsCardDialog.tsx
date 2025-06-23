@@ -97,10 +97,23 @@ export const NewsCardDialog = ({
   const imageUrl = !article.image_url ? getPlaceholderImage() : article.image_url;
 
   // Clean the title and description
-  const cleanTitle = cleanHtmlContent(article.title);
+  const cleanTitle = cleanHtmlContent(article.title) || 'Untitled Article';
   const cleanDescription = cleanHtmlContent(article.description);
   const hasValidDescription = isValidDescription(article.description);
   const topicTags = getTopicTags();
+
+  // Format the published date
+  let formattedDate = 'Unknown date';
+  if (article.publishedAt) {
+    const date = new Date(article.publishedAt);
+    if (!isNaN(date.getTime())) {
+      formattedDate = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+  }
 
   return (
     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-slate-900 border-slate-700">
@@ -117,7 +130,7 @@ export const NewsCardDialog = ({
         )}
         <div className="flex items-center gap-4 text-sm text-slate-400">
           <span>{article.source}</span>
-          <span>{formatDate(article.publishedAt)}</span>
+          <span>{formattedDate}</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {topicTags.map((tag, index) => (

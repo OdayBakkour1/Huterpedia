@@ -631,7 +631,6 @@ serve(async (req) => {
     const { data: articles, error: articlesError } = await supabase
       .from('news_articles')
       .select('*')
-      .gte('published_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()) // last 30 days
       .order('published_at', { ascending: false })
       .limit(200);
 

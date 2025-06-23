@@ -53,6 +53,7 @@ export const NewsCardContent = ({
           <span className="ml-2 text-xs text-cyan-400">Cached</span>
         )}
       </div>
+      <h4 className="text-base font-semibold text-white mb-1">{title || 'Untitled Article'}</h4>
       <p className="text-slate-300 text-sm line-clamp-4 min-h-[3.5rem]">{description}</p>
     </div>
   );
