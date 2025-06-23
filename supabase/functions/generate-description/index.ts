@@ -30,6 +30,13 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Restrict access: Only allow requests with the internal secret header
+  const internalSecret = Deno.env.get('INTERNAL_EDGE_SECRET');
+  const internalHeader = req.headers.get('X-Internal-Call');
+  if (!internalSecret || internalHeader !== internalSecret) {
+    return new Response(JSON.stringify({ error: 'Forbidden: Not an internal call' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+
   try {
     // Require JWT auth
     const authHeader = req.headers.get('Authorization');

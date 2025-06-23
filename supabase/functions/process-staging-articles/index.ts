@@ -76,77 +76,28 @@ const isValidDescription = (description: string): boolean => {
 // Generate AI description
 const generateDescription = async (title: string, url: string, source: string): Promise<string> => {
   try {
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    
-    if (!GEMINI_API_KEY) {
-      console.log('No GEMINI_API_KEY found, skipping AI description generation');
+    const internalSecret = Deno.env.get('INTERNAL_EDGE_SECRET');
+    if (!internalSecret) {
+      console.error('INTERNAL_EDGE_SECRET not set');
       return '';
     }
-
-    const prompt = `Generate a concise, professional description (2-3 sentences, max 200 words) for this cybersecurity news article:
-
-Title: ${title}
-Source: ${source}
-${url ? `URL: ${url}` : ''}
-
-The description should:
-- Summarize the key cybersecurity implications
-- Be factual and informative
-- Focus on the main threat, vulnerability, or security development
-- Be suitable for a cybersecurity news aggregator
-
-Do not include HTML tags or special formatting.`;
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch('https://gzpayeckolpfflgvkqvh.functions.supabase.co/generate-description', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Internal-Call': internalSecret
       },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.3,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 300,
-        },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          }
-        ]
-      }),
+      body: JSON.stringify({ title, url, source })
     });
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Failed to generate AI description: ${response.status}`, errorText);
+      console.error('generate-description Edge Function error:', errorText);
       return '';
     }
-
     const data = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
-    return cleanHtmlContent(generatedText);
+    return data.description || '';
   } catch (error) {
-    console.error('Error generating AI description:', error);
+    console.error('Error calling generate-description Edge Function:', error);
     return '';
   }
 };
