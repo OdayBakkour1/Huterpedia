@@ -73,10 +73,6 @@ export const NewsCardHeader = ({
     <div className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-2">
         <Badge className={getSeverityColor(category)}>{category}</Badge>
-        <span className="text-xs text-slate-400">{formattedDate}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="text-base font-semibold text-white truncate" title={cleanTitle}>{cleanTitle}</h3>
       </div>
       <Button
         variant="ghost"

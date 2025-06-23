@@ -8,20 +8,17 @@ export const useNewsArticles = () => {
   return useQuery({
     queryKey: ['news-articles'],
     queryFn: async () => {
-      // Call the fetch-news Edge Function
+      // Call the secure read-only fetch-news-readonly Edge Function
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
-      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news`, {
-        method: 'POST',
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ maxArticles: 200 }),
       });
       if (!response.ok) throw new Error('Failed to fetch news articles');
       const data = await response.json();
-      // Assume Edge Function returns { articles: [...] }
       // Map published_at to publishedAt for frontend compatibility
       return (data.articles as any[]).map(article => ({
         ...article,
