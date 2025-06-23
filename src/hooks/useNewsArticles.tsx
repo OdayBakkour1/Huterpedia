@@ -22,7 +22,11 @@ export const useNewsArticles = () => {
       if (!response.ok) throw new Error('Failed to fetch news articles');
       const data = await response.json();
       // Assume Edge Function returns { articles: [...] }
-      return data.articles as NewsArticle[];
+      // Map published_at to publishedAt for frontend compatibility
+      return (data.articles as any[]).map(article => ({
+        ...article,
+        publishedAt: article.published_at || article.publishedAt,
+      })) as NewsArticle[];
     },
     staleTime: 3 * 60 * 1000,
     refetchInterval: 10 * 60 * 1000,
