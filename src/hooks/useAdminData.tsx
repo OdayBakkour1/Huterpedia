@@ -7,10 +7,17 @@ export function useAddNewsArticle() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (formData: any) => {
-      const { error } = await supabase
-        .from('news_articles')
-        .insert([formData]);
-      if (error) throw error;
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      const response = await fetch('/api/admin-add-article', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) throw new Error('Failed to add news article');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['news-articles'] });
