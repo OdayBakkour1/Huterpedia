@@ -9,7 +9,7 @@ max_rows = 1000
 
 [auth]
 enabled = true
-port = 54324
+# port = 54324
 site_url = "https://hunterpedia.site"
 additional_redirect_urls = [
   "https://hunterpedia.site",
@@ -18,7 +18,7 @@ additional_redirect_urls = [
 ]
 jwt_expiry = 3600
 enable_signup = true
-email_double_confirm_changes = true
+# email_double_confirm_changes = true
 enable_manual_linking = false
 
 [functions.fetch-news]
