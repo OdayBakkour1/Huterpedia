@@ -18,5 +18,11 @@
         "source": "/((?!api/|security-check|_next/|static/|favicon.ico|sw.js|robots.txt|manifest.json|HunterPedia Png-01.png).*)",
         "destination": "/index.html"
       }
+    ],
+    "cron": [
+      {
+        "path": "/api/trigger-fetch-news",
+        "schedule": "*/10 * * * *"
+      }
     ]
 }

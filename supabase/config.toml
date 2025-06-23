@@ -17,12 +17,14 @@ additional_redirect_urls = [
   "https://gzpayeckolpfflgvkqvh.supabase.co"
 ]
 jwt_expiry = 3600
-enable_signup = true
+enable_signup = trueEnvironment Variables
 # email_double_confirm_changes = true
 enable_manual_linking = false
 
 [functions.fetch-news]
 verify_jwt = false
+schedules.every_10_minutes.cron = "*/10 * * * *"
+schedules.every_10_minutes.payload = '{ "staging": true }'
 
 [functions.process-staging-articles]
 verify_jwt = false
