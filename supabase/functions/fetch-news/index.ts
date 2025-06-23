@@ -402,9 +402,10 @@ serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const useStaging = body.staging || false;
-    const maxArticlesPerSource = body.maxArticles || 20;
+    const maxArticlesPerSource = 5; // Limit to 5 articles per source
+    const maxSources = 10; // Limit to 10 sources per request
 
-    console.log(`Starting news fetch process... (Staging mode: ${useStaging}, Max articles per source: ${maxArticlesPerSource})`);
+    console.log(`Starting news fetch process... (Staging mode: ${useStaging}, Max articles per source: ${maxArticlesPerSource}, Max sources: ${maxSources})`);
 
     // Fetch active news sources with better error handling
     const { data: sources, error: sourcesError } = await supabase
@@ -420,13 +421,16 @@ serve(async (req) => {
 
     console.log(`Found ${sources?.length || 0} active sources`);
 
+    // Limit the number of sources processed per request
+    const limitedSources = sources ? sources.slice(0, maxSources) : [];
+
     let totalNewArticles = 0;
     let totalProcessedSources = 0;
     let totalErrors = 0;
     const targetTable = useStaging ? 'news_articles_staging' : 'news_articles';
     const sourceResults: any[] = [];
 
-    for (const source of sources || []) {
+    for (const source of limitedSources) {
       const sourceResult = {
         name: source.name,
         url: source.url,
@@ -439,37 +443,26 @@ serve(async (req) => {
       try {
         console.log(`Processing source: ${source.name} (${source.url})`);
         
-        // Enhanced fetch with timeout and retry logic
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-        
-        const response = await fetch(source.url, {
-          signal: controller.signal,
-          headers: {
-            'User-Agent': 'Hunterpedia News Aggregator 1.0',
-            'Accept': 'application/rss+xml, application/xml, text/xml'
-          }
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          const errorMsg = `Failed to fetch ${source.url}: ${response.status} ${response.statusText}`;
-          console.error(errorMsg);
-          sourceResult.errors.push(errorMsg);
+        // Defensive: Check content type before parsing
+        const feedResponse = await fetch(source.url);
+        const contentType = feedResponse.headers.get('content-type');
+        if (!contentType || !contentType.includes('xml')) {
+          console.warn(`Skipping source ${source.name}: Not an XML feed`);
+          sourceResult.errors.push('Not an XML feed');
+          totalErrors++;
+          continue;
+        }
+        const feedText = await feedResponse.text();
+        let feed;
+        try {
+          feed = await parseFeed(feedText);
+        } catch (err) {
+          console.error(`Error parsing feed for ${source.name}:`, err);
+          sourceResult.errors.push('Feed parsing error');
+          totalErrors++;
           continue;
         }
         
-        const xmlText = await response.text();
-        
-        if (!xmlText || xmlText.trim().length === 0) {
-          const errorMsg = `Empty response from ${source.url}`;
-          console.error(errorMsg);
-          sourceResult.errors.push(errorMsg);
-          continue;
-        }
-        
-        const feed = await parseFeed(xmlText);
         const items = feed.entries || [];
         
         sourceResult.articlesFound = items.length;
@@ -634,9 +627,25 @@ serve(async (req) => {
 
     console.log(`Finished processing all sources. Summary:`, summary);
 
+    // After processing sources, fetch the latest articles for the user
+    const { data: articles, error: articlesError } = await supabase
+      .from('news_articles')
+      .select('*')
+      .gte('published_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()) // last 30 days
+      .order('published_at', { ascending: false })
+      .limit(200);
+
+    if (articlesError) {
+      return new Response(JSON.stringify({ error: articlesError.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     return new Response(JSON.stringify({
       message: `News fetched successfully in ${mode} mode`,
-      summary
+      summary,
+      articles
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
