@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sparkles, LoaderCircle, ExternalLink } from "lucide-react";
@@ -49,12 +48,12 @@ export const NewsCardActions = ({
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 flex-col sm:flex-row w-full mt-2 z-10">
       {articleUrl ? (
         <Button 
           variant="outline" 
           size="sm" 
-          className="flex-1 bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600 hover:text-white touch-target"
+          className="flex-1 bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600 hover:text-white touch-target w-full sm:w-auto"
           asChild
         >
           <a href={articleUrl} target="_blank" rel="noopener noreferrer">
@@ -65,19 +64,18 @@ export const NewsCardActions = ({
       ) : (
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="flex-1 bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600 hover:text-white touch-target">
+            <Button variant="outline" size="sm" className="flex-1 bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600 hover:text-white touch-target w-full sm:w-auto">
               {isMobile ? "Read" : "Read Full Article"}
             </Button>
           </DialogTrigger>
           {children}
         </Dialog>
       )}
-
-      <Button 
-        variant="outline" 
+      <Button
+        variant="outline"
         size={isMobile ? "default" : "sm"}
         className={cn(
-          "bg-cyan-500/20 text-cyan-400 border-cyan-500/50 hover:bg-cyan-500/30 touch-target focus-mobile",
+          "bg-cyan-500/20 text-cyan-400 border-cyan-500/50 hover:bg-cyan-500/30 touch-target focus-mobile w-full sm:w-auto",
           isMobile ? "min-w-[48px] px-3" : "min-w-[40px]"
         )}
         onClick={handleAiClick}
