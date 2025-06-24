@@ -100,12 +100,6 @@ const Index = () => {
               <span className="text-slate-400 text-sm text-center px-2">
                 {articles.length} articles available • {usePersonalizedFeed ? "Personalized feed" : "General feed"} • Updated automatically every 15 minutes
               </span>
-              {cachedCount > 0 && (
-                <span className="text-cyan-400 text-xs flex items-center gap-1">
-                  <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>
-                  {cachedCount} articles cached for fast loading
-                </span>
-              )}
             </div>
           )}
         </div>
