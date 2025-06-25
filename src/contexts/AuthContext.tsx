@@ -63,6 +63,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    // Periodic session validity check every 10 minutes
+    const interval = setInterval(async () => {
+      if (session?.access_token) {
+        const { data, error } = await supabase.auth.getUser(session.access_token);
+        if (error || !data?.user) {
+          setUser(null);
+          setSession(null);
+          setLoading(false);
+          toast({
+            title: "Session Expired",
+            description: "Your session has expired. Please sign in again.",
+            variant: "destructive",
+          });
+          await signOut();
+        }
+      }
+    }, 10 * 60 * 1000); // 10 minutes
+
+    return () => clearInterval(interval);
+  }, [session]);
+
   const checkAccountLockout = (email: string): boolean => {
     const lockoutKey = `lockout-${email}`;
     const maxAttempts = 5;

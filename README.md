@@ -139,6 +139,30 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For questions or support, please contact us at contact@hunterpedia.site.
 
+## Security: XSS Mitigation with Supabase JWT
+
+- **Strict Content Security Policy (CSP):** Only allow trusted sources for scripts/styles. See `vercel.json` for recommended settings.
+- **Never use `dangerouslySetInnerHTML`** unless content is sanitized with a library like DOMPurify.
+- **Sanitize all user input** before storing or rendering.
+- **Minimize third-party scripts**; only use trusted, necessary ones.
+- **Keep dependencies up to date** and audit for vulnerabilities.
+- **React's default escaping** protects against most XSS when rendering variables.
+
+## Example: Forwarding JWT to Supabase Edge Functions
+
+```js
+const session = await supabase.auth.getSession();
+const token = session.data.session?.access_token;
+const response = await fetch('https://<your-project-id>.functions.supabase.co/your-function', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  },
+  body: JSON.stringify({ ...yourPayload }),
+});
+```
+
 ---
 
 Built with ❤️ by the Hunterpedia Team
