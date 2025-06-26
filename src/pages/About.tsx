@@ -139,8 +139,8 @@ const About = () => {
             </div>
           </div>
         </section>
+        <NewPublicFooter />
       </div>
-      <NewPublicFooter />
     </>
   );
 };
