@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, Crown } from "lucide-react";
@@ -67,6 +67,9 @@ export const WelcomeBackDialog = () => {
               Welcome Back!
             </span>
           </DialogTitle>
+          <DialogDescription>
+            You have successfully signed in. Review your subscription status and continue to your dashboard.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">

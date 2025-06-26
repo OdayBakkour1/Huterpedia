@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Crown, Calendar, Edit, Users, Search, Filter, Plus, Trash2, Eye } from 'lucide-react';
@@ -424,6 +424,9 @@ export const SubscriptionManagement = () => {
         <DialogContent className="bg-slate-900 border-slate-700 max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-white">Edit User Subscription</DialogTitle>
+            <DialogDescription>
+              Update the user's subscription plan, AI credits, and trial or premium dates.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

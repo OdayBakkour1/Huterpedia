@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Users, Crown, Shield, User, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 
 export const UsersManagement = () => {
@@ -214,8 +214,10 @@ export const UsersManagement = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this user? This action cannot be undone.
+            </DialogDescription>
           </DialogHeader>
-          <div>Are you sure you want to delete this user?</div>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setDeleteDialogOpen(false)} disabled={deleteUserMutation.isPending}>Cancel</Button>
             <Button variant="destructive" onClick={handleDeleteUser} disabled={deleteUserMutation.isPending}>Delete</Button>

@@ -1,4 +1,4 @@
-import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Sparkles, LoaderCircle } from "lucide-react";
@@ -119,6 +119,9 @@ export const NewsCardDialog = ({
     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-slate-900 border-slate-700">
       <DialogHeader>
         <DialogTitle className="text-xl text-white">{cleanTitle}</DialogTitle>
+        <DialogDescription>
+          Detailed information about the selected news article, including source, date, tags, and description.
+        </DialogDescription>
       </DialogHeader>
       <div className="space-y-4">
         {article.image_url && (

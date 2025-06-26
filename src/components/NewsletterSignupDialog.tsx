@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -94,6 +93,9 @@ const NewsletterSignupDialog = ({ open, onOpenChange }: NewsletterSignupDialogPr
             <Shield className="mr-3 h-6 w-6 text-cyan-400" />
             Weekly Intel Brief
           </DialogTitle>
+          <DialogDescription>
+            Subscribe to receive weekly cybersecurity intelligence updates in your inbox.
+          </DialogDescription>
         </DialogHeader>
         
         {!isSuccess ? (
