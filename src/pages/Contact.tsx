@@ -78,12 +78,12 @@ const Contact = () => {
         <div className="hidden md:block absolute bottom-20 left-1/3 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rotate-12 animate-pulse blur-sm"></div>
         <NewPublicHeader />
         {/* Main Content */}
-        <section className="relative z-10 pb-12 sm:pb-24">
+        <section className="relative z-10 pb-8 sm:pb-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-6xl mx-auto">
               
               {/* Contact Methods - Top Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-12 sm:mb-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 {contactMethods.map((method, index) => (
                   <Card key={index} className="group relative bg-white/5 backdrop-blur-2xl border border-white/10 hover:border-white/20 rounded-3xl shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -182,7 +182,7 @@ const Contact = () => {
               </Card>
 
               {/* Additional Info */}
-              <div className="mt-12 sm:mt-16 text-center">
+              <div className="mt-8 sm:mt-10 text-center">
                 <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-600/10 animate-pulse"></div>
                   <CardContent className="relative p-8 sm:p-12">
