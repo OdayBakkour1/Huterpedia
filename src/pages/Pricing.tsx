@@ -61,7 +61,7 @@ const Pricing = () => {
         <div className="hidden md:block absolute bottom-20 left-1/3 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rotate-12 animate-pulse blur-sm"></div>
         <NewPublicHeader />
         {/* Main Content */}
-        <section className="relative z-10 container mx-auto px-6 py-20">
+        <section className="relative z-10 container mx-auto px-6 py-8 sm:py-12">
           <div className="text-center mb-20">
             <h1 className="text-6xl lg:text-7xl font-bold mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-[12px]">
               Simple Pricing
@@ -74,7 +74,7 @@ const Pricing = () => {
         </section>
 
         {/* Pricing Card */}
-        <section className="relative z-10 py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-6">
             <div className="max-w-md mx-auto">
               <Card className="group relative backdrop-blur-2xl border rounded-3xl shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 overflow-hidden bg-white/10 border-cyan-400/50 ring-2 ring-cyan-400/30">
@@ -138,7 +138,7 @@ const Pricing = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="relative z-10 py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">

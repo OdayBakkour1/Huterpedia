@@ -215,7 +215,7 @@ const Landing = () => {
         </section>
 
         {/* What Is Hunterpedia */}
-        <section className="relative z-10 py-16 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="text-center mb-12 sm:mb-20">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent px-0 py-2">
@@ -288,7 +288,7 @@ const Landing = () => {
         </section>
 
         {/* How It Works */}
-        <section className="relative z-10 py-16 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="text-center mb-12 sm:mb-20">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white via-purple-200 to-cyan-300 bg-clip-text text-transparent">
@@ -345,7 +345,7 @@ const Landing = () => {
         </section>
 
         {/* Live Preview */}
-        <section className="relative z-10 py-16 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
@@ -406,7 +406,7 @@ const Landing = () => {
         </section>
 
         {/* Pricing Section */}
-        <section className="relative z-10 py-16 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent py-2">
@@ -485,7 +485,7 @@ const Landing = () => {
         </section>
 
         {/* Final CTA */}
-        <section className="relative z-10 py-16 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
               {/* Animated mesh gradient */}

@@ -54,7 +54,7 @@ const About = () => {
         <div className="hidden md:block absolute bottom-20 left-1/3 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rotate-12 animate-pulse blur-sm"></div>
         <NewPublicHeader />
         {/* Main Content */}
-        <section className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <section className="relative z-10 container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="text-center mb-12 sm:mb-20">
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent px-2">
               About Hunterpedia
@@ -67,7 +67,7 @@ const About = () => {
         </section>
 
         {/* Mission Section */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="max-w-6xl mx-auto">
               <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden mb-12 sm:mb-20">
@@ -90,7 +90,7 @@ const About = () => {
         </section>
 
         {/* Values Section */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <h2 className="text-4xl sm:text-5xl font-bold text-center mb-12 sm:mb-16 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent px-2">
               Our Values
@@ -115,7 +115,7 @@ const About = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-cyan-500/10 animate-pulse"></div>

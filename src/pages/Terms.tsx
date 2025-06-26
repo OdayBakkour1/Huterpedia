@@ -95,7 +95,7 @@ const Terms = () => {
         </div>
 
         {/* Overview */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden mb-12 sm:mb-20">
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 animate-pulse"></div>
@@ -147,7 +147,7 @@ const Terms = () => {
         </section>
 
         {/* Terms Sections */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-7xl mx-auto">
               {sections.map((section, index) => (
@@ -180,7 +180,7 @@ const Terms = () => {
         </section>
 
         {/* Additional Terms */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
               <Card className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8">
@@ -213,7 +213,7 @@ const Terms = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-600/10 animate-pulse"></div>

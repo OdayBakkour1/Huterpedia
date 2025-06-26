@@ -51,7 +51,7 @@ const Privacy = () => {
         <div className="hidden md:block absolute bottom-20 left-1/3 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rotate-12 animate-pulse blur-sm"></div>
         <NewPublicHeader />
         {/* Main Content */}
-        <section className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <section className="relative z-10 container mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="text-center mb-12 sm:mb-20">
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent px-2 py-[8px]">
               Privacy Policy
@@ -68,7 +68,7 @@ const Privacy = () => {
         </section>
 
         {/* Overview */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden mb-12 sm:mb-20">
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 animate-pulse"></div>
@@ -110,7 +110,7 @@ const Privacy = () => {
         </section>
 
         {/* Privacy Sections */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-7xl mx-auto">
               {sections.map((section, index) => <Card key={index} className="group relative bg-white/5 backdrop-blur-2xl border border-white/10 hover:border-white/20 rounded-3xl shadow-2xl transition-all duration-500 hover:scale-105 hover:-translate-y-2 overflow-hidden">
@@ -139,7 +139,7 @@ const Privacy = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="relative z-10 py-12 sm:py-24">
+        <section className="relative z-10 py-8 sm:py-12">
           <div className="container mx-auto px-4 sm:px-6">
             <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-600/10 animate-pulse"></div>
