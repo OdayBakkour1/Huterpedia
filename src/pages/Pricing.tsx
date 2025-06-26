@@ -38,9 +38,10 @@ const Pricing = () => {
   return (
     <>
       <Helmet>
-        <title>Pricing - Hunterpedia</title>
-        <meta property="og:title" content="Pricing - Hunterpedia" />
-        <meta property="og:description" content="Simple, affordable pricing for full access to Hunterpedia's threat intelligence platform." />
+        <title>Hunterpedia Pricing | Plans for Cyber Professionals</title>
+        <meta name="description" content="Choose a plan that fits your needs. Get full access to Hunterpedia's premium threat alerts, CVE tracking, and real-time cybersecurity updates." />
+        <meta property="og:title" content="Hunterpedia Pricing | Plans for Cyber Professionals" />
+        <meta property="og:description" content="Choose a plan that fits your needs. Get full access to Hunterpedia's premium threat alerts, CVE tracking, and real-time cybersecurity updates." />
         <meta property="og:image" content="https://www.hunterpedia.site/Thumb/Pricing.png" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/pricing" />

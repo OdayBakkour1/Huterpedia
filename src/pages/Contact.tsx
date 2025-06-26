@@ -55,9 +55,10 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact - Hunterpedia</title>
-        <meta property="og:title" content="Contact - Hunterpedia" />
-        <meta property="og:description" content="Contact the Hunterpedia team for support, questions, or business inquiries." />
+        <title>Contact Hunterpedia | Reach Our Cybersecurity Team</title>
+        <meta name="description" content="Have questions or feedback? Contact the Hunterpedia team to collaborate, report issues, or ask about our cybersecurity tools and news services." />
+        <meta property="og:title" content="Contact Hunterpedia | Reach Our Cybersecurity Team" />
+        <meta property="og:description" content="Have questions or feedback? Contact the Hunterpedia team to collaborate, report issues, or ask about our cybersecurity tools and news services." />
         <meta property="og:image" content="https://www.hunterpedia.site/Thumb/Contact.png" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/contact" />

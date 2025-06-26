@@ -47,9 +47,10 @@ const Landing = () => {
   return (
     <>
       <Helmet>
-        <title>Hunterpedia - First Cybersecurity News Aggregator</title>
-        <meta property="og:title" content="Hunterpedia - First Cybersecurity News Aggregator" />
-        <meta property="og:description" content="Hunterpedia is the world's first real-time cybersecurity news aggregator. Stay ahead of global threats, breaches, and vulnerabilities." />
+        <title>Hunterpedia | Cybersecurity News & Threat Intelligence</title>
+        <meta name="description" content="Track real-time cyber threats, breaches, and CVE alerts. Hunterpedia aggregates trusted security news sources to keep you protected 24/7." />
+        <meta property="og:title" content="Hunterpedia | Cybersecurity News & Threat Intelligence" />
+        <meta property="og:description" content="Track real-time cyber threats, breaches, and CVE alerts. Hunterpedia aggregates trusted security news sources to keep you protected 24/7." />
         <meta property="og:image" content="https://www.hunterpedia.site/Thumb/Home.png" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/" />

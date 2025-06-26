@@ -59,9 +59,10 @@ const Checkout = () => {
   return (
     <>
       <Helmet>
-        <title>Checkout - Hunterpedia</title>
-        <meta property="og:title" content="Checkout - Hunterpedia" />
-        <meta property="og:description" content="Subscribe to Hunterpedia for real-time cybersecurity intelligence and premium features." />
+        <title>Hunterpedia Checkout | Secure Subscription Process</title>
+        <meta name="description" content="Subscribe to Hunterpedia securely. Get instant access to premium CVE alerts, cyber intel feeds, and real-time security news from top sources." />
+        <meta property="og:title" content="Hunterpedia Checkout | Secure Subscription Process" />
+        <meta property="og:description" content="Subscribe to Hunterpedia securely. Get instant access to premium CVE alerts, cyber intel feeds, and real-time security news from top sources." />
         <meta property="og:image" content="https://www.hunterpedia.site/Thumb/Checkout.png" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/checkout" />

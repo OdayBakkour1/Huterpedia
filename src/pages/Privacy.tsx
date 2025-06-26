@@ -28,9 +28,10 @@ const Privacy = () => {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy - Hunterpedia</title>
-        <meta property="og:title" content="Privacy Policy - Hunterpedia" />
-        <meta property="og:description" content="Read Hunterpedia's privacy policy and learn how we protect your data and privacy." />
+        <title>Hunterpedia Privacy Policy | User Data Protection</title>
+        <meta name="description" content="Your privacy is our priority. Read how Hunterpedia collects, stores, and protects your data while providing accurate cybersecurity updates." />
+        <meta property="og:title" content="Hunterpedia Privacy Policy | User Data Protection" />
+        <meta property="og:description" content="Your privacy is our priority. Read how Hunterpedia collects, stores, and protects your data while providing accurate cybersecurity updates." />
         <meta property="og:image" content="https://www.hunterpedia.site/Thumb/Privacy.png" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/privacy" />

@@ -31,9 +31,10 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About - Hunterpedia</title>
-        <meta property="og:title" content="About - Hunterpedia" />
-        <meta property="og:description" content="Learn more about Hunterpedia, the first cybersecurity news aggregator." />
+        <title>About Hunterpedia | Cyber Threat Intelligence Mission</title>
+        <meta name="description" content="Learn about Hunterpedia's mission to deliver curated cybersecurity updates, CVE alerts, and threat intel from reliable sources around the world." />
+        <meta property="og:title" content="About Hunterpedia | Cyber Threat Intelligence Mission" />
+        <meta property="og:description" content="Learn about Hunterpedia's mission to deliver curated cybersecurity updates, CVE alerts, and threat intel from reliable sources around the world." />
         <meta property="og:image" content="https://www.hunterpedia.site/Thumb/About.png" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/about" />
