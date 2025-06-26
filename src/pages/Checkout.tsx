@@ -65,6 +65,10 @@ const Checkout = () => {
       <NewPublicHeader />
       
       <div className="flex flex-col items-center justify-center min-h-[70vh] p-6 z-10 relative">
+        {/* Checkout thumbnail */}
+        <div className="flex justify-center mb-8">
+          <img src="/Thumb/Checkout.png" alt="Checkout Thumbnail" className="w-32 h-32 object-cover rounded-3xl shadow-2xl border-4 border-white/10 bg-white/10" />
+        </div>
         <div className="max-w-4xl w-full">
           <Button 
             onClick={() => navigate(-1)} 
