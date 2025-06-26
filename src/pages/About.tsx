@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import NewPublicHeader from "@/components/NewPublicHeader";
-import NewPublicFooter from "@/components/NewPublicFooter";
+import Footer from "@/components/Footer";
 import { Helmet } from 'react-helmet-async';
 
 const About = () => {
@@ -140,7 +140,7 @@ const About = () => {
           </div>
         </section>
       </div>
-      <NewPublicFooter />
+      <Footer />
     </>
   );
 };
