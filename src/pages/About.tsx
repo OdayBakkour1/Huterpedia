@@ -39,6 +39,8 @@ const About = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/about" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About Hunterpedia | Cyber Threat Intelligence Mission" />
+        <meta name="twitter:description" content="Learn about Hunterpedia's mission to deliver curated cybersecurity updates, CVE alerts, and threat intel from reliable sources around the world." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/About.png" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">

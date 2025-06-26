@@ -67,6 +67,8 @@ const Checkout = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/checkout" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Hunterpedia Checkout | Secure Subscription Process" />
+        <meta name="twitter:description" content="Subscribe to Hunterpedia securely. Get instant access to premium CVE alerts, cyber intel feeds, and real-time security news from top sources." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Checkout.png" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">

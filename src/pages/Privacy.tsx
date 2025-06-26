@@ -36,6 +36,8 @@ const Privacy = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/privacy" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Hunterpedia Privacy Policy | User Data Protection" />
+        <meta name="twitter:description" content="Your privacy is our priority. Read how Hunterpedia collects, stores, and protects your data while providing accurate cybersecurity updates." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Privacy.png" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">

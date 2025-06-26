@@ -55,6 +55,8 @@ const Landing = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Hunterpedia | Cybersecurity News & Threat Intelligence" />
+        <meta name="twitter:description" content="Track real-time cyber threats, breaches, and CVE alerts. Hunterpedia aggregates trusted security news sources to keep you protected 24/7." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Home.png" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">

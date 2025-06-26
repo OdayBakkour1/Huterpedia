@@ -46,6 +46,8 @@ const Pricing = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.hunterpedia.site/pricing" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Hunterpedia Pricing | Plans for Cyber Professionals" />
+        <meta name="twitter:description" content="Choose a plan that fits your needs. Get full access to Hunterpedia's premium threat alerts, CVE tracking, and real-time cybersecurity updates." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Pricing.png" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
