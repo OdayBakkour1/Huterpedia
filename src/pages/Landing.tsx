@@ -172,7 +172,9 @@ const Landing = () => {
                 <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl p-4 sm:p-6 transform rotate-1 hover:rotate-0 transition-transform duration-500">
                   {/* Thumbnail image for landing page */}
                   <div className="flex justify-center mb-4">
-                    <img src="/Thumb/Home.png" alt="Home Thumbnail" className="w-48 h-48 object-cover rounded-3xl shadow-2xl border-4 border-white/10 bg-white/10" />
+                    <div className="flex items-center justify-center w-48 h-48 rounded-3xl shadow-2xl border-4 border-white/10 bg-white/10">
+                      <Shield className="h-32 w-32 text-cyan-400" />
+                    </div>
                   </div>
                   <div className="flex items-center justify-between mb-4 sm:mb-6">
                     <div className="flex items-center space-x-2 sm:space-x-3">
