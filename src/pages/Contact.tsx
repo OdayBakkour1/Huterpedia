@@ -80,7 +80,7 @@ const Contact = () => {
         {/* Main Content */}
         <section className="relative z-10 pb-8 sm:pb-12">
           <div className="container mx-auto px-4 sm:px-6">
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-6xl mx-auto mt-4 sm:mt-6">
               
               {/* Contact Methods - Top Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
