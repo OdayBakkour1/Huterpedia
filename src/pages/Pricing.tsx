@@ -49,6 +49,7 @@ const Pricing = () => {
         <meta name="twitter:title" content="Hunterpedia Pricing | Plans for Cyber Professionals" />
         <meta name="twitter:description" content="Choose a plan that fits your needs. Get full access to Hunterpedia's premium threat alerts, CVE tracking, and real-time cybersecurity updates." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Pricing.png" />
+        <link rel="canonical" href="https://www.hunterpedia.site/pricing" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
         {/* Modern mesh gradient background */}

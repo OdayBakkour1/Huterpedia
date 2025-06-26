@@ -58,6 +58,7 @@ const Landing = () => {
         <meta name="twitter:title" content="Hunterpedia | Cybersecurity News & Threat Intelligence" />
         <meta name="twitter:description" content="Track real-time cyber threats, breaches, and CVE alerts. Hunterpedia aggregates trusted security news sources to keep you protected 24/7." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Home.png" />
+        <link rel="canonical" href="https://www.hunterpedia.site/" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
         {/* Modern mesh gradient background */}

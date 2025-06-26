@@ -66,6 +66,7 @@ const Contact = () => {
         <meta name="twitter:title" content="Contact Hunterpedia | Reach Our Cybersecurity Team" />
         <meta name="twitter:description" content="Have questions or feedback? Contact the Hunterpedia team to collaborate, report issues, or ask about our cybersecurity tools and news services." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Contact.png" />
+        <link rel="canonical" href="https://www.hunterpedia.site/contact" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
         {/* Modern mesh gradient background */}

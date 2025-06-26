@@ -39,6 +39,7 @@ const Privacy = () => {
         <meta name="twitter:title" content="Hunterpedia Privacy Policy | User Data Protection" />
         <meta name="twitter:description" content="Your privacy is our priority. Read how Hunterpedia collects, stores, and protects your data while providing accurate cybersecurity updates." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Privacy.png" />
+        <link rel="canonical" href="https://www.hunterpedia.site/privacy" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
         {/* Modern mesh gradient background */}

@@ -66,6 +66,7 @@ const Terms = () => {
         <meta name="twitter:title" content="Hunterpedia Terms of Use | Legal & User Guidelines" />
         <meta name="twitter:description" content="Understand the rules of using Hunterpedia. Our terms outline your rights, obligations, and how we maintain a secure platform for all users." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/TERMSpng.png" />
+        <link rel="canonical" href="https://www.hunterpedia.site/terms" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
         {/* Modern mesh gradient background */}

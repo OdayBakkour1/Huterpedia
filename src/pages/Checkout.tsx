@@ -70,6 +70,7 @@ const Checkout = () => {
         <meta name="twitter:title" content="Hunterpedia Checkout | Secure Subscription Process" />
         <meta name="twitter:description" content="Subscribe to Hunterpedia securely. Get instant access to premium CVE alerts, cyber intel feeds, and real-time security news from top sources." />
         <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/Checkout.png" />
+        <link rel="canonical" href="https://www.hunterpedia.site/checkout" />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/20 via-transparent to-transparent"></div>
