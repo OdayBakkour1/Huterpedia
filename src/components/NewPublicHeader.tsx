@@ -11,17 +11,19 @@ const NewPublicHeader = () => {
         <div className="container mx-auto px-4 sm:px-6 py-2 sm:py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <div onClick={() => navigate('/')} className="flex items-center cursor-pointer select-none">
-                <img
-                  src="/HunterPedia Png-01.png"
-                  alt="Hunterpedia Logo"
-                  className="h-20 w-20 object-contain"
-                />
-                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent ml-2">
-                  Hunterpedia
-                </h1>
+              <div onClick={() => navigate('/')} className="flex flex-col cursor-pointer select-none">
+                <div className="flex items-center">
+                  <img
+                    src="/HunterPedia Png-01.png"
+                    alt="Hunterpedia Logo"
+                    className="h-20 w-20 object-contain"
+                  />
+                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent ml-2">
+                    Hunterpedia
+                  </h1>
+                </div>
+                <p className="text-xs sm:text-sm text-white/60 mt-1 ml-2">Intelligence. Curated. Real-Time.</p>
               </div>
-              <p className="text-xs sm:text-sm text-white/60 hidden sm:block">Intelligence. Curated. Real-Time.</p>
             </div>
             <Button 
               onClick={() => navigate('/auth')} 
