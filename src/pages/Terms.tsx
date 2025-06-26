@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import NewPublicHeader from "@/components/NewPublicHeader";
 import NewPublicFooter from "@/components/NewPublicFooter";
+import { Helmet } from 'react-helmet-async';
 
 const Terms = () => {
   const navigate = useNavigate();
@@ -52,6 +53,96 @@ const Terms = () => {
   ];
 
   return (
+    <>
+      <Helmet>
+        <title>Terms of Service - Hunterpedia</title>
+        <meta property="og:title" content="Terms of Service - Hunterpedia" />
+        <meta property="og:description" content="Review the terms of service for using Hunterpedia's cybersecurity intelligence platform." />
+        <meta property="og:image" content="https://www.hunterpedia.site/Thumb/TERMSpng.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.hunterpedia.site/terms" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://www.hunterpedia.site/Thumb/TERMSpng.png" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
+        {/* Modern mesh gradient background */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/20 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent"></div>
+        {/* Floating geometric shapes - hidden on mobile for performance */}
+        <div className="hidden md:block absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rounded-3xl rotate-45 animate-pulse blur-sm"></div>
+        <div className="hidden md:block absolute top-1/3 right-10 w-20 h-20 bg-gradient-to-br from-purple-400/10 to-cyan-600/10 rounded-full animate-bounce blur-sm"></div>
+        <div className="hidden md:block absolute bottom-20 left-1/3 w-16 h-16 bg-gradient-to-br from-cyan-400/10 to-purple-600/10 rotate-12 animate-pulse blur-sm"></div>
+        <NewPublicHeader />
+        {/* Main Content */}
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+          <div className="text-center mb-12 sm:mb-20">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent px-2">
+              Terms of Service
+            </h1>
+            <p className="text-lg sm:text-xl text-white/70 max-w-4xl mx-auto leading-relaxed px-4">
+              Clear, fair terms that protect both our users and our platform. 
+              Understanding your rights and responsibilities when using Hunterpedia.
+            </p>
+            <div className="mt-6 sm:mt-8 inline-flex items-center space-x-2 bg-white/5 backdrop-blur-xl rounded-full px-4 sm:px-6 py-2 sm:py-3 border border-white/10">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+              <span className="text-sm sm:text-base text-white/80">Effective: January 15, 2025</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Overview */}
+        <section className="relative z-10 py-12 sm:py-24">
+          <div className="container mx-auto px-4 sm:px-6">
+            <Card className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden mb-12 sm:mb-20">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-cyan-500/10 animate-pulse"></div>
+              <CardContent className="relative p-8 sm:p-16">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-white via-cyan-200 to-purple-300 bg-clip-text text-transparent">
+                  Welcome to Hunterpedia
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
+                  <div>
+                    <p className="text-lg sm:text-xl text-white/70 leading-relaxed mb-4 sm:mb-6">
+                      These terms govern your use of Hunterpedia's cybersecurity intelligence platform. 
+                      By using our service, you're agreeing to these terms and joining a community 
+                      committed to improving global cybersecurity.
+                    </p>
+                    <p className="text-base sm:text-lg text-cyan-400 font-semibold">
+                      Fair. Transparent. Focused on security.
+                    </p>
+                  </div>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-cyan-500/20 p-1.5 sm:p-2 rounded-full">
+                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+                      </div>
+                      <span className="text-sm sm:text-base text-white/80">Responsible use guidelines</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-cyan-500/20 p-1.5 sm:p-2 rounded-full">
+                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+                      </div>
+                      <span className="text-sm sm:text-base text-white/80">Clear intellectual property rights</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-cyan-500/20 p-1.5 sm:p-2 rounded-full">
+                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+                      </div>
+                      <span className="text-sm sm:text-base text-white/80">Privacy-first approach</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-cyan-500/20 p-1.5 sm:p-2 rounded-full">
+                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-400" />
+                      </div>
+                      <span className="text-sm sm:text-base text-white/80">Professional community standards</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Terms Sections */}
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-purple-950 relative overflow-hidden">
       {/* Modern mesh gradient background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/20 via-transparent to-transparent"></div>
