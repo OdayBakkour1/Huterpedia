@@ -142,6 +142,14 @@ export const Header = ({
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
+                      onClick={() => navigate('/checkout')}
+                      className="text-cyan-400 hover:text-white font-semibold"
+                    >
+                      <Crown className="h-4 w-4 mr-2" />
+                      Upgrade
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
                       onClick={() => navigate('/profile')}
                       className="text-slate-300 hover:text-white"
                     >
@@ -241,6 +249,13 @@ export const Header = ({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-slate-800 border-slate-700 w-64">
                     <AIUsageIndicator />
+                    <DropdownMenuItem
+                      onClick={() => navigate('/checkout')}
+                      className="text-cyan-400 hover:text-white font-semibold"
+                    >
+                      <Crown className="h-4 w-4 mr-2" />
+                      Upgrade
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => navigate('/profile')}
                       className="text-slate-300 hover:text-white"
