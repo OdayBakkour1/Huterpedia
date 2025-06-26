@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Crown, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function PaymentButton({ amount, productName, onSuccess, onError }) {
   const { user } = useAuth();
@@ -22,9 +23,18 @@ export default function PaymentButton({ amount, productName, onSuccess, onError 
     try {
       console.log("Creating payment with:", { amount, email: user.email, userId: user.id, productInfo: productName });
       
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      if (!token) {
+        throw new Error('User session not found. Please log in again.');
+      }
+      
       const res = await fetch('https://gzpayeckolpfflgvkqvh.supabase.co/functions/v1/create-payment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           amount,
           currency: 'USD',
@@ -35,9 +45,9 @@ export default function PaymentButton({ amount, productName, onSuccess, onError 
       });
       
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error(`Payment API error (${res.status}):`, errorText);
-        throw new Error(`Payment service error (${res.status}): ${errorText}`);
+        const errorData = await res.json();
+        console.error(`Payment API error (${res.status}):`, errorData);
+        throw new Error(errorData.details || errorData.error || `Payment service error (${res.status})`);
       }
       
       const data = await res.json();
