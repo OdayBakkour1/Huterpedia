@@ -10,9 +10,10 @@ console.log('[HOOK] useNewsArticles loaded');
 export const useNewsArticles = (page: number) => {
   console.log('[HOOK] useNewsArticles called, page:', page);
   const { session, loading } = useAuth();
+  const user = session?.user;
 
   return useQuery<{ articles: NewsArticle[]; totalCount: number }, Error>({
-    queryKey: ['news-articles', page, !!session],
+    queryKey: ['news-articles', page, user?.id],
     queryFn: async () => {
       if (loading) return { articles: [], totalCount: 0 };
       const token = session?.access_token;
@@ -32,7 +33,7 @@ export const useNewsArticles = (page: number) => {
         totalCount: data.totalCount,
       };
     },
-    enabled: !loading,
+    enabled: !!user,
     staleTime: 3 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
