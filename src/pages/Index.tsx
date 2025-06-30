@@ -28,7 +28,7 @@ const Index = () => {
   const [allArticles, setAllArticles] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
 
-  const { data, isLoading, isError } = useNewsArticles(page);
+  const { data, isLoading: newsLoading, isError } = useNewsArticles(page);
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
@@ -58,10 +58,10 @@ const Index = () => {
   }, [data]);
 
   useEffect(() => {
-    if (inView && allArticles.length < totalCount && !isLoading) {
+    if (inView && allArticles.length < totalCount && !newsLoading) {
       setPage(prev => prev + 1);
     }
-  }, [inView, allArticles.length, totalCount, isLoading]);
+  }, [inView, allArticles.length, totalCount, newsLoading]);
 
   if (loading || subscriptionLoading) {
     return (
@@ -78,7 +78,7 @@ const Index = () => {
   // Use allArticles instead of paginated/infinite query data
   // Pass allArticles to NewsGrid, and update loading/end-of-list UI accordingly
   const articles = usePersonalizedFeed ? (personalizedArticles || []) : allArticles;
-  const isLoading = usePersonalizedFeed ? personalizedLoading : isLoading;
+  const loading = usePersonalizedFeed ? personalizedLoading : newsLoading;
 
   // Filtered news for search and category
   const filteredNews = articles.filter((article) => {
@@ -145,7 +145,7 @@ const Index = () => {
           </div>
         </div>
 
-        {isLoading ? (
+        {loading ? (
           <div className="text-center py-12">
             <div className="animate-pulse space-y-4">
               <div className="h-4 bg-slate-700 rounded w-1/3 mx-auto"></div>
@@ -170,7 +170,7 @@ const Index = () => {
             <NewsGrid articles={filteredNews} />
             {!usePersonalizedFeed && (
               <div ref={loadMoreRef} className="flex justify-center py-8">
-                {isLoading ? (
+                {loading ? (
                   <span className="text-slate-400">Loading more articles...</span>
                 ) : (
                   <span className="text-slate-500">You've reached the end.</span>
