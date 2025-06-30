@@ -121,6 +121,11 @@ const Index = () => {
   // Remove filtering and just sort by publishedAt descending
   const sortedNews = articles.slice().sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 
+  // Filter by selected category (except 'All')
+  const filteredNews = selectedCategory === "All"
+    ? sortedNews
+    : sortedNews.filter(article => article.category === selectedCategory);
+
   // Count cached articles for performance info
   const cachedCount = articles.filter(article => article.cached_content_url).length;
 
@@ -198,7 +203,7 @@ const Index = () => {
           </div>
         ) : (
           <>
-            <NewsGrid articles={sortedNews} />
+            <NewsGrid articles={filteredNews} />
             {/* Infinite scroll trigger */}
             {hasMore && !isLoading && (
               <div ref={setInfiniteScrollRef} style={{ height: 1 }} />
