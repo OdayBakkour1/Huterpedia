@@ -7,6 +7,7 @@ import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 
 export const SubscriptionExpiredDialog = () => {
+  console.log('[COMP] SubscriptionExpiredDialog render');
   const [open, setOpen] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const { data: subscription } = useSubscriptionStatus();

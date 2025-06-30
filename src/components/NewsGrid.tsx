@@ -6,6 +6,7 @@ interface NewsGridProps {
 }
 
 export const NewsGrid = ({ articles }: NewsGridProps) => {
+  console.log('[COMP] NewsGrid render, articles:', articles.length);
   if (articles.length === 0) {
     return (
       <div className="text-center py-12">

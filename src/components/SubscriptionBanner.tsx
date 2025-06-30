@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Crown, Clock, AlertTriangle } from 'lucide-react';
 
 export const SubscriptionBanner = () => {
+  console.log('[COMP] SubscriptionBanner render');
   const { data: subscription, isLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
   const navigate = useNavigate();

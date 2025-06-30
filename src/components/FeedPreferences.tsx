@@ -27,6 +27,7 @@ const categories = [
 ];
 
 export const FeedPreferences = () => {
+  console.log('[COMP] FeedPreferences render');
   const { preferences, updatePreferences, isUpdating } = useFeedPreferences();
   const { toast } = useToast();
 
