@@ -23,7 +23,7 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   
-  const { articles: paginatedArticles, isLoading: paginatedLoading, hasMore, fetchNextPage, meta } = usePaginatedNewsArticles();
+  const { articles: paginatedArticles, isLoading: paginatedLoading, meta } = usePaginatedNewsArticles();
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
@@ -31,9 +31,7 @@ const Index = () => {
   // Preload cached content only after articles are loaded
   usePreloadCachedContent(paginatedArticles || []);
 
-  const [infiniteScrollRef, setInfiniteScrollRef] = useState<HTMLDivElement | null>(null);
   const [totalCount, setTotalCount] = useState<number | null>(null);
-  const [pageCount, setPageCount] = useState<number>(0);
   const [categories, setCategories] = useState<string[]>([]);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
 
@@ -67,28 +65,11 @@ const Index = () => {
     }
   }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
-  // Infinite scroll observer
-  useEffect(() => {
-    if (!infiniteScrollRef || !hasMore) return;
-    const observer = new window.IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 1 }
-    );
-    observer.observe(infiniteScrollRef);
-    return () => observer.disconnect();
-  }, [infiniteScrollRef, hasMore, fetchNextPage]);
-
   // Update meta info when first page loads
   useEffect(() => {
     if (meta.showMeta) {
       setTotalCount(meta.totalCount ?? null);
-      setPageCount(meta.pageCount ?? 0);
       setCategories(meta.categories ?? []);
-      // meta.categories should be an object: { [category]: count }
       setCategoryCounts(meta.categoryCounts ?? {});
     }
   }, [meta]);
@@ -196,7 +177,7 @@ const Index = () => {
               <p className="text-slate-400 text-sm sm:text-base">
                 {usePersonalizedFeed 
                   ? "No articles match your current preferences. Try adjusting your feed settings or switch to the general feed."
-                  : "News articles are automatically fetched every 15 minutes. Please check back shortly for the latest cybersecurity updates from the last 30 days."
+                  : "News articles are automatically fetched every 15 minutes. Please check back shortly for the latest cybersecurity updates from today."
                 }
               </p>
             </div>
@@ -204,13 +185,6 @@ const Index = () => {
         ) : (
           <>
             <NewsGrid articles={filteredNews} />
-            {/* Infinite scroll trigger */}
-            {hasMore && !isLoading && (
-              <div ref={setInfiniteScrollRef} style={{ height: 1 }} />
-            )}
-            {isLoading && articles.length > 0 && (
-              <div className="text-center py-4 text-slate-400">Loading more articles...</div>
-            )}
           </>
         )}
       </main>

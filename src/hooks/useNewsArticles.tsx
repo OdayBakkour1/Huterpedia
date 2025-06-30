@@ -96,19 +96,17 @@ export const useToggleBookmark = () => {
 
 export const usePaginatedNewsArticles = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [meta, setMeta] = useState<{ showMeta: boolean; totalCount?: number; pageCount?: number; categories?: string[]; categoryCounts?: Record<string, number> }>({ showMeta: false });
+  const [meta, setMeta] = useState<{ showMeta: boolean; totalCount?: number; categories?: string[]; categoryCounts?: Record<string, number> }>({ showMeta: false });
 
-  const fetchPage = useCallback(async (pageToFetch: number) => {
+  const fetchAll = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
-      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly?page=${pageToFetch}`, {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly`, {
         method: 'GET',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -120,25 +118,12 @@ export const usePaginatedNewsArticles = () => {
         ...article,
         publishedAt: article.published_at || article.publishedAt,
       })) as NewsArticle[];
-      setArticles(prev => [...prev, ...newArticles]);
-      setHasMore(newArticles.length > 0);
-      // Build categoryCounts from backend or from articles if not provided
-      let categoryCounts: Record<string, number> = {};
-      if (data.categoryCounts) {
-        categoryCounts = data.categoryCounts;
-      } else if (data.categories && Array.isArray(data.categories)) {
-        // If categories is an array of strings, count from articles
-        categoryCounts = {};
-        for (const cat of data.categories) {
-          categoryCounts[cat] = newArticles.filter(a => a.category === cat).length;
-        }
-      }
+      setArticles(newArticles);
       setMeta({
         showMeta: !!data.showMeta,
         totalCount: data.totalCount,
-        pageCount: data.pageCount,
         categories: data.categories,
-        categoryCounts,
+        categoryCounts: data.categoryCounts,
       });
     } catch (err: any) {
       setError(err.message || 'Unknown error');
@@ -147,22 +132,13 @@ export const usePaginatedNewsArticles = () => {
     }
   }, []);
 
-  const fetchNextPage = useCallback(() => {
-    if (!hasMore || isLoading) return;
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchPage(nextPage);
-  }, [hasMore, isLoading, page, fetchPage]);
-
   // Initial load
   React.useEffect(() => {
     setArticles([]);
-    setPage(1);
-    setHasMore(true);
     setMeta({ showMeta: false });
-    fetchPage(1);
+    fetchAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { articles, isLoading, error, hasMore, fetchNextPage, meta };
+  return { articles, isLoading, error, meta };
 };
