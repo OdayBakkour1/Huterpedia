@@ -25,7 +25,6 @@ export const Header = ({
   showPreferences = false,
   setShowPreferences
 }: HeaderProps) => {
-  console.log('[COMP] Header render');
   const { user, signOut } = useAuth();
   const { data: userRole } = useCurrentUserRole();
   const { data: subscription } = useSubscriptionStatus();

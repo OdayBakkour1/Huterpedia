@@ -375,69 +375,243 @@ async function checkAccess(supabase, user) {
   return { isAdmin: false, allowed: false };
 }
 
-// Helper function to split an array into smaller chunks
-function chunkArray(array, size) {
-  const chunks = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Starting news fetch process...');
-    
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-    );
-
-    // OPERATION 1: Clear the staging table.
-    console.log('Producer: Clearing the news_articles_staging table...');
-    const { error: deleteError } = await supabaseAdmin.from('news_articles_staging').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    if (deleteError) throw new Error(`Failed to clear staging table: ${deleteError.message}`);
-    console.log('Producer: Staging table cleared.');
-
-    // OPERATION 2: Fetch ALL sources.
-    const { data: sources, error: sourcesError } = await supabaseAdmin.from('news_sources').select('id, name, url, category').eq('is_active', true);
-    if (sourcesError) throw sourcesError;
-    if (!sources || sources.length === 0) {
-        return new Response(JSON.stringify({ message: 'No active news sources found.' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    const authHeader = req.headers.get('Authorization');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
-    console.log(`Producer: Found ${sources.length} sources. Splitting into batches.`);
-
-    // OPERATION 3: Split sources into small batches and "fan-out" the work.
-    const batches = chunkArray(sources, 5); // Process 5 sources per worker function
-    console.log(`Producer: Dispatching ${batches.length} batches.`);
-
-    for (const batch of batches) {
-      // Invoke the worker function for each batch.
-      // 'event' invocation type means we "fire-and-forget" and don't wait for the worker to finish.
-      // This makes the producer function extremely fast.
-      await supabaseAdmin.functions.invoke('process-rss-batch', {
-        body: { batch },
-        invocationType: 'event'
-      })
+    if (authHeader === `Bearer ${supabaseServiceKey}`) {
+      // Backend automation: allow full access, skip user checks
+      // ... proceed with function logic as backend
+    } else {
+      // User JWT: validate and check access
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: 'Invalid authentication token' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      // Check access
+      const access = await checkAccess(supabase, user);
+      if (!access.allowed) {
+        return new Response(JSON.stringify({ error: 'Subscription or trial expired' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
     }
 
-    return new Response(JSON.stringify({ message: `Successfully dispatched ${sources.length} sources across ${batches.length} worker jobs.` }), {
-        status: 200, headers: { 'Content-Type': 'application/json' }
+    const body = await req.json().catch(() => ({}));
+    const useStaging = body.staging || false;
+    const maxArticlesPerSource = 5; // Limit to 5 articles per source
+    const maxSources = 10; // Limit to 10 sources per request
+
+    console.log(`Starting news fetch process... (Staging mode: ${useStaging}, Max articles per source: ${maxArticlesPerSource}, Max sources: ${maxSources})`);
+
+    // Fetch active news sources with better error handling
+    const { data: sources, error: sourcesError } = await supabase
+      .from('news_sources')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: true });
+
+    if (sourcesError) {
+      console.error('Error fetching sources:', sourcesError);
+      throw sourcesError;
+    }
+
+    console.log(`Found ${sources?.length || 0} active sources`);
+
+    // Limit the number of sources processed per request
+    const limitedSources = sources ? sources.slice(0, maxSources) : [];
+
+    let totalNewArticles = 0;
+    let totalProcessedSources = 0;
+    let totalErrors = 0;
+    const targetTable = useStaging ? 'news_articles_staging' : 'news_articles';
+    const sourceResults: any[] = [];
+
+    for (const source of limitedSources) {
+      const sourceResult = {
+        name: source.name,
+        url: source.url,
+        category: source.category,
+        articlesFound: 0,
+        articlesAdded: 0,
+        errors: [] as string[]
+      };
+
+      try {
+        console.log(`Processing source: ${source.name} (${source.url})`);
+        
+        // Defensive: Check content type before parsing
+        const feedResponse = await fetch(source.url);
+        const contentType = feedResponse.headers.get('content-type');
+        if (!contentType || !contentType.includes('xml')) {
+          console.warn(`Skipping source ${source.name}: Not an XML feed`);
+          sourceResult.errors.push('Not an XML feed');
+          totalErrors++;
+          continue;
+        }
+        const feedText = await feedResponse.text();
+        let feed;
+        try {
+          feed = await parseFeed(feedText);
+        } catch (err) {
+          console.error(`Error parsing feed for ${source.name}:`, err);
+          sourceResult.errors.push('Feed parsing error');
+          totalErrors++;
+          continue;
+        }
+        
+        const items = feed.entries || [];
+        
+        sourceResult.articlesFound = items.length;
+        console.log(`Found ${items.length} items in RSS feed for ${source.name}`);
+
+        // Process items with limit
+        const itemsToProcess = items.slice(0, maxArticlesPerSource);
+        
+        for (const item of itemsToProcess) {
+          try {
+            const title = cleanHtmlContent(item.title?.value || '');
+            let description = cleanHtmlContent(item.description?.value || '');
+            const link = item.links?.[0]?.href || item.id || '';
+            const pubDate = item.published || item.updated || item.pubDate || '';
+
+            if (!title || title.length < 10) {
+              console.log(`Skipping item with insufficient title: "${title}"`);
+              continue;
+            }
+
+            // Enhanced duplicate checking
+            const isDuplicateArticle = await isDuplicate(supabase, title, source.name, link, targetTable);
+            if (isDuplicateArticle) {
+              console.log(`Duplicate article found, skipping: ${title}`);
+              continue;
+            }
+
+            // Enhanced date parsing
+            const { date: publishedAt, isFallback: dateIsFallback } = parsePublishDate(pubDate);
+
+            // Enhanced category detection
+            const detectedCategory = detectCategory(title, description, source.name, source.category);
+
+            // For both staging and production modes, always insert into news_articles_staging only
+            const { data: newArticle, error: insertError } = await supabase
+              .from('news_articles_staging')
+              .insert({
+                title,
+                description: description || '',
+                source: source.name,
+                url: link || null,
+                category: detectedCategory,
+                published_at: publishedAt,
+                has_valid_description: isValidDescription(description),
+                is_processed: false
+              })
+              .select('id')
+              .single();
+            if (insertError) {
+              console.error('Error inserting article to staging:', insertError);
+              sourceResult.errors.push(`Insert error: ${insertError.message}`);
+              continue;
+            }
+            sourceResult.articlesAdded++;
+            totalNewArticles++;
+            console.log(`Inserted article to staging: ${title}`);
+
+          } catch (itemError) {
+            console.error('Error processing item:', itemError);
+            sourceResult.errors.push(`Item processing error: ${itemError.message}`);
+          }
+        }
+
+        totalProcessedSources++;
+
+      } catch (sourceError) {
+        console.error(`Error processing source ${source.name}:`, sourceError);
+        sourceResult.errors.push(`Source error: ${sourceError.message}`);
+        totalErrors++;
+      }
+
+      sourceResults.push(sourceResult);
+    }
+
+    // Update analytics
+    try {
+      const { error: analyticsError } = await supabase
+        .from('analytics')
+        .upsert({
+          metric_name: 'news_fetch_run',
+          metric_value: totalNewArticles,
+          date_recorded: new Date().toISOString().split('T')[0]
+        }, {
+          onConflict: 'metric_name,date_recorded'
+        });
+
+      if (analyticsError) {
+        console.error('Error updating analytics:', analyticsError);
+      }
+    } catch (analyticsError) {
+      console.error('Error in analytics update:', analyticsError);
+    }
+
+    const mode = useStaging ? 'staging' : 'production';
+    const summary = {
+      mode,
+      totalSources: sources?.length || 0,
+      processedSources: totalProcessedSources,
+      totalNewArticles,
+      totalErrors,
+      sourceResults: sourceResults.filter(r => r.errors.length > 0 || r.articlesAdded > 0)
+    };
+
+    console.log(`Finished processing all sources. Summary:`, summary);
+
+    // After processing sources, fetch the latest articles for the user
+    const { data: articles, error: articlesError } = await supabase
+      .from('news_articles')
+      .select('*')
+      .order('published_at', { ascending: false })
+      .limit(200);
+
+    if (articlesError) {
+      return new Response(JSON.stringify({ error: articlesError.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response(JSON.stringify({
+      message: `News fetched successfully in ${mode} mode`,
+      summary,
+      articles
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
     });
-
   } catch (error) {
-    console.error('Error in main handler:', error);
+    console.error('Error in fetch-news function:', error);
     return new Response(JSON.stringify({ 
-      error: error.message || 'Internal server error',
-      details: error instanceof Error ? error.stack : undefined
+      error: 'Failed to fetch news',
+      details: error.message 
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });

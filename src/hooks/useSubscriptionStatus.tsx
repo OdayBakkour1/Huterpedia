@@ -3,8 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
-console.log('[HOOK] useSubscriptionStatus loaded');
-
 export interface SubscriptionStatus {
   isActive: boolean;
   isPremium: boolean;
@@ -16,8 +14,7 @@ export interface SubscriptionStatus {
   daysRemaining: number;
 }
 
-export function useSubscriptionStatus() {
-  console.log('[HOOK] useSubscriptionStatus called');
+export const useSubscriptionStatus = () => {
   const { user } = useAuth();
   const { data: userRole } = useCurrentUserRole();
   
@@ -114,4 +111,4 @@ export function useSubscriptionStatus() {
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-}
+};

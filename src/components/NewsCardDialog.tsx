@@ -21,8 +21,6 @@ export const NewsCardDialog = ({
   isAiSummarizing, 
   onAiSummarize 
 }: NewsCardDialogProps) => {
-  console.log('[COMP] NewsCardDialog render', { article, user, aiUsage, isAiSummarizing });
-
   const getTopicTags = () => {
     const tags = [];
     const textToCheck = `${article.title} ${article.description}`.toLowerCase();

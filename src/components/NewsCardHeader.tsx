@@ -25,8 +25,6 @@ export const NewsCardHeader = ({
   onBookmarkToggle, 
   isBookmarkPending 
 }: NewsCardHeaderProps) => {
-  console.log('[COMP] NewsCardHeader render', { category, publishedAt, title, user, isBookmarked, isBookmarkPending });
-
   const getTimeAgo = (dateString: string) => {
     try {
       const date = new Date(dateString);
