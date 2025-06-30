@@ -15,6 +15,9 @@ export const useNewsArticles = () => {
   >({
     queryKey: ['news-articles', !!session],
     queryFn: async ({ pageParam = 1 }) => {
+      if (loading) {
+        return { articles: [], totalCount: 0 };
+      }
       const token = session?.access_token;
       const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly?page=${pageParam}`, {
         method: 'GET',
@@ -32,7 +35,6 @@ export const useNewsArticles = () => {
         totalCount: data.totalCount,
       };
     },
-    enabled: !loading,
     getNextPageParam: (lastPage, allPages) => {
       const loadedArticles = allPages.reduce((acc, page) => acc + page.articles.length, 0);
       if (loadedArticles < lastPage.totalCount) {
