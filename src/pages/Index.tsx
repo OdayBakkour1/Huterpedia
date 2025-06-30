@@ -14,7 +14,6 @@ import { usePreloadCachedContent } from "@/hooks/useCachedContent";
 import { useFeedPreferences } from "@/hooks/useFeedPreferences";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
-import { useInView } from 'react-intersection-observer';
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -24,19 +23,10 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   
-  const [page, setPage] = useState(1);
-  const [allArticles, setAllArticles] = useState([]);
-  const [totalCount, setTotalCount] = useState(0);
-
-  const { data, isLoading: newsLoading, isError } = useNewsArticles(page);
+  const { data, isLoading: newsLoading, isError } = useNewsArticles(1);
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
-  
-  const { ref: loadMoreRef, inView } = useInView({
-    threshold: 0,
-    rootMargin: '200px',
-  });
 
   useEffect(() => {
     if (!loading && !user) {
@@ -50,19 +40,6 @@ const Index = () => {
     }
   }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
-  useEffect(() => {
-    if (data) {
-      setAllArticles(prev => [...prev, ...data.articles]);
-      setTotalCount(data.totalCount);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (inView && allArticles.length < totalCount && !newsLoading) {
-      setPage(prev => prev + 1);
-    }
-  }, [inView, allArticles.length, totalCount, newsLoading]);
-
   if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
@@ -75,9 +52,8 @@ const Index = () => {
     return null;
   }
 
-  // Use allArticles instead of paginated/infinite query data
-  // Pass allArticles to NewsGrid, and update loading/end-of-list UI accordingly
-  const articles = usePersonalizedFeed ? (personalizedArticles || []) : allArticles;
+  // Use only the first page of articles
+  const articles = usePersonalizedFeed ? (personalizedArticles || []) : (data?.articles || []);
   const articlesLoading = usePersonalizedFeed ? personalizedLoading : newsLoading;
 
   // Filtered news for search and category
@@ -168,15 +144,6 @@ const Index = () => {
         ) : (
           <>
             <NewsGrid articles={filteredNews} />
-            {!usePersonalizedFeed && (
-              <div ref={loadMoreRef} className="flex justify-center py-8">
-                {articlesLoading ? (
-                  <span className="text-slate-400">Loading more articles...</span>
-                ) : (
-                  <span className="text-slate-500">You've reached the end.</span>
-                )}
-              </div>
-            )}
           </>
         )}
       </main>
