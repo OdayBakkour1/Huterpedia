@@ -1,18 +1,30 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { NewsArticle } from '@/types/news';
+import { useState, useEffect } from 'react';
 
 const SUPABASE_FUNCTIONS_URL = 'https://gzpayeckolpfflgvkqvh.functions.supabase.co';
 
 export const useNewsArticles = () => {
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
   return useInfiniteQuery<
     { articles: NewsArticle[]; totalCount: number },
     Error
   >({
-    queryKey: ['news-articles'],
+    queryKey: ['news-articles', !!session],
     queryFn: async ({ pageParam = 1 }) => {
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
+      const token = session?.access_token;
       const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly?page=${pageParam}`, {
         method: 'GET',
         headers: {
