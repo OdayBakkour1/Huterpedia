@@ -35,6 +35,25 @@ const Index = () => {
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [pageCount, setPageCount] = useState<number>(0);
   const [categories, setCategories] = useState<string[]>([]);
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
+
+  // Master category list
+  const MASTER_CATEGORIES = [
+    "All",
+    "Analysis",
+    "APT",
+    "Updates",
+    "Threats",
+    "Ransomware",
+    "Vulnerabilities",
+    "Phishing",
+    "Malware",
+    "Zero Day",
+    "Social Engineering",
+    "Breaches",
+    "Tools",
+    "CVE"
+  ];
 
   useEffect(() => {
     if (!loading && !user) {
@@ -69,18 +88,19 @@ const Index = () => {
       setTotalCount(meta.totalCount ?? null);
       setPageCount(meta.pageCount ?? 0);
       setCategories(meta.categories ?? []);
+      // meta.categories should be an object: { [category]: count }
+      setCategoryCounts(meta.categoryCounts ?? {});
     }
   }, [meta]);
 
-  // Shuffle categories every time meta.categories changes
+  // Shuffle categories (except 'All') every time meta changes
   const shuffledCategories = useMemo(() => {
-    if (!categories) return [];
-    const arr = [...categories];
+    const arr = MASTER_CATEGORIES.slice(1); // skip 'All'
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return arr;
+    return [MASTER_CATEGORIES[0], ...arr];
   }, [categories]);
 
   if (loading || subscriptionLoading) {
@@ -149,7 +169,8 @@ const Index = () => {
               <CategoryFilter 
                 selectedCategory={selectedCategory} 
                 setSelectedCategory={setSelectedCategory} 
-                articles={articles}
+                categories={shuffledCategories}
+                categoryCounts={categoryCounts}
               />
             </div>
           </div>

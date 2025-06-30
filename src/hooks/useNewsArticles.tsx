@@ -100,7 +100,7 @@ export const usePaginatedNewsArticles = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
-  const [meta, setMeta] = useState<{ showMeta: boolean; totalCount?: number; pageCount?: number; categories?: string[] }>({ showMeta: false });
+  const [meta, setMeta] = useState<{ showMeta: boolean; totalCount?: number; pageCount?: number; categories?: string[]; categoryCounts?: Record<string, number> }>({ showMeta: false });
 
   const fetchPage = useCallback(async (pageToFetch: number) => {
     setIsLoading(true);
@@ -122,14 +122,24 @@ export const usePaginatedNewsArticles = () => {
       })) as NewsArticle[];
       setArticles(prev => [...prev, ...newArticles]);
       setHasMore(newArticles.length > 0);
-      if (data.showMeta) {
-        setMeta({
-          showMeta: true,
-          totalCount: data.totalCount,
-          pageCount: data.pageCount,
-          categories: data.categories,
-        });
+      // Build categoryCounts from backend or from articles if not provided
+      let categoryCounts: Record<string, number> = {};
+      if (data.categoryCounts) {
+        categoryCounts = data.categoryCounts;
+      } else if (data.categories && Array.isArray(data.categories)) {
+        // If categories is an array of strings, count from articles
+        categoryCounts = {};
+        for (const cat of data.categories) {
+          categoryCounts[cat] = newArticles.filter(a => a.category === cat).length;
+        }
       }
+      setMeta({
+        showMeta: !!data.showMeta,
+        totalCount: data.totalCount,
+        pageCount: data.pageCount,
+        categories: data.categories,
+        categoryCounts,
+      });
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
