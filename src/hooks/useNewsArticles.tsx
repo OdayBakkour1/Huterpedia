@@ -2,21 +2,12 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tansta
 import { supabase } from '@/integrations/supabase/client';
 import { NewsArticle } from '@/types/news';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SUPABASE_FUNCTIONS_URL = 'https://gzpayeckolpfflgvkqvh.functions.supabase.co';
 
 export const useNewsArticles = () => {
-  const [session, setSession] = useState<any>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, []);
+  const { session, loading } = useAuth();
 
   return useInfiniteQuery<
     { articles: NewsArticle[]; totalCount: number },
@@ -41,6 +32,7 @@ export const useNewsArticles = () => {
         totalCount: data.totalCount,
       };
     },
+    enabled: !loading,
     getNextPageParam: (lastPage, allPages) => {
       const loadedArticles = allPages.reduce((acc, page) => acc + page.articles.length, 0);
       if (loadedArticles < lastPage.totalCount) {
