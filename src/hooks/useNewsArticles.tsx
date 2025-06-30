@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { NewsArticle } from '@/types/news';
+import { useState, useCallback } from 'react';
+import React from 'react';
 
 const SUPABASE_FUNCTIONS_URL = 'https://gzpayeckolpfflgvkqvh.functions.supabase.co';
 
@@ -90,4 +92,60 @@ export const useToggleBookmark = () => {
       queryClient.invalidateQueries({ queryKey: ['user-bookmarks'] });
     },
   });
+};
+
+export const usePaginatedNewsArticles = () => {
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchPage = useCallback(async (pageToFetch: number) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly?page=${pageToFetch}`, {
+        method: 'GET',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch news articles');
+      const data = await response.json();
+      const newArticles = (data.articles as any[]).map(article => ({
+        ...article,
+        publishedAt: article.published_at || article.publishedAt,
+      })) as NewsArticle[];
+      setArticles(prev => [...prev, ...newArticles]);
+      setTotalCount(data.totalCount);
+      setHasMore(articles.length + newArticles.length < data.totalCount);
+    } catch (err: any) {
+      setError(err.message || 'Unknown error');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [articles.length]);
+
+  const fetchNextPage = useCallback(() => {
+    if (!hasMore || isLoading) return;
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchPage(nextPage);
+  }, [hasMore, isLoading, page, fetchPage]);
+
+  // Initial load
+  React.useEffect(() => {
+    setArticles([]);
+    setPage(1);
+    setHasMore(true);
+    setTotalCount(null);
+    fetchPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { articles, isLoading, error, totalCount, hasMore, fetchNextPage };
 };

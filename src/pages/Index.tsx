@@ -9,7 +9,7 @@ import { SubscriptionBanner } from "@/components/SubscriptionBanner";
 import { SubscriptionExpiredDialog } from "@/components/SubscriptionExpiredDialog";
 import { WelcomeBackDialog } from "@/components/WelcomeBackDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNewsArticles } from "@/hooks/useNewsArticles";
+import { usePaginatedNewsArticles } from "@/hooks/useNewsArticles";
 import { usePreloadCachedContent } from "@/hooks/useCachedContent";
 import { useFeedPreferences } from "@/hooks/useFeedPreferences";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
@@ -23,13 +23,15 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   
-  const { data: newsArticles, isLoading: newsLoading } = useNewsArticles();
+  const { articles: paginatedArticles, isLoading: paginatedLoading, hasMore, fetchNextPage } = usePaginatedNewsArticles();
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
   
   // Preload cached content only after articles are loaded
-  usePreloadCachedContent(newsArticles || []);
+  usePreloadCachedContent(paginatedArticles || []);
+
+  const [infiniteScrollRef, setInfiniteScrollRef] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -43,6 +45,21 @@ const Index = () => {
     }
   }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!infiniteScrollRef || !hasMore) return;
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1 }
+    );
+    observer.observe(infiniteScrollRef);
+    return () => observer.disconnect();
+  }, [infiniteScrollRef, hasMore, fetchNextPage]);
+
   if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
@@ -55,8 +72,8 @@ const Index = () => {
     return null;
   }
 
-  const articles = usePersonalizedFeed ? (personalizedArticles || []) : (newsArticles || []);
-  const isLoading = usePersonalizedFeed ? personalizedLoading : newsLoading;
+  const articles = usePersonalizedFeed ? (personalizedArticles || []) : (paginatedArticles || []);
+  const isLoading = usePersonalizedFeed ? personalizedLoading : paginatedLoading;
 
   const filteredNews = articles.filter((article) => {
     const matchesCategory = selectedCategory === "All" || article.category === selectedCategory;
@@ -119,7 +136,7 @@ const Index = () => {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading && articles.length === 0 ? (
           <div className="text-center py-12">
             <div className="animate-pulse space-y-4">
               <div className="h-4 bg-slate-700 rounded w-1/3 mx-auto"></div>
@@ -140,7 +157,16 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          <NewsGrid articles={filteredNews} />
+          <>
+            <NewsGrid articles={filteredNews} />
+            {/* Infinite scroll trigger */}
+            {hasMore && !isLoading && (
+              <div ref={setInfiniteScrollRef} style={{ height: 1 }} />
+            )}
+            {isLoading && articles.length > 0 && (
+              <div className="text-center py-4 text-slate-400">Loading more articles...</div>
+            )}
+          </>
         )}
       </main>
     </div>
