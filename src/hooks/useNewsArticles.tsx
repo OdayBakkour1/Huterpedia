@@ -120,7 +120,12 @@ export const usePaginatedNewsArticles = () => {
         ...article,
         publishedAt: article.published_at || article.publishedAt,
       })) as NewsArticle[];
-      setArticles(prev => [...prev, ...newArticles]);
+      setArticles(prev => {
+        const combined = [...prev, ...newArticles];
+        // Debug log for order
+        console.log('Loaded articles (publishedAt):', combined.map(a => a.publishedAt));
+        return combined;
+      });
       setTotalCount(data.totalCount);
       setHasMore(articles.length + newArticles.length < data.totalCount);
     } catch (err: any) {
