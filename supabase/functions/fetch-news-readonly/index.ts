@@ -46,17 +46,41 @@ serve(async (req) => {
   if (!access.allowed) {
     return new Response(JSON.stringify({ error: 'Subscription or trial expired' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
+  // --- Pagination logic for last 4 days ---
   const url = new URL(req.url);
   const page = parseInt(url.searchParams.get('page') || '1', 10);
   const limit = 50;
   const offset = (page - 1) * limit;
-  const { data, error, count } = await supabase
+  // Calculate the date 4 days ago
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const fourDaysAgo = new Date(today);
+  fourDaysAgo.setUTCDate(today.getUTCDate() - 3); // includes today, so 3 days back
+  // Query for articles in the last 4 days (paginated)
+  const { data, error } = await supabase
     .from('news_articles')
-    .select('id, title, description, source, author, published_at, category, url, image_url, cached_content_url, cached_image_url, cache_updated_at, created_at, updated_at', { count: 'exact' })
+    .select('id, title, description, source, author, published_at, category, url, image_url, cached_content_url, cached_image_url, cache_updated_at, created_at, updated_at')
+    .gte('published_at', fourDaysAgo.toISOString())
+    .lte('published_at', today.toISOString().replace(/T.*$/, 'T23:59:59.999Z'))
     .order('published_at', { ascending: false })
     .range(offset, offset + limit - 1);
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
-  return new Response(JSON.stringify({ articles: data, totalCount: count }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  if (page === 1) {
+    // Query for total count and all categories in the 4-day window (not paginated)
+    const { data: allArticles, error: allError } = await supabase
+      .from('news_articles')
+      .select('category', { count: 'exact' })
+      .gte('published_at', fourDaysAgo.toISOString())
+      .lte('published_at', today.toISOString().replace(/T.*$/, 'T23:59:59.999Z'));
+    if (allError) {
+      return new Response(JSON.stringify({ error: allError.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const totalCount = allArticles ? allArticles.length : 0;
+    const categories = Array.from(new Set((allArticles || []).map(a => a.category).filter(Boolean)));
+    return new Response(JSON.stringify({ articles: data, totalCount, pageCount: data.length, categories, showMeta: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } else {
+    return new Response(JSON.stringify({ articles: data, pageCount: data.length, showMeta: false }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
 }); 

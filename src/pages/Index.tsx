@@ -23,7 +23,7 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   
-  const { articles: paginatedArticles, isLoading: paginatedLoading, hasMore, fetchNextPage } = usePaginatedNewsArticles();
+  const { articles: paginatedArticles, isLoading: paginatedLoading, hasMore, fetchNextPage, meta } = usePaginatedNewsArticles();
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
@@ -32,6 +32,9 @@ const Index = () => {
   usePreloadCachedContent(paginatedArticles || []);
 
   const [infiniteScrollRef, setInfiniteScrollRef] = useState<HTMLDivElement | null>(null);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [pageCount, setPageCount] = useState<number>(0);
+  const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -59,6 +62,15 @@ const Index = () => {
     observer.observe(infiniteScrollRef);
     return () => observer.disconnect();
   }, [infiniteScrollRef, hasMore, fetchNextPage]);
+
+  // Update meta info when first page loads
+  useEffect(() => {
+    if (meta.showMeta) {
+      setTotalCount(meta.totalCount ?? null);
+      setPageCount(meta.pageCount ?? 0);
+      setCategories(meta.categories ?? []);
+    }
+  }, [meta]);
 
   if (loading || subscriptionLoading) {
     return (
@@ -111,10 +123,16 @@ const Index = () => {
           {articles.length > 0 && (
             <div className="flex justify-center flex-col items-center gap-2">
               <span className="text-slate-400 text-sm text-center px-2">
-                {articles.length} articles available • {usePersonalizedFeed ? "Personalized feed" : "General feed"} • Updated automatically every 15 minutes
+                {totalCount !== null ? `${totalCount} articles available` : ""} • General feed • Updated automatically every 15 minutes
               </span>
             </div>
           )}
+          <div className="flex flex-wrap gap-2 justify-center mt-4">
+            <button className="px-3 py-1 rounded bg-cyan-700 text-white">All {pageCount}</button>
+            {categories.map((cat) => (
+              <button key={cat} className="px-3 py-1 rounded bg-slate-700 text-white">{cat}</button>
+            ))}
+          </div>
         </div>
 
         <div className="mb-4 sm:mb-8 space-y-4">

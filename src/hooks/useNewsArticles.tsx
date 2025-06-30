@@ -99,8 +99,8 @@ export const usePaginatedNewsArticles = () => {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [meta, setMeta] = useState<{ showMeta: boolean; totalCount?: number; pageCount?: number; categories?: string[] }>({ showMeta: false });
 
   const fetchPage = useCallback(async (pageToFetch: number) => {
     setIsLoading(true);
@@ -120,20 +120,22 @@ export const usePaginatedNewsArticles = () => {
         ...article,
         publishedAt: article.published_at || article.publishedAt,
       })) as NewsArticle[];
-      setArticles(prev => {
-        const combined = [...prev, ...newArticles];
-        // Debug log for order
-        console.log('Loaded articles (publishedAt):', combined.map(a => a.publishedAt));
-        return combined;
-      });
-      setTotalCount(data.totalCount);
-      setHasMore(articles.length + newArticles.length < data.totalCount);
+      setArticles(prev => [...prev, ...newArticles]);
+      setHasMore(newArticles.length > 0);
+      if (data.showMeta) {
+        setMeta({
+          showMeta: true,
+          totalCount: data.totalCount,
+          pageCount: data.pageCount,
+          categories: data.categories,
+        });
+      }
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
       setIsLoading(false);
     }
-  }, [articles.length]);
+  }, []);
 
   const fetchNextPage = useCallback(() => {
     if (!hasMore || isLoading) return;
@@ -147,10 +149,10 @@ export const usePaginatedNewsArticles = () => {
     setArticles([]);
     setPage(1);
     setHasMore(true);
-    setTotalCount(null);
+    setMeta({ showMeta: false });
     fetchPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { articles, isLoading, error, totalCount, hasMore, fetchNextPage };
+  return { articles, isLoading, error, hasMore, fetchNextPage, meta };
 };
