@@ -3,18 +3,14 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
 };
 
 async function checkAccess(supabase, user) {
   if (user.email && user.email.toLowerCase() === 'odaybakour2@gmail.com') return { isAdmin: true, allowed: true };
   const { data: roleData } = await supabase.from('user_roles').select('role').eq('user_id', user.id).maybeSingle();
   if (roleData?.role === 'admin') return { isAdmin: true, allowed: true };
-  const { data: subscription } = await supabase
-    .from('subscriptions')
-    .select('status, trial_end_date, subscription_end_date')
-    .eq('user_id', user.id)
-    .maybeSingle();
+  const { data: subscription } = await supabase.from('subscriptions').select('status, trial_end_date, subscription_end_date').eq('user_id', user.id).maybeSingle();
   const now = new Date();
   if (subscription) {
     if (subscription.status === 'active' && subscription.subscription_end_date && new Date(subscription.subscription_end_date) > now) return { isAdmin: false, allowed: true };
@@ -46,6 +42,7 @@ serve(async (req) => {
   if (!access.allowed) {
     return new Response(JSON.stringify({ error: 'Subscription or trial expired' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
+
   // --- Pagination and category filter logic ---
   const url = new URL(req.url);
   const page = parseInt(url.searchParams.get('page') || '1', 10);
@@ -60,16 +57,18 @@ serve(async (req) => {
   const endOfDay = new Date(today);
   endOfDay.setUTCHours(23, 59, 59, 999);
 
-  // Build base query
+  // Build base query for articles
   let query = supabase
     .from('news_articles')
     .select('id, title, description, source, author, published_at, category, url, image_url, cached_content_url, cached_image_url, cache_updated_at, created_at, updated_at')
     .gte('published_at', startOfDay.toISOString())
     .lte('published_at', endOfDay.toISOString());
+
   if (category && category !== 'All') {
     query = query.eq('category', category);
   }
   query = query.order('published_at', { ascending: false }).range(offset, offset + limit - 1);
+
   const { data, error } = await query;
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -92,39 +91,40 @@ serve(async (req) => {
     "CVE"
   ];
 
-  // Count total articles and per-category counts for today (not paginated)
-  let totalCount = 0;
-  let categoryCounts = {};
-  if (category && category !== 'All') {
-    // Only count for the selected category
-    const { count, error: countError } = await supabase
-      .from('news_articles')
-      .select('id', { count: 'exact', head: true })
-      .gte('published_at', startOfDay.toISOString())
-      .lte('published_at', endOfDay.toISOString())
-      .eq('category', category);
-    if (countError) {
-      return new Response(JSON.stringify({ error: countError.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-    totalCount = count || 0;
-    categoryCounts[category] = totalCount;
-    categoryCounts['All'] = totalCount;
-  } else {
-    // Count for all categories
-    const { data: allArticles, error: allError } = await supabase
-      .from('news_articles')
-      .select('category')
-      .gte('published_at', startOfDay.toISOString())
-      .lte('published_at', endOfDay.toISOString());
-    if (allError) {
-      return new Response(JSON.stringify({ error: allError.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-    totalCount = allArticles ? allArticles.length : 0;
-    for (const cat of MASTER_CATEGORIES) {
-      categoryCounts[cat] = (allArticles || []).filter(a => a.category === cat).length;
-    }
-    categoryCounts['All'] = totalCount;
+  // Fast category counts using SQL function
+  const { data: categoryAgg, error: aggError } = await supabase
+    .rpc('category_counts_today', {
+      start_time: startOfDay.toISOString(),
+      end_time: endOfDay.toISOString()
+    });
+
+  if (aggError) {
+    return new Response(JSON.stringify({ error: aggError.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+  if (!categoryAgg) {
+    return new Response(JSON.stringify({ error: 'categoryAgg is undefined/null' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 
-  return new Response(JSON.stringify({ articles: data, totalCount, categories: MASTER_CATEGORIES, categoryCounts, pageCount: data.length, showMeta: page === 1 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  let totalCount = 0;
+  let categoryCounts = {};
+  for (const cat of MASTER_CATEGORIES) {
+    const found = (categoryAgg || []).find(c => c.category === cat);
+    categoryCounts[cat] = found ? Number(found.count) : 0;
+    totalCount += found ? Number(found.count) : 0;
+  }
+  categoryCounts['All'] = totalCount;
+
+  return new Response(JSON.stringify({
+    articles: data,
+    totalCount,
+    categories: MASTER_CATEGORIES,
+    categoryCounts,
+    pageCount: data.length,
+    showMeta: page === 1
+  }), {
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'application/json'
+    }
+  });
 }); 

@@ -100,6 +100,12 @@ const Index = () => {
     return () => observer.disconnect();
   }, [infiniteScrollRef, hasMore, fetchNextPage]);
 
+  // Filter articles by searchQuery (frontend search)
+  const filteredArticles = articles.filter(article =>
+    article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (article.description && article.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
@@ -189,7 +195,7 @@ const Index = () => {
           </div>
         ) : (
           <>
-            <NewsGrid articles={articles} />
+            <NewsGrid articles={filteredArticles} />
             {/* Infinite scroll trigger */}
             {hasMore && !isLoading && (
               <div ref={setInfiniteScrollRef} style={{ height: 1 }} />
