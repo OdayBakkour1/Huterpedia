@@ -1,25 +1,19 @@
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { NewsArticle } from '@/types/news';
-import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const SUPABASE_FUNCTIONS_URL = 'https://gzpayeckolpfflgvkqvh.functions.supabase.co';
 
-export const useNewsArticles = () => {
+export const useNewsArticles = (page: number) => {
   const { session, loading } = useAuth();
 
-  return useInfiniteQuery<
-    { articles: NewsArticle[]; totalCount: number },
-    Error
-  >({
-    queryKey: ['news-articles', !!session],
-    queryFn: async ({ pageParam = 1 }) => {
-      if (loading) {
-        return { articles: [], totalCount: 0 };
-      }
+  return useQuery<{ articles: NewsArticle[]; totalCount: number }, Error>({
+    queryKey: ['news-articles', page, !!session],
+    queryFn: async () => {
+      if (loading) return { articles: [], totalCount: 0 };
       const token = session?.access_token;
-      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly?page=${pageParam}`, {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly?page=${page}`, {
         method: 'GET',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -35,14 +29,7 @@ export const useNewsArticles = () => {
         totalCount: data.totalCount,
       };
     },
-    getNextPageParam: (lastPage, allPages) => {
-      const loadedArticles = allPages.reduce((acc, page) => acc + page.articles.length, 0);
-      if (loadedArticles < lastPage.totalCount) {
-        return allPages.length + 1; // next page number
-      }
-      return undefined;
-    },
-    initialPageParam: 1,
+    enabled: !loading,
     staleTime: 3 * 60 * 1000,
     refetchOnWindowFocus: false,
   });

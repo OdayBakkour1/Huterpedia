@@ -24,14 +24,11 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   
-  const {
-    data: newsPages,
-    isLoading: newsLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    error: newsError,
-  } = useNewsArticles();
+  const [page, setPage] = useState(1);
+  const [allArticles, setAllArticles] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const { data, isLoading, isError } = useNewsArticles(page);
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
@@ -40,11 +37,6 @@ const Index = () => {
     threshold: 0,
     rootMargin: '200px',
   });
-
-  // Flatten paginated articles
-  const paginatedArticles = newsPages?.pages
-    ? newsPages.pages.flatMap(page => page.articles)
-    : [];
 
   useEffect(() => {
     if (!loading && !user) {
@@ -59,10 +51,17 @@ const Index = () => {
   }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage && !usePersonalizedFeed) {
-      fetchNextPage();
+    if (data) {
+      setAllArticles(prev => [...prev, ...data.articles]);
+      setTotalCount(data.totalCount);
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, usePersonalizedFeed]);
+  }, [data]);
+
+  useEffect(() => {
+    if (inView && allArticles.length < totalCount && !isLoading) {
+      setPage(prev => prev + 1);
+    }
+  }, [inView, allArticles.length, totalCount, isLoading]);
 
   if (loading || subscriptionLoading) {
     return (
@@ -76,9 +75,10 @@ const Index = () => {
     return null;
   }
 
-  // Use paginatedArticles for general feed, personalizedArticles for personalized feed
-  const articles = usePersonalizedFeed ? (personalizedArticles || []) : paginatedArticles;
-  const isLoading = usePersonalizedFeed ? personalizedLoading : newsLoading;
+  // Use allArticles instead of paginated/infinite query data
+  // Pass allArticles to NewsGrid, and update loading/end-of-list UI accordingly
+  const articles = usePersonalizedFeed ? (personalizedArticles || []) : allArticles;
+  const isLoading = usePersonalizedFeed ? personalizedLoading : isLoading;
 
   // Filtered news for search and category
   const filteredNews = articles.filter((article) => {
@@ -170,10 +170,8 @@ const Index = () => {
             <NewsGrid articles={filteredNews} />
             {!usePersonalizedFeed && (
               <div ref={loadMoreRef} className="flex justify-center py-8">
-                {isFetchingNextPage ? (
+                {isLoading ? (
                   <span className="text-slate-400">Loading more articles...</span>
-                ) : hasNextPage ? (
-                  <span className="text-slate-400">Scroll down to load more</span>
                 ) : (
                   <span className="text-slate-500">You've reached the end.</span>
                 )}
