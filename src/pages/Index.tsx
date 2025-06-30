@@ -36,9 +36,6 @@ const Index = () => {
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
   
-  // Preload cached content only after articles are loaded
-  usePreloadCachedContent(newsPages?.pages ? newsPages.pages.flatMap(page => page.articles) : []);
-
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
     rootMargin: '200px',
