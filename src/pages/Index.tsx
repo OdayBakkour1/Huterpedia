@@ -16,19 +16,29 @@ import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 
 const Index = () => {
+  console.log('[COMP] Index.tsx render start');
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [showPreferences, setShowPreferences] = useState(false);
   const [usePersonalizedFeed, setUsePersonalizedFeed] = useState(false);
+  console.log('[COMP] useState hooks called');
+
   const { user, loading } = useAuth();
+  console.log('[COMP] useAuth called, user:', user, 'loading:', loading);
   const navigate = useNavigate();
+  console.log('[COMP] useNavigate called');
   
   const { data, isLoading: newsLoading, isError } = useNewsArticles(1);
+  console.log('[COMP] useNewsArticles called');
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
+  console.log('[COMP] useFeedPreferences called');
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
+  console.log('[COMP] useSubscriptionStatus called');
   const { data: userRole } = useCurrentUserRole();
+  console.log('[COMP] useCurrentUserRole called');
 
   useEffect(() => {
+    console.log('[COMP] useEffect (auth/subscription check)');
     if (!loading && !user) {
       navigate('/auth');
       return;
@@ -41,6 +51,7 @@ const Index = () => {
   }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
   if (loading || subscriptionLoading) {
+    console.log('[COMP] Loading or subscriptionLoading, returning loading UI');
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
@@ -49,12 +60,14 @@ const Index = () => {
   }
 
   if (!user) {
+    console.log('[COMP] No user, returning null');
     return null;
   }
 
   // Use only the first page of articles
   const articles = usePersonalizedFeed ? (personalizedArticles || []) : (data?.articles || []);
   const articlesLoading = usePersonalizedFeed ? personalizedLoading : newsLoading;
+  console.log('[COMP] articles calculated, count:', articles.length, 'articlesLoading:', articlesLoading);
 
   // Filtered news for search and category
   const filteredNews = articles.filter((article) => {
@@ -63,12 +76,15 @@ const Index = () => {
                          article.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+  console.log('[COMP] filteredNews calculated, count:', filteredNews.length);
 
   // Count cached articles for performance info
   const cachedCount = filteredNews.filter(article => article.cached_content_url).length;
+  console.log('[COMP] cachedCount:', cachedCount);
 
   // Preload cached content only after filtered articles are loaded
   usePreloadCachedContent(filteredNews);
+  console.log('[COMP] usePreloadCachedContent called');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
