@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { NewsGrid } from "@/components/NewsGrid";
@@ -72,6 +72,17 @@ const Index = () => {
     }
   }, [meta]);
 
+  // Shuffle categories every time meta.categories changes
+  const shuffledCategories = useMemo(() => {
+    if (!categories) return [];
+    const arr = [...categories];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [categories]);
+
   if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
@@ -127,12 +138,6 @@ const Index = () => {
               </span>
             </div>
           )}
-          <div className="flex flex-wrap gap-2 justify-center mt-4">
-            <button className="px-3 py-1 rounded bg-cyan-700 text-white">All {pageCount}</button>
-            {categories.map((cat) => (
-              <button key={cat} className="px-3 py-1 rounded bg-slate-700 text-white">{cat}</button>
-            ))}
-          </div>
         </div>
 
         <div className="mb-4 sm:mb-8 space-y-4">
