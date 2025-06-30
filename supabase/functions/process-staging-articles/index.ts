@@ -76,26 +76,26 @@ const isValidDescription = (description: string): boolean => {
 // Generate AI description
 const generateDescription = async (title: string, url: string, source: string): Promise<string> => {
   try {
-    const internalSecret = Deno.env.get('INTERNAL_EDGE_SECRET');
-    if (!internalSecret) {
+    const secret = Deno.env.get('INTERNAL_EDGE_SECRET');
+    if (!secret) {
       console.error('INTERNAL_EDGE_SECRET not set');
       return '';
     }
-    const response = await fetch('https://gzpayeckolpfflgvkqvh.functions.supabase.co/generate-description', {
+    const res = await fetch('https://gzpayeckolpfflgvkqvh.functions.supabase.co/generate-description', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Internal-Call': internalSecret
+        'X-Internal-Call': secret
       },
       body: JSON.stringify({ title, url, source })
     });
-    if (!response.ok) {
-      const errorText = await response.text();
+    if (!res.ok) {
+      const errorText = await res.text();
       console.error('generate-description Edge Function error:', errorText);
       return '';
     }
-    const data = await response.json();
-    return data.description || '';
+    const { description } = await res.json();
+    return description || '';
   } catch (error) {
     console.error('Error calling generate-description Edge Function:', error);
     return '';

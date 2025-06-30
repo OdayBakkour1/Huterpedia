@@ -375,6 +375,15 @@ async function checkAccess(supabase, user) {
   return { isAdmin: false, allowed: false };
 }
 
+// Helper function to split an array into smaller chunks
+function chunkArray(array, size) {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -383,155 +392,42 @@ serve(async (req) => {
   try {
     console.log('Starting news fetch process...');
     
-    // For backend operations, use service role key
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+    );
 
-    // Step 1: Clear staging table first
-    console.log('Clearing staging table...');
-    const { error: deleteError } = await supabase
-      .from('news_articles_staging')
-      .delete()
-      .neq('id', null);
-    if (deleteError) {
-      console.error('Error clearing staging table:', deleteError);
-      return new Response(JSON.stringify({ error: 'Failed to clear staging table', details: deleteError.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+    // OPERATION 1: Clear the staging table.
+    console.log('Producer: Clearing the news_articles_staging table...');
+    const { error: deleteError } = await supabaseAdmin.from('news_articles_staging').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (deleteError) throw new Error(`Failed to clear staging table: ${deleteError.message}`);
+    console.log('Producer: Staging table cleared.');
+
+    // OPERATION 2: Fetch ALL sources.
+    const { data: sources, error: sourcesError } = await supabaseAdmin.from('news_sources').select('id, name, url, category').eq('is_active', true);
+    if (sourcesError) throw sourcesError;
+    if (!sources || sources.length === 0) {
+        return new Response(JSON.stringify({ message: 'No active news sources found.' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    console.log(`Producer: Found ${sources.length} sources. Splitting into batches.`);
+
+    // OPERATION 3: Split sources into small batches and "fan-out" the work.
+    const batches = chunkArray(sources, 5); // Process 5 sources per worker function
+    console.log(`Producer: Dispatching ${batches.length} batches.`);
+
+    for (const batch of batches) {
+      // Invoke the worker function for each batch.
+      // 'event' invocation type means we "fire-and-forget" and don't wait for the worker to finish.
+      // This makes the producer function extremely fast.
+      await supabaseAdmin.functions.invoke('process-rss-batch', {
+        body: { batch },
+        invocationType: 'event'
+      })
     }
 
-    // Fetch active news sources
-    console.log('Fetching active news sources...');
-    const { data: sources, error: sourcesError } = await supabase
-      .from('news_sources')
-      .select('*')
-      .eq('is_active', true)
-      .order('created_at', { ascending: true });
-
-    if (sourcesError) {
-      console.error('Error fetching sources:', sourcesError);
-      return new Response(JSON.stringify({ error: 'Failed to fetch news sources', details: sourcesError.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    console.log(`Found ${sources?.length || 0} active sources`);
-
-    // Limit the number of sources processed per request
-    const limitedSources = sources?.slice(0, 10) || [];
-    const maxArticlesPerSource = 5;
-    const articlesBatch = [];
-    let totalArticles = 0;
-
-    for (const source of limitedSources) {
-      try {
-        console.log(`Processing source: ${source.name} (${source.url})`);
-        
-        // Fetch and parse RSS feed
-        const feedResponse = await fetch(source.url);
-        const contentType = feedResponse.headers.get('content-type');
-        if (!contentType || !contentType.includes('xml')) {
-          console.warn(`Skipping source ${source.name}: Not an XML feed`);
-          continue;
-        }
-        
-        const feedText = await feedResponse.text();
-        const feed = await parseFeed(feedText);
-        const items = feed.entries || [];
-        
-        console.log(`Found ${items.length} items in RSS feed for ${source.name}`);
-        
-        // Process items with limit
-        const itemsToProcess = items.slice(0, maxArticlesPerSource);
-        
-        for (const item of itemsToProcess) {
-          try {
-            const title = cleanHtmlContent(item.title?.value || '');
-            let description = cleanHtmlContent(item.description?.value || '');
-            const link = item.links?.[0]?.href || item.id || '';
-            const { date: pubDate } = parsePublishDate(item.published || item.updated || item.pubDate || '');
-
-            if (!title || title.length < 10) {
-              console.log(`Skipping item with insufficient title: "${title}"`);
-              continue;
-            }
-
-            // Check if article already exists
-            const { data: existing } = await supabase
-              .from('news_articles')
-              .select('id')
-              .eq('url', link)
-              .single();
-
-            if (existing) {
-              console.log(`Skipping duplicate article: ${title}`);
-              continue;
-            }
-
-            // Add to batch
-            const article = {
-              title,
-              description,
-              source: source.name,
-              url: link,
-              category: detectCategory(title, description, source.name, source.category || 'General'),
-              published_at: pubDate,
-              has_valid_description: isValidDescription(description),
-              is_processed: false
-            };
-            
-            articlesBatch.push(article);
-            totalArticles++;
-
-            // Bulk insert when batch reaches 100 items
-            if (articlesBatch.length >= 100) {
-              console.log(`Inserting batch of ${articlesBatch.length} articles...`);
-              const { error: insertError } = await supabase
-                .from('news_articles_staging')
-                .insert(articlesBatch);
-              
-              if (insertError) {
-                console.error('Error inserting batch:', insertError);
-                continue;
-              }
-              
-              articlesBatch.length = 0;
-            }
-          } catch (error) {
-            console.error(`Error processing article from ${source.name}:`, error);
-          }
-        }
-      } catch (error) {
-        console.error(`Error processing source ${source.name}:`, error);
-      }
-    }
-
-    // Insert any remaining articles
-    if (articlesBatch.length > 0) {
-      console.log(`Inserting remaining ${articlesBatch.length} articles...`);
-      const { error: finalInsertError } = await supabase
-        .from('news_articles_staging')
-        .insert(articlesBatch);
-      
-      if (finalInsertError) {
-        console.error('Error inserting final batch:', finalInsertError);
-      }
-    }
-
-    console.log(`Total articles processed: ${totalArticles}`);
-    return new Response(JSON.stringify({ 
-      success: true, 
-      message: 'News articles processed successfully',
-      stats: {
-        totalSources: sources?.length || 0,
-        processedSources: limitedSources.length,
-        totalArticles
-      }
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({ message: `Successfully dispatched ${sources.length} sources across ${batches.length} worker jobs.` }), {
+        status: 200, headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
