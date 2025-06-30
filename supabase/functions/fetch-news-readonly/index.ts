@@ -78,8 +78,30 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: allError.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
     const totalCount = allArticles ? allArticles.length : 0;
-    const categories = Array.from(new Set((allArticles || []).map(a => a.category).filter(Boolean)));
-    return new Response(JSON.stringify({ articles: data, totalCount, pageCount: data.length, categories, showMeta: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    // Master category list
+    const MASTER_CATEGORIES = [
+      "Analysis",
+      "APT",
+      "Updates",
+      "Threats",
+      "Ransomware",
+      "Vulnerabilities",
+      "Phishing",
+      "Malware",
+      "Zero Day",
+      "Social Engineering",
+      "Breaches",
+      "Tools",
+      "CVE"
+    ];
+    // Count articles per category
+    const categoryCounts = {};
+    for (const cat of MASTER_CATEGORIES) {
+      categoryCounts[cat] = (allArticles || []).filter(a => a.category === cat).length;
+    }
+    // Add 'All' as the total count
+    categoryCounts["All"] = totalCount;
+    return new Response(JSON.stringify({ articles: data, totalCount, pageCount: data.length, categories: MASTER_CATEGORIES, categoryCounts, showMeta: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } else {
     return new Response(JSON.stringify({ articles: data, pageCount: data.length, showMeta: false }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }

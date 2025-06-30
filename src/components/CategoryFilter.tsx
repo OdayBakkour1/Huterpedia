@@ -32,7 +32,7 @@ export const CategoryFilter = ({ selectedCategory, setSelectedCategory, categori
         const meta = CATEGORY_META[categoryName] || { icon: Shield, color: "text-slate-400" };
         const Icon = meta.icon;
         const isSelected = selectedCategory === categoryName;
-        const count = categoryCounts[categoryName] ?? 0;
+        const count = categoryName === "All" ? (categoryCounts["All"] ?? 0) : (categoryCounts[categoryName] ?? 0);
         return (
           <button
             key={categoryName}
