@@ -23,13 +23,13 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   
-  const { articles: paginatedArticles, isLoading: paginatedLoading, meta } = usePaginatedNewsArticles();
+  const { articles, isLoading, hasMore, fetchNextPage, meta } = usePaginatedNewsArticles(selectedCategory);
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
   
   // Preload cached content only after articles are loaded
-  usePreloadCachedContent(paginatedArticles || []);
+  usePreloadCachedContent(articles || []);
 
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
@@ -84,6 +84,22 @@ const Index = () => {
     return [MASTER_CATEGORIES[0], ...arr];
   }, [categories]);
 
+  // Infinite scroll observer
+  const [infiniteScrollRef, setInfiniteScrollRef] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!infiniteScrollRef || !hasMore) return;
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1 }
+    );
+    observer.observe(infiniteScrollRef);
+    return () => observer.disconnect();
+  }, [infiniteScrollRef, hasMore, fetchNextPage]);
+
   if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
@@ -95,17 +111,6 @@ const Index = () => {
   if (!user) {
     return null;
   }
-
-  const articles = usePersonalizedFeed ? (personalizedArticles || []) : (paginatedArticles || []);
-  const isLoading = usePersonalizedFeed ? personalizedLoading : paginatedLoading;
-
-  // Remove filtering and just sort by publishedAt descending
-  const sortedNews = articles.slice().sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-
-  // Filter by selected category (except 'All')
-  const filteredNews = selectedCategory === "All"
-    ? sortedNews
-    : sortedNews.filter(article => article.category === selectedCategory);
 
   // Count cached articles for performance info
   const cachedCount = articles.filter(article => article.cached_content_url).length;
@@ -184,7 +189,14 @@ const Index = () => {
           </div>
         ) : (
           <>
-            <NewsGrid articles={filteredNews} />
+            <NewsGrid articles={articles} />
+            {/* Infinite scroll trigger */}
+            {hasMore && !isLoading && (
+              <div ref={setInfiniteScrollRef} style={{ height: 1 }} />
+            )}
+            {isLoading && articles.length > 0 && (
+              <div className="text-center py-4 text-slate-400">Loading more articles...</div>
+            )}
           </>
         )}
       </main>

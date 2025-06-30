@@ -94,19 +94,24 @@ export const useToggleBookmark = () => {
   });
 };
 
-export const usePaginatedNewsArticles = () => {
+export const usePaginatedNewsArticles = (selectedCategory: string) => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
   const [meta, setMeta] = useState<{ showMeta: boolean; totalCount?: number; categories?: string[]; categoryCounts?: Record<string, number> }>({ showMeta: false });
 
-  const fetchAll = useCallback(async () => {
+  const fetchPage = useCallback(async (pageToFetch: number, category: string) => {
     setIsLoading(true);
     setError(null);
     try {
       const session = await supabase.auth.getSession();
       const token = session.data.session?.access_token;
-      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly`, {
+      const params = new URLSearchParams();
+      params.append('page', String(pageToFetch));
+      if (category && category !== 'All') params.append('category', category);
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/fetch-news-readonly?${params.toString()}`, {
         method: 'GET',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -118,13 +123,16 @@ export const usePaginatedNewsArticles = () => {
         ...article,
         publishedAt: article.published_at || article.publishedAt,
       })) as NewsArticle[];
-      setArticles(newArticles);
-      setMeta({
-        showMeta: !!data.showMeta,
-        totalCount: data.totalCount,
-        categories: data.categories,
-        categoryCounts: data.categoryCounts,
-      });
+      setArticles(prev => pageToFetch === 1 ? newArticles : [...prev, ...newArticles]);
+      setHasMore(newArticles.length > 0);
+      if (data.showMeta) {
+        setMeta({
+          showMeta: true,
+          totalCount: data.totalCount,
+          categories: data.categories,
+          categoryCounts: data.categoryCounts,
+        });
+      }
     } catch (err: any) {
       setError(err.message || 'Unknown error');
     } finally {
@@ -132,13 +140,22 @@ export const usePaginatedNewsArticles = () => {
     }
   }, []);
 
-  // Initial load
+  const fetchNextPage = useCallback(() => {
+    if (!hasMore || isLoading) return;
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchPage(nextPage, selectedCategory);
+  }, [hasMore, isLoading, page, fetchPage, selectedCategory]);
+
+  // Initial load and when category changes
   React.useEffect(() => {
     setArticles([]);
+    setPage(1);
+    setHasMore(true);
     setMeta({ showMeta: false });
-    fetchAll();
+    fetchPage(1, selectedCategory);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedCategory]);
 
-  return { articles, isLoading, error, meta };
+  return { articles, isLoading, error, hasMore, fetchNextPage, meta };
 };
