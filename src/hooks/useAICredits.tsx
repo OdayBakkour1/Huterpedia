@@ -1,8 +1,10 @@
+console.log('[HOOK] useAICredits loaded');
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useAICredits = (userId: string) => {
+export function useAICredits(userId: string) {
+  console.log('[HOOK] useAICredits called');
   return useQuery({
     queryKey: ['ai-credits', userId],
     queryFn: async () => {
@@ -41,4 +43,4 @@ export const useAICredits = (userId: string) => {
     enabled: !!userId,
     staleTime: 30 * 1000, // 30 seconds
   });
-};
+}

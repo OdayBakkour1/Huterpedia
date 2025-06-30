@@ -1,5 +1,6 @@
-
 import { useQuery } from '@tanstack/react-query';
+
+console.log('[HOOK] useCachedContent loaded');
 
 export const useCachedContent = (articleId: string, cachedContentUrl?: string) => {
   return useQuery({
@@ -25,6 +26,7 @@ export const useCachedContent = (articleId: string, cachedContentUrl?: string) =
 };
 
 export const usePreloadCachedContent = (articles: any[]) => {
+  console.log('[HOOK] usePreloadCachedContent called, articles:', articles?.length);
   return useQuery({
     queryKey: ['preload-cached-content'],
     queryFn: async () => {

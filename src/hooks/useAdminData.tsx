@@ -4,6 +4,8 @@ import { useToast } from '@/hooks/use-toast';
 
 const SUPABASE_FUNCTIONS_URL = 'https://gzpayeckolpfflgvkqvh.functions.supabase.co';
 
+console.log('[HOOK] useAdminData loaded');
+
 // Stubbed admin hooks for compatibility
 export function useAddNewsArticle() {
   const queryClient = useQueryClient();
@@ -132,6 +134,7 @@ export const useAddNewsSource = () => {
 };
 
 export function useNewsSources() {
+  console.log('[HOOK] useNewsSources called');
   return useQuery({
     queryKey: ['news-sources'],
     queryFn: async () => {

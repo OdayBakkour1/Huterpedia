@@ -2,7 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
+console.log('[HOOK] useCurrentUserRole loaded');
+
 export const useCurrentUserRole = () => {
+  console.log('[HOOK] useCurrentUserRole called');
   const { user } = useAuth();
   
   return useQuery({

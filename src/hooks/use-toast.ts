@@ -1,4 +1,3 @@
-
 import * as React from "react"
 
 import type {
@@ -167,7 +166,10 @@ function toast({ ...props }: Toast) {
   }
 }
 
-function useToast() {
+console.log('[HOOK] useToast loaded');
+
+export function useToast() {
+  console.log('[HOOK] useToast called');
   const [state, setState] = React.useState<State>(memoryState)
 
   React.useEffect(() => {

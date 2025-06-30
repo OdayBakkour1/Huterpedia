@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { NewsArticle } from "@/types/news";
 
+console.log('[HOOK] useFeedPreferences loaded');
+
 export interface FeedPreferences {
   id?: string;
   user_id: string;
@@ -15,6 +17,7 @@ export interface FeedPreferences {
 }
 
 export const useFeedPreferences = (enabled: boolean = false) => {
+  console.log('[HOOK] useFeedPreferences called, enabled:', enabled);
   const { user } = useAuth();
   const queryClient = useQueryClient();
 

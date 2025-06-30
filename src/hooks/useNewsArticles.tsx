@@ -5,7 +5,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const SUPABASE_FUNCTIONS_URL = 'https://gzpayeckolpfflgvkqvh.functions.supabase.co';
 
+console.log('[HOOK] useNewsArticles loaded');
+
 export const useNewsArticles = (page: number) => {
+  console.log('[HOOK] useNewsArticles called, page:', page);
   const { session, loading } = useAuth();
 
   return useQuery<{ articles: NewsArticle[]; totalCount: number }, Error>({

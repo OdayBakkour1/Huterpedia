@@ -1,7 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+console.log('[HOOK] useAnalyticsManagement loaded');
+
 export const useAnalyticsManagement = () => {
+  console.log('[HOOK] useAnalyticsManagement called');
   const queryClient = useQueryClient();
 
   const updateAnalyticsMetrics = useMutation({

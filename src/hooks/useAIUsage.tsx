@@ -1,9 +1,11 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+console.log('[HOOK] useAIUsage loaded');
+
 export const useAIUsage = () => {
+  console.log('[HOOK] useAIUsage called');
   const { user } = useAuth();
 
   return useQuery({
