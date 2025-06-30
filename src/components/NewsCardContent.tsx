@@ -17,8 +17,12 @@ export const NewsCardContent = ({
   title,
   source,
   publishedAt,
+  user,
+  aiUsage,
   isCached
 }: NewsCardContentProps) => {
+  console.log('[COMP] NewsCardContent render', { description, title, source, publishedAt, user, aiUsage, isCached });
+
   // Format date in short format (e.g., 22-Jun-25)
   const formatDate = (dateString: string) => {
     try {

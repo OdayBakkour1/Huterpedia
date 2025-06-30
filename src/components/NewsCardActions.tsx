@@ -22,6 +22,7 @@ export const NewsCardActions = ({
   articleUrl,
   children 
 }: NewsCardActionsProps) => {
+  console.log('[COMP] NewsCardActions render', { user, aiUsage, isAiSummarizing, articleUrl });
   const isMobile = useIsMobile();
   const { toast } = useToast();
 

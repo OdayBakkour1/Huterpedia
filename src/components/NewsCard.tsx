@@ -14,6 +14,7 @@ import { NewsCardActions } from "./NewsCardActions";
 import { NewsCardDialog } from "./NewsCardDialog";
 import { AISummaryDialog } from "./AISummaryDialog";
 import { cleanArticleData } from "@/utils/textUtils";
+import React from "react";
 
 interface NewsCardProps {
   article: NewsArticle & {
@@ -24,16 +25,29 @@ interface NewsCardProps {
 }
 
 export const NewsCard = ({ article }: NewsCardProps) => {
+  console.log('[COMP] NewsCard render', article.id, article.title);
   const { user } = useAuth();
+  console.log('[HOOK] useAuth in NewsCard', user);
   const { toast } = useToast();
+  console.log('[HOOK] useToast in NewsCard');
   const { data: bookmarks } = useUserBookmarks();
+  console.log('[HOOK] useUserBookmarks in NewsCard', bookmarks);
   const { data: aiUsage } = useAIUsage();
+  console.log('[HOOK] useAIUsage in NewsCard', aiUsage);
   const { data: cachedContent } = useCachedContent(article.id, article.cached_content_url);
+  console.log('[HOOK] useCachedContent in NewsCard', cachedContent);
   const toggleBookmark = useToggleBookmark();
+  console.log('[HOOK] useToggleBookmark in NewsCard', toggleBookmark);
   const queryClient = useQueryClient();
+  console.log('[HOOK] useQueryClient in NewsCard', queryClient);
   const [isAiSummarizing, setIsAiSummarizing] = useState(false);
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [showSummaryDialog, setShowSummaryDialog] = useState(false);
+
+  // Add logs for state changes
+  React.useEffect(() => { console.log('[STATE] isAiSummarizing', isAiSummarizing); }, [isAiSummarizing]);
+  React.useEffect(() => { console.log('[STATE] aiSummary', aiSummary); }, [aiSummary]);
+  React.useEffect(() => { console.log('[STATE] showSummaryDialog', showSummaryDialog); }, [showSummaryDialog]);
 
   // Use cached content if available, otherwise fall back to original data
   const effectiveArticle = cachedContent ? {
