@@ -14,6 +14,7 @@ import { usePreloadCachedContent } from "@/hooks/useCachedContent";
 import { useFeedPreferences } from "@/hooks/useFeedPreferences";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
+import { useInView } from 'react-intersection-observer';
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -23,13 +24,30 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   
-  const { data: newsArticles, isLoading: newsLoading } = useNewsArticles();
+  const {
+    data: newsPages,
+    isLoading: newsLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    error: newsError,
+  } = useNewsArticles();
   const { data: personalizedArticles, isLoading: personalizedLoading } = useFeedPreferences(usePersonalizedFeed);
   const { data: subscriptionStatus, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const { data: userRole } = useCurrentUserRole();
   
   // Preload cached content only after articles are loaded
-  usePreloadCachedContent(newsArticles || []);
+  usePreloadCachedContent(newsPages?.pages ? newsPages.pages.flatMap(page => page.articles) : []);
+
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 0,
+    rootMargin: '200px',
+  });
+
+  // Flatten paginated articles
+  const paginatedArticles = newsPages?.pages
+    ? newsPages.pages.flatMap(page => page.articles)
+    : [];
 
   useEffect(() => {
     if (!loading && !user) {
@@ -43,6 +61,12 @@ const Index = () => {
     }
   }, [user, loading, subscriptionStatus, subscriptionLoading, navigate, userRole]);
 
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage && !usePersonalizedFeed) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, usePersonalizedFeed]);
+
   if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
@@ -55,9 +79,11 @@ const Index = () => {
     return null;
   }
 
-  const articles = usePersonalizedFeed ? (personalizedArticles || []) : (newsArticles || []);
+  // Use paginatedArticles for general feed, personalizedArticles for personalized feed
+  const articles = usePersonalizedFeed ? (personalizedArticles || []) : paginatedArticles;
   const isLoading = usePersonalizedFeed ? personalizedLoading : newsLoading;
 
+  // Filtered news for search and category
   const filteredNews = articles.filter((article) => {
     const matchesCategory = selectedCategory === "All" || article.category === selectedCategory;
     const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -66,7 +92,10 @@ const Index = () => {
   });
 
   // Count cached articles for performance info
-  const cachedCount = articles.filter(article => article.cached_content_url).length;
+  const cachedCount = filteredNews.filter(article => article.cached_content_url).length;
+
+  // Preload cached content only after filtered articles are loaded
+  usePreloadCachedContent(filteredNews);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
@@ -140,7 +169,20 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          <NewsGrid articles={filteredNews} />
+          <>
+            <NewsGrid articles={filteredNews} />
+            {!usePersonalizedFeed && (
+              <div ref={loadMoreRef} className="flex justify-center py-8">
+                {isFetchingNextPage ? (
+                  <span className="text-slate-400">Loading more articles...</span>
+                ) : hasNextPage ? (
+                  <span className="text-slate-400">Scroll down to load more</span>
+                ) : (
+                  <span className="text-slate-500">You've reached the end.</span>
+                )}
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
