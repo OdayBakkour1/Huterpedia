@@ -46,13 +46,24 @@ serve(async (req) => {
   if (!access.allowed) {
     return new Response(JSON.stringify({ error: 'Subscription or trial expired' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
-  const { data, error } = await supabase
+
+  const url = new URL(req.url);
+  const page = parseInt(url.searchParams.get('page') || '1', 10);
+  const limit = 50;
+  const offset = (page - 1) * limit;
+
+  const { data, error, count } = await supabase
     .from('news_articles')
-    .select('id, title, description, source, author, published_at, category, url, image_url, cached_content_url, cached_image_url, cache_updated_at, created_at, updated_at')
+    .select('id, title, description, source, published_at, category, url, image_url', { count: 'exact' })
     .order('published_at', { ascending: false })
-    .limit(200);
+    .range(offset, offset + limit - 1);
+
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
-  return new Response(JSON.stringify({ articles: data }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  
+  return new Response(JSON.stringify({
+    articles: data,
+    totalCount: count
+  }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 }); 
