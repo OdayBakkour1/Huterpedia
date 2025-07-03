@@ -30,3 +30,16 @@ CREATE POLICY "Service Role Update" ON storage.objects
   FOR UPDATE
   TO service_role
   USING (bucket_id = 'article-cache');
+
+-- Fix function search_path warnings (Supabase Security Advisor)
+ALTER FUNCTION public.truncate_table()
+SET search_path = public;
+
+ALTER FUNCTION public.category_counts_today()
+SET search_path = public;
+
+ALTER FUNCTION public.check_subscription_status(uuid)
+SET search_path = public;
+
+ALTER FUNCTION public.get_user_subscription(uuid)
+SET search_path = public;
