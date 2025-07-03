@@ -27,6 +27,7 @@ const Auth = () => {
     errors: [] as string[]
   });
   const [showResendConfirmation, setShowResendConfirmation] = useState(false);
+  const [linkedinLoading, setLinkedinLoading] = useState(false);
   const {
     signIn,
     signUp,
@@ -193,6 +194,32 @@ const Auth = () => {
       setGoogleLoading(false);
     }
   };
+  const handleLinkedinAuth = async () => {
+    setLinkedinLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'linkedin_oidc',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+      if (error) {
+        toast({
+          title: "LinkedIn Sign In Failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "LinkedIn Sign In Failed",
+        description: "An unexpected error occurred.",
+        variant: "destructive"
+      });
+    } finally {
+      setLinkedinLoading(false);
+    }
+  };
   const handleResendConfirmation = async () => {
     if (!email || emailError) {
       toast({
@@ -299,6 +326,13 @@ const Auth = () => {
                     </svg>
                     {googleLoading ? 'Signing in with Google...' : 'Continue with Google'}
                   </Button>
+                  <Button onClick={handleLinkedinAuth} disabled={linkedinLoading || isLocked} className="w-full bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 shadow-xl rounded-2xl py-6 text-base font-medium transition-all duration-300 hover:scale-105" variant="outline">
+                    <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" rx="4" fill="#0077B5"/>
+                      <path d="M7.5 9H10V17H7.5V9ZM8.75 7.75C8.06 7.75 7.5 7.19 7.5 6.5C7.5 5.81 8.06 5.25 8.75 5.25C9.44 5.25 10 5.81 10 6.5C10 7.19 9.44 7.75 8.75 7.75ZM13 9H15.25V10.08C15.59 9.5 16.34 8.75 17.5 8.75C19.29 8.75 19.5 9.91 19.5 11.08V17H17V11.5C17 10.95 16.55 10.5 16 10.5C15.45 10.5 15 10.95 15 11.5V17H13V9Z" fill="white"/>
+                    </svg>
+                    {linkedinLoading ? 'Signing in with LinkedIn...' : 'Continue with LinkedIn'}
+                  </Button>
                   
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center">
@@ -337,6 +371,13 @@ const Auth = () => {
                       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                     </svg>
                     {googleLoading ? 'Signing up with Google...' : 'Continue with Google'}
+                  </Button>
+                  <Button onClick={handleLinkedinAuth} disabled={linkedinLoading} className="w-full bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 shadow-xl rounded-2xl py-6 text-base font-medium transition-all duration-300 hover:scale-105" variant="outline">
+                    <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" rx="4" fill="#0077B5"/>
+                      <path d="M7.5 9H10V17H7.5V9ZM8.75 7.75C8.06 7.75 7.5 7.19 7.5 6.5C7.5 5.81 8.06 5.25 8.75 5.25C9.44 5.25 10 5.81 10 6.5C10 7.19 9.44 7.75 8.75 7.75ZM13 9H15.25V10.08C15.59 9.5 16.34 8.75 17.5 8.75C19.29 8.75 19.5 9.91 19.5 11.08V17H17V11.5C17 10.95 16.55 10.5 16 10.5C15.45 10.5 15 10.95 15 11.5V17H13V9Z" fill="white"/>
+                    </svg>
+                    {linkedinLoading ? 'Signing up with LinkedIn...' : 'Continue with LinkedIn'}
                   </Button>
                   
                   <div className="relative">
