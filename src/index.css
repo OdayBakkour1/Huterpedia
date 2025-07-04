@@ -206,3 +206,8 @@
 body[data-scroll-locked="1"] {
   pointer-events: auto !important;
 }
+
+/* Fix: Ensure dialog overlay is always below dialog content */
+[data-state="open"].bg-black\/80 {
+  z-index: 9998 !important;
+}
