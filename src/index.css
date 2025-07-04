@@ -211,3 +211,8 @@ body[data-scroll-locked="1"] {
 [data-state="open"].bg-black\/80 {
   z-index: 9998 !important;
 }
+
+/* Debug: Force dialog content to the absolute top of the stacking order */
+[role="dialog"][data-state="open"] {
+  z-index: 2147483647 !important;
+}
