@@ -79,6 +79,7 @@ export const NewsCard = ({ article }: NewsCardProps) => {
   };
 
   const handleAiSummarize = async () => {
+    console.log('AI Summarize button clicked');
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -99,7 +100,7 @@ export const NewsCard = ({ article }: NewsCardProps) => {
     }
 
     setIsAiSummarizing(true);
-    
+    console.log('Starting AI summary API call...');
     try {
       const { data, error } = await supabase.functions.invoke('summarize-article', {
         body: {
@@ -110,6 +111,7 @@ export const NewsCard = ({ article }: NewsCardProps) => {
       });
 
       if (error) {
+        console.error('Supabase function error:', error);
         throw error;
       }
 
@@ -129,8 +131,10 @@ export const NewsCard = ({ article }: NewsCardProps) => {
       if (data?.summary) {
         setAiSummary(data.summary);
         setShowSummaryDialog(true);
+        console.log('AI summary received, dialog should open now.');
         queryClient.invalidateQueries({ queryKey: ['ai-usage'] });
       } else {
+        console.error('No summary received from API');
         throw new Error("No summary received");
       }
     } catch (error) {
