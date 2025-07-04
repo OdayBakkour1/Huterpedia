@@ -5,6 +5,8 @@ import { ExternalLink, Sparkles, LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NewsArticle } from "@/types/news";
 import { cleanHtmlContent, isValidDescription } from "@/utils/textUtils";
+import { useContext, useEffect } from "react";
+import { DialogContext } from "@/components/Header";
 
 interface NewsCardDialogProps {
   article: NewsArticle;
@@ -21,6 +23,12 @@ export const NewsCardDialog = ({
   isAiSummarizing, 
   onAiSummarize 
 }: NewsCardDialogProps) => {
+  const { setDialogOpen } = useContext(DialogContext);
+  useEffect(() => {
+    setDialogOpen(true);
+    return () => setDialogOpen(false);
+  }, [setDialogOpen]);
+
   const getTopicTags = () => {
     const tags = [];
     const textToCheck = `${article.title} ${article.description}`.toLowerCase();

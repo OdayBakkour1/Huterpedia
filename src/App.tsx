@@ -22,7 +22,8 @@ import Terms from "@/pages/Terms";
 import NotFound from "@/pages/NotFound";
 import { AdminRoute } from "@/components/AdminRoute";
 import { MainLayout } from "@/components/MainLayout";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { DialogContext } from "@/components/Header";
 
 const queryClient = new QueryClient();
 
@@ -36,44 +37,47 @@ function ScrollToTop() {
 }
 
 const App = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <ScrollToTop />
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/auth" element={<Auth />} />
-                
-                {/* Routes with MainLayout */}
-                <Route path="/dashboard" element={<Index />} />
-                <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
-                <Route path="/bookmarks" element={<MainLayout><Bookmarks /></MainLayout>} />
+    <DialogContext.Provider value={{ dialogOpen, setDialogOpen }}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <ScrollToTop />
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/auth" element={<Auth />} />
+                  
+                  {/* Routes with MainLayout */}
+                  <Route path="/dashboard" element={<Index />} />
+                  <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
+                  <Route path="/bookmarks" element={<MainLayout><Bookmarks /></MainLayout>} />
 
-                {/* Payment Routes */}
-                <Route path="/checkout" element={<MainLayout><Checkout /></MainLayout>} />
-                <Route path="/payment-success" element={<MainLayout><PaymentSuccess /></MainLayout>} />
-                <Route path="/payment-cancel" element={<MainLayout><PaymentCancel /></MainLayout>} />
+                  {/* Payment Routes */}
+                  <Route path="/checkout" element={<MainLayout><Checkout /></MainLayout>} />
+                  <Route path="/payment-success" element={<MainLayout><PaymentSuccess /></MainLayout>} />
+                  <Route path="/payment-cancel" element={<MainLayout><PaymentCancel /></MainLayout>} />
 
-                {/* Standalone Routes */}
-                <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                <Route path="/about" element={<MainLayout><About /></MainLayout>} />
-                <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
-                <Route path="/pricing" element={<MainLayout><Pricing /></MainLayout>} />
-                <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
-                <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+                  {/* Standalone Routes */}
+                  <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                  <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+                  <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
+                  <Route path="/pricing" element={<MainLayout><Pricing /></MainLayout>} />
+                  <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
+                  <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </DialogContext.Provider>
   );
 };
 

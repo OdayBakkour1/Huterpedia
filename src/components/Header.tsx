@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, createContext } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AIUsageIndicator } from "./AIUsageIndicator";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -18,6 +18,9 @@ interface HeaderProps {
   showPreferences?: boolean;
   setShowPreferences?: (value: boolean) => void;
 }
+
+// Dialog context to track if any dialog is open
+const DialogContext = createContext<{ dialogOpen: boolean; setDialogOpen: (open: boolean) => void }>({ dialogOpen: false, setDialogOpen: () => {} });
 
 export const Header = ({
   usePersonalizedFeed = false,
@@ -38,6 +41,7 @@ export const Header = ({
     full_name: null,
     avatar_url: null
   });
+  const { dialogOpen } = useContext(DialogContext);
 
   useEffect(() => {
     if (user) {
@@ -70,7 +74,7 @@ export const Header = ({
   const isDashboard = window.location.pathname === '/dashboard';
 
   return (
-    <header className="bg-slate-900/90 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-40">
+    <header className={`bg-slate-900/90 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-40${dialogOpen ? ' pointer-events-none' : ''}`}>
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
           <div 

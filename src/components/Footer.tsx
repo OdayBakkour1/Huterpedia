@@ -1,8 +1,11 @@
 import { Shield, Facebook, Linkedin, Twitter, Instagram } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useContext } from "react-router-dom";
+import { DialogContext } from "./Header";
+
 const Footer = () => {
+  const { dialogOpen } = useContext(DialogContext);
   const navigate = useNavigate();
-  return <footer className="relative z-10 bg-white/5 backdrop-blur-2xl border-t border-white/10 py-8">
+  return <footer className={`relative z-10 bg-white/5 backdrop-blur-2xl border-t border-white/10 py-8${dialogOpen ? ' pointer-events-none' : ''}`}>
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">

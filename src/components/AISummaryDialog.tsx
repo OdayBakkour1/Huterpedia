@@ -2,6 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Sparkles } from "lucide-react";
 import { NewsArticle } from "@/types/news";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useContext, useEffect } from "react";
+import { DialogContext } from "@/components/Header";
 
 interface AISummaryDialogProps {
   open: boolean;
@@ -12,6 +14,13 @@ interface AISummaryDialogProps {
 
 export const AISummaryDialog = ({ open, onOpenChange, summary, article }: AISummaryDialogProps) => {
   const isMobile = useIsMobile();
+  const { setDialogOpen } = useContext(DialogContext);
+
+  useEffect(() => {
+    setDialogOpen(open);
+    return () => setDialogOpen(false);
+  }, [open, setDialogOpen]);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -43,7 +52,7 @@ export const AISummaryDialog = ({ open, onOpenChange, summary, article }: AISumm
         className={
           isMobile
             ? "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-sm rounded-lg max-h-[80vh] overflow-y-auto z-[9999] bg-slate-900 border-slate-700"
-            : "max-w-2xl bg-slate-900 border-slate-700 max-h-[90vh] overflow-y-auto"
+            : "max-w-2xl bg-slate-900 border-slate-700 max-h-[90vh] overflow-y-auto z-[9999]"
         }
       >
         <DialogHeader>
