@@ -38,6 +38,20 @@ function ScrollToTop() {
 
 const App = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Workaround: forcibly remove pointer-events from body when dialog is open
+  useEffect(() => {
+    if (dialogOpen) {
+      document.body.style.pointerEvents = "auto";
+    } else {
+      document.body.style.pointerEvents = "";
+    }
+    // Clean up on unmount
+    return () => {
+      document.body.style.pointerEvents = "";
+    };
+  }, [dialogOpen]);
+
   return (
     <DialogContext.Provider value={{ dialogOpen, setDialogOpen }}>
       <QueryClientProvider client={queryClient}>
