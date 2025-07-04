@@ -1,5 +1,6 @@
 import { Shield, Facebook, Linkedin, Twitter, Instagram } from "lucide-react";
-import { useNavigate, useContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
 import { DialogContext } from "./Header";
 
 const Footer = () => {
