@@ -74,7 +74,6 @@ export const AISummaryDialog = ({ open, onOpenChange, summary, article }: AISumm
               <span>{article.source}</span>
               <span>{formattedDate}</span>
             </div>
-            <p className="text-sm text-slate-400">{article.description}</p>
           </div>
         </div>
       </DialogContent>
