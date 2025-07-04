@@ -300,3 +300,5 @@ export const Header = ({
     </header>
   );
 };
+
+export { DialogContext };
